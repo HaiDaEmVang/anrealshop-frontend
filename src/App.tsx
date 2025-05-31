@@ -1,39 +1,73 @@
-import { createTheme, MantineProvider } from '@mantine/core';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Notifications } from '@mantine/notifications';
 import './App.css';
+import { createTheme, MantineProvider, TextInput } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
 import '@mantine/tiptap/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
+import { Notifications } from '@mantine/notifications';
 import { Header } from './components/header/Header';
 import { TopHeader } from './components/header/TopHeader';
 import { Footer } from './components/Footer/Footer';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AuthoPage from './pages/AuthoPage';
-import ResetPassword from './components/Autho/ResetPasswrod';
-// Import other pages as needed
+import MyshopPage from './pages/MyshopPage/MyshopPage';
 
 function App() {
   const theme = createTheme({
-    // Your existing theme configuration
+    primaryColor: 'blue',
+    colors: {
+      blue: [
+        '#f0faff', // 50
+        '#e0f5fe', // 100
+        '#bae8fd', // 200
+        '#7dd5fc', // 300
+        '#38bcf8', // 400
+        '#0ea5e9', // 500 - primary
+        '#028ac7', // 600
+        '#0370a1', // 700
+        '#075e85', // 800
+        '#0c506e', // 900
+        '#083549', // 950
+      ],
+    },
+    fontFamily: 'Inter var, ui-sans-serif, system-ui, sans-serif',
+    defaultRadius: 'md',
+    components: {
+      Input: {
+        styles: {
+          root: { '&:focus': { borderColor: '#0ea5e9' } }
+        },
+      },
+      Button: {
+        defaultProps: {
+          color: '#0ea5e9',
+        },
+      },
+    },
   });
+
 
   return (
     <MantineProvider theme={theme}>
       <Notifications position="top-right" zIndex={1000} />
       <BrowserRouter>
         <div className="min-h-screen flex flex-col">
-          {/* <TopHeader />
-          <Header /> */}
           <main className="flex-1">
             <Routes>
               <Route path="/login" element={<AuthoPage />} />
               <Route path="/register" element={<AuthoPage />} />
-              {/* Other routes */}
+              <Route path="/myshop/*" element={<MyshopPage />} />
+              <Route path="/" element={
+                <>
+                  <TopHeader />
+                  <Header />
+                  <div>Home Page Content</div>
+                  <Footer />
+                </>
+              } />
             </Routes>
           </main>
-          {/* <Footer /> */}
         </div>
       </BrowserRouter>
     </MantineProvider>

@@ -9,7 +9,6 @@ export function AuthoPage() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Handle URL path to show the appropriate form
   useEffect(() => {
     if (location.pathname !== '/login' && location.pathname !== '/register') {
       navigate('/login');
