@@ -3,6 +3,8 @@ import { Outlet, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import ShopAdminHeader from '../../components/header/ShopAdminHeader'
 import ProductPage from '../../components/Myshop/Product/ProductPage'
 import CreateProduct from '../../components/Myshop/Product/Create/CreateProduct'
+import OrderPage from '../../components/Myshop/Order/OrderPage'
+import OrderDetailComp from '../../components/Myshop/Order/OrderDetail/OrderDetail'
 
 const MyshopPage = () => {
   const location = useLocation();
@@ -14,20 +16,13 @@ const MyshopPage = () => {
       
       <div className="flex-1 bg-gray-50">
         <Routes>
-          {/* Default redirect to dashboard when accessing /myshop */}
           <Route index element={<Navigate to="/myshop/dashboard" replace />} />
-          
-          {/* Dashboard route */}
           <Route path="dashboard" element={<div>Dashboard Content</div>} />
-          
-          {/* Sales routes */}
           <Route path="sale" element={<div>Sales Overview</div>} />
-          
-          {/* Product routes */}
           <Route path="products" element={<ProductPage />} />
           <Route path="product/create" element={<CreateProduct />} />
-          
-          {/* Fallback for undefined routes */}
+          <Route path="orders" element={<OrderPage />} />
+          <Route path="orders/details/:id" element={<OrderDetailComp />} />
           <Route path="*" element={<div>Page not found</div>} />
         </Routes>
       </div>
