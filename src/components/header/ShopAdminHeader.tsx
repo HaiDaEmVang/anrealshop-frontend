@@ -1,33 +1,31 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import {
-  Group,
-  Text,
-  UnstyledButton,
-  Avatar,
-  Menu,
-  Divider,
   ActionIcon,
-  Indicator,
+  Avatar,
   Burger,
+  Divider,
   Drawer,
+  Group,
+  Indicator,
+  Menu,
   Stack,
-  rem,
+  Text,
+  UnstyledButton
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { useState } from 'react';
 import {
-  FiHome,
-  FiPackage,
-  FiShoppingBag,
-  FiUsers,
-  FiSettings,
-  FiLogOut,
-  FiUser,
-  FiMessageSquare,
-  FiPieChart,
   FiBell,
   FiChevronDown,
+  FiHome,
+  FiLogOut,
+  FiMessageSquare,
+  FiPackage,
+  FiPieChart,
+  FiSettings,
+  FiShoppingBag,
+  FiUser
 } from 'react-icons/fi';
-import { useDisclosure } from '@mantine/hooks';
+import { Link, useLocation } from 'react-router-dom';
 
 const navLinks = [
   { label: 'Tổng quan', icon: <FiPieChart size={16} />, path: '/myshop/dashboard' },

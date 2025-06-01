@@ -1,16 +1,17 @@
-import './App.css';
-import { createTheme, MantineProvider, TextInput } from '@mantine/core';
-import '@mantine/core/styles.css';
 import '@mantine/carousel/styles.css';
-import '@mantine/tiptap/styles.css';
+import { createTheme, MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
-import '@mantine/notifications/styles.css';
 import { Notifications } from '@mantine/notifications';
+import '@mantine/notifications/styles.css';
+import '@mantine/tiptap/styles.css';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './App.css';
+import { Footer } from './components/Footer/Footer';
 import { Header } from './components/header/Header';
 import { TopHeader } from './components/header/TopHeader';
-import { Footer } from './components/Footer/Footer';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AuthoPage from './pages/AuthoPage';
+import AdminPage from './pages/MyshopPage/AdminPage';
 import MyshopPage from './pages/MyshopPage/MyshopPage';
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
               <Route path="/login" element={<AuthoPage />} />
               <Route path="/register" element={<AuthoPage />} />
               <Route path="/myshop/*" element={<MyshopPage />} />
+              <Route path="admin/*" element={<AdminPage />} />
               <Route path="/" element={
                 <>
                   <TopHeader />
