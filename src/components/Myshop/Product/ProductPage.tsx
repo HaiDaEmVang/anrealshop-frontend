@@ -51,7 +51,7 @@ const ProductPage = () => {
         shadow="xs" 
         p="md" 
         mb="md"
-        radius="md"
+        radius="md" 
         className="bg-white"
       >
         {/* Truyền viewMode và setViewMode vào OptionConfig */}

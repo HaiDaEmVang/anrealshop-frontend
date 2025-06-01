@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { Container, Paper, Title, Breadcrumbs, Anchor, Box, Text, Group, Modal, Button } from '@mantine/core';
+import { Anchor, Box, Breadcrumbs, Button, Container, Group, Modal, Paper, Text, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { FiEye, FiChevronRight, FiEdit3, FiSave } from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import { FiChevronRight, FiEdit3, FiEye, FiSave } from 'react-icons/fi';
+import { Link, useParams } from 'react-router-dom';
 import Infor from './Infor';
 import Review from './Review';
-import { Link } from 'react-router-dom';
 
 interface ProductImage {
   file?: File;
@@ -13,10 +13,15 @@ interface ProductImage {
   type: 'image' | 'video';
 }
 
-const CreateProduct = () => {
+// Đổi tên component để phù hợp với cả hai chức năng
+const ProductForm = () => {
+  const { id } = useParams(); // Lấy id từ URL nếu ở chế độ chỉnh sửa
+  const isEditMode = !!id; // Kiểm tra xem đang ở chế độ chỉnh sửa hay không
+  
   // Form instance shared between components
   const form = useForm({
     initialValues: {
+      id: '',
       name: '',
       category_id: '',
       description: '',
@@ -48,12 +53,83 @@ const CreateProduct = () => {
   const [media, setMedia] = useState<ProductImage[]>([]);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch product data if in edit mode
+  useEffect(() => {
+    if (isEditMode) {
+      fetchProductData();
+    }
+  }, [id]);
+
+  // Giả lập API call để lấy dữ liệu sản phẩm khi ở chế độ chỉnh sửa
+  const fetchProductData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Giả lập gọi API - trong thực tế bạn sẽ gọi API thực
+      await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập delay API
+      
+      // Dữ liệu mẫu - thay bằng API call thực tế
+      const productData = {
+        id: id,
+        name: 'Sản phẩm mẫu',
+        category_id: 'cat123',
+        description: '<p>Mô tả chi tiết sản phẩm</p>',
+        shortDescription: 'Mô tả ngắn về sản phẩm',
+        tags: ['thời trang', 'mới'],
+        sku: 'SP-001',
+        price: 150000,
+        comparePrice: 200000,
+        costPrice: 100000,
+        quantity: 50,
+        isActive: true,
+        isFeatured: true,
+        weight: 0.5,
+        length: 30,
+        width: 20,
+        height: 10,
+        variants: [],
+        seoTitle: 'Tiêu đề SEO',
+        seoDescription: 'Mô tả SEO',
+        seoKeywords: 'từ khóa, seo, sản phẩm',
+        location: 'Kho A',
+      };
+      
+      // Dữ liệu ảnh mẫu
+      const mediaData = [
+        {
+          id: 'img1',
+          url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=300',
+          type: 'image' as const
+        },
+        {
+          id: 'img2',
+          url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=300',
+          type: 'image' as const
+        }
+      ];
+      
+      // Cập nhật form với dữ liệu sản phẩm
+      form.setValues(productData);
+      // Cập nhật media
+      setMedia(mediaData);
+      
+      // Đánh dấu form là "không thay đổi" sau khi nạp dữ liệu ban đầu
+      setIsDirty(false);
+      
+    } catch (error) {
+      console.error('Error fetching product data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Breadcrumb items
   const breadcrumbItems = [
     { title: 'Trang chủ', href: '/myshop' },
-    { title: 'Quản lý sản phẩm', href: '/myshop/product' },
-    { title: 'Tạo sản phẩm mới', href: '#' },
+    { title: 'Quản lý sản phẩm', href: '/myshop/products' },
+    { title: isEditMode ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới', href: '#' },
   ].map((item, index) => (
     <Anchor component={Link} to={item.href} key={index} size="sm">
       {item.title}
@@ -75,7 +151,10 @@ const CreateProduct = () => {
     }
 
     // Submit product to API
-    console.log('Submitting product:', form.values, media);
+    console.log(`${isEditMode ? 'Updating' : 'Submitting'} product:`, form.values, media);
+
+    // Giả lập API call
+    console.log(`Product ${isEditMode ? 'updated' : 'created'} successfully`);
   };
 
   const openPreview = () => {
@@ -161,21 +240,35 @@ const CreateProduct = () => {
         <Group justify="space-between" align="center">
           <Group>
             <FiEdit3 size={24} className="text-primary" />
-            <Title order={2} size="h3">Tạo sản phẩm mới</Title>
+            <Title order={2} size="h3">{isEditMode ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới'}</Title>
           </Group>
           <Text c="dimmed" size="sm">
-            Nhập thông tin để tạo sản phẩm mới của bạn
+            {isEditMode 
+              ? 'Chỉnh sửa thông tin sản phẩm của bạn' 
+              : 'Nhập thông tin để tạo sản phẩm mới của bạn'
+            }
           </Text>
         </Group>
       </Paper>
 
-      {/* Main Form Content */}
+      {/* Main Form Content - Hiển thị loading nếu đang tải dữ liệu */}
       <Paper shadow="xs" p="md" radius="md" className="bg-white mb-20">
-        <Infor
-          form={form}
-          media={media}
-          setMedia={setMedia}
-        />
+        {isLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <div className="animate-pulse flex flex-col items-center">
+              <div className="h-32 w-32 bg-gray-200 rounded-full mb-4"></div>
+              <div className="h-6 w-1/2 bg-gray-200 rounded mb-2"></div>
+              <div className="h-4 w-1/3 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        ) : (
+          <Infor
+            form={form}
+            media={media}
+            setMedia={setMedia}
+            isEditMode={isEditMode}
+          />
+        )}
       </Paper>
 
       {/* Action Buttons - Fixed at Bottom */}
@@ -188,7 +281,7 @@ const CreateProduct = () => {
         <Container fluid px="lg">
           <Group justify="space-between">
             <Text size="sm" c="dimmed" className="hidden md:block">
-              {isDirty ? 'Sản phẩm có thay đổi chưa được lưu' : 'Tạo và quản lý thông tin sản phẩm của bạn'}
+              {isDirty ? 'Sản phẩm có thay đổi chưa được lưu' : isEditMode ? 'Chỉnh sửa thông tin sản phẩm của bạn' : 'Tạo và quản lý thông tin sản phẩm của bạn'}
             </Text>
             <Group>
               <Button
@@ -212,7 +305,7 @@ const CreateProduct = () => {
                 disabled={!isDirty}
                 radius="md"
               >
-                Đăng sản phẩm
+                {isEditMode ? 'Cập nhật sản phẩm' : 'Đăng sản phẩm'}
               </Button>
             </Group>
           </Group>
@@ -222,4 +315,4 @@ const CreateProduct = () => {
   );
 };
 
-export default CreateProduct;
+export default ProductForm;

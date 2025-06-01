@@ -1,14 +1,12 @@
-import React from 'react'
-import { Outlet, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import ShopAdminHeader from '../../components/header/ShopAdminHeader'
-import ProductPage from '../../components/Myshop/Product/ProductPage'
-import CreateProduct from '../../components/Myshop/Product/Create/CreateProduct'
-import OrderPage from '../../components/Myshop/Order/OrderPage'
+import MessagePage from '../../components/Myshop/Message/MessagePage'
 import OrderDetailComp from '../../components/Myshop/Order/OrderDetail/OrderDetail'
+import OrderPage from '../../components/Myshop/Order/OrderPage'
+import { default as CreateProduct, default as ProductForm } from '../../components/Myshop/Product/Create/CreateProduct'
+import ProductPage from '../../components/Myshop/Product/ProductPage'
 
 const MyshopPage = () => {
-  const location = useLocation();
-  const currentPath = location.pathname;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -20,9 +18,11 @@ const MyshopPage = () => {
           <Route path="dashboard" element={<div>Dashboard Content</div>} />
           <Route path="sale" element={<div>Sales Overview</div>} />
           <Route path="products" element={<ProductPage />} />
-          <Route path="product/create" element={<CreateProduct />} />
+          <Route path="products/create" element={<CreateProduct />} />
+          <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="orders" element={<OrderPage />} />
-          <Route path="orders/details/:id" element={<OrderDetailComp />} />
+          <Route path="orders/:id" element={<OrderDetailComp />} />
+          <Route path="messages" element={<MessagePage />} />
           <Route path="*" element={<div>Page not found</div>} />
         </Routes>
       </div>

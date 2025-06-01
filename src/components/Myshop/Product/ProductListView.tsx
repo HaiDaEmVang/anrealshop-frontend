@@ -1,26 +1,27 @@
-import { 
-  Table, 
-  Image, 
-  Text, 
-  Badge, 
-  ActionIcon, 
-  Menu, 
+import {
+  ActionIcon,
+  Badge,
   Checkbox,
-  Switch,
-  Pagination,
   Group,
-  Loader
+  Image,
+  Loader,
+  Menu,
+  Pagination,
+  Switch,
+  Table,
+  Text
 } from '@mantine/core';
-import { 
-  FiEdit2, 
-  FiCopy, 
-  FiTrash2, 
-  FiMoreVertical,
-  FiCheckCircle,
+import {
   FiAlertTriangle,
+  FiCheckCircle,
   FiClock,
-  FiEyeOff
+  FiCopy,
+  FiEdit2,
+  FiEyeOff,
+  FiMoreVertical,
+  FiTrash2
 } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   id: string;
@@ -54,7 +55,7 @@ const statusIcons = {
   hidden: <FiEyeOff size={16} className="text-gray-500" />
 };
 
-const statusLabels = {
+const statusLabels = { 
   active: 'Đang hoạt động',
   violation: 'Vi phạm',
   pending: 'Chờ duyệt',
@@ -80,9 +81,20 @@ const ListProduct = ({
   onProductAction,
   totalPages
 }: ListProductProps) => {
+  const navigate = useNavigate();
   
   const formatPrice = (price: number) => {
     return price.toLocaleString('vi-VN') + '₫';
+  };
+
+  const handleProductAction = (action: 'edit' | 'duplicate' | 'delete', productId: string) => {
+    if (action === 'edit') {
+      // Điều hướng đến trang chỉnh sửa với ID sản phẩm
+      navigate(`/myshop/products/edit/${productId}`);
+    } else {
+      // Các hành động khác vẫn giữ nguyên
+      onProductAction(action, productId);
+    }
   };
 
   return (
@@ -181,13 +193,13 @@ const ListProduct = ({
                       <Menu.Dropdown>
                         <Menu.Item 
                           leftSection={<FiEdit2 size={14} />}
-                          onClick={() => onProductAction('edit', product.id)}
+                          onClick={() => handleProductAction('edit', product.id)}
                         >
                           Chỉnh sửa
                         </Menu.Item>
                         <Menu.Item 
                           leftSection={<FiCopy size={14} />}
-                          onClick={() => onProductAction('duplicate', product.id)}
+                          onClick={() => handleProductAction('duplicate', product.id)}
                         >
                           Nhân bản
                         </Menu.Item>
@@ -195,7 +207,7 @@ const ListProduct = ({
                         <Menu.Item 
                           leftSection={<FiTrash2 size={14} />} 
                           color="red"
-                          onClick={() => onProductAction('delete', product.id)}
+                          onClick={() => handleProductAction('delete', product.id)}
                         >
                           Xóa
                         </Menu.Item>

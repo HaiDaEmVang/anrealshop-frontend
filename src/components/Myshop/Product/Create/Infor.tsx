@@ -1,18 +1,16 @@
 import {
-  Button,
+  ActionIcon,
   Group,
   Paper,
   Stack,
-  Text,
   TextInput,
-  Title,
-  ActionIcon
+  Title
 } from '@mantine/core';
 import { type UseFormReturnType } from '@mantine/form';
 import Highlight from '@tiptap/extension-highlight';
+import Image from '@tiptap/extension-image'; // Add this import
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
-import Image from '@tiptap/extension-image'; // Add this import
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useState } from 'react';
@@ -55,9 +53,10 @@ const tags = [
 interface InforProps {
   form: UseFormReturnType<any>;
   media: ProductImage[];
-  setMedia: React.Dispatch<React.SetStateAction<ProductImage[]>>; // Sửa đây nè
+  setMedia: React.Dispatch<React.SetStateAction<ProductImage[]>>; 
+  isEditMode?: boolean;// Sửa đây nè
 }
-const Infor = ({ form, media, setMedia }: InforProps) => {
+const Infor = ({ form, media, setMedia, isEditMode = false }: InforProps) => {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
     description: true,
     seo: true,
