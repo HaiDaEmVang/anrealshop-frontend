@@ -7,11 +7,11 @@ import CategoryManagement from '../../components/Admin/Category/CategoryPage';
 import AdminHeader from '../../components/Admin/Header/AdminHeader';
 import AdminSidebar from '../../components/Admin/Header/AdminSideBar';
 import ProductApprovalPage from '../../components/Admin/Product/ProductPage';
+import ShopApprovalPage from '../../components/Admin/Shop/ShopPage';
 
 // Placeholder components - sẽ được thay thế bằng các component thực tế sau
 const AdminDashboard = () => <div>Dashboard Admin</div>;
 const UserManagement = () => <div>Quản lý người dùng</div>;
-const ShopRegistration = () => <div>Đăng ký shop</div>;
 const OrderManagement = () => <div>Quản lý đơn hàng</div>;
 const ReportManagement = () => <div>Báo cáo và thống kê</div>;
 const SystemSettings = () => <div>Cài đặt hệ thống</div>;
@@ -94,7 +94,7 @@ const AdminPage: React.FC = () => {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="categories" element={<CategoryManagement />} />
               <Route path="users" element={<UserManagement />} />
-              <Route path="shop-registrations" element={<ShopRegistration />} />
+              <Route path="shop-registrations" element={<ShopApprovalPage />} />
               <Route path="product-approvals" element={<ProductApprovalPage />} />
               <Route path="orders" element={<OrderManagement />} />
               <Route path="reports" element={<ReportManagement />} />
