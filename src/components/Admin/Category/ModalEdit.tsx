@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import {
     Button,
+    Center,
+    Divider,
     FileInput,
     Group,
     Image,
     Modal,
+    Paper,
     Select,
     Stack,
     Switch,
-    Textarea,
-    TextInput,
     Text,
-    Paper,
-    Center,
-    Divider
+    Textarea,
+    TextInput
 } from '@mantine/core';
-import { FiUpload, FiImage } from 'react-icons/fi';
+import React, { useEffect, useMemo, useState } from 'react';
+import { FiImage, FiUpload } from 'react-icons/fi';
 
 interface Category {
     id: string;

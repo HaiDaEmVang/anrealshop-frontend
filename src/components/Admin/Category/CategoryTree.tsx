@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     ActionIcon,
     Badge,
@@ -8,6 +7,7 @@ import {
     Text,
     Tooltip
 } from '@mantine/core';
+import React from 'react';
 import {
     FiArrowDown,
     FiArrowUp,

@@ -1,21 +1,21 @@
-import React from 'react';
 import {
     ActionIcon,
     Badge,
     Group,
+    Image as MantineImage,
     Menu,
     Table,
     Text,
-    Tooltip,
-    Image as MantineImage
+    Tooltip
 } from '@mantine/core';
+import React from 'react';
 import {
     FiEdit2,
     FiEye,
+    FiImage,
     FiMoreVertical,
     FiPlus,
-    FiTrash2,
-    FiImage
+    FiTrash2
 } from 'react-icons/fi';
 
 interface BaseCategory {

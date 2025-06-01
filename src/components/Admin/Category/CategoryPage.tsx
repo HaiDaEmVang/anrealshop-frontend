@@ -16,10 +16,10 @@ import {
     FiPlus
 } from 'react-icons/fi';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
+import CategoryTable from './CategoryTable';
 import CategoryTree from './CategoryTree';
 import DeleteCategoryModal from './ModalDelete';
 import CategoryModal from './ModalEdit';
-import CategoryTable from './CategoryTable';
 
 
 interface Category {
