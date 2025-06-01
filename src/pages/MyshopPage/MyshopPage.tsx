@@ -5,6 +5,7 @@ import OrderDetailComp from '../../components/Myshop/Order/OrderDetail/OrderDeta
 import OrderPage from '../../components/Myshop/Order/OrderPage'
 import { default as CreateProduct, default as ProductForm } from '../../components/Myshop/Product/Create/CreateProduct'
 import ProductPage from '../../components/Myshop/Product/ProductPage'
+import Setting from '../../components/Myshop/Setting/SettingPage'
 
 const MyshopPage = () => {
 
@@ -23,6 +24,7 @@ const MyshopPage = () => {
           <Route path="orders" element={<OrderPage />} />
           <Route path="orders/:id" element={<OrderDetailComp />} />
           <Route path="messages" element={<MessagePage />} />
+          <Route path="settings" element={<Setting />} />
           <Route path="*" element={<div>Page not found</div>} />
         </Routes>
       </div>
