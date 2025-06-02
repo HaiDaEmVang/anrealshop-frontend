@@ -1,6 +1,6 @@
-import { Container, Grid, Group, Text, Title, UnstyledButton, Anchor } from '@mantine/core';
-import { FaFacebook, FaTwitter, FaInstagram, FaCreditCard, FaPaypal, FaCcVisa, FaCcMastercard } from 'react-icons/fa';
-import { FiMail, FiMapPin, FiPhone } from 'react-icons/fi';
+import { Anchor, Container, Grid, Group, Text, Title, UnstyledButton } from '@mantine/core';
+import { FaCcMastercard, FaCcVisa, FaCreditCard, FaFacebook, FaInstagram, FaPaypal, FaTwitter } from 'react-icons/fa';
+import { FiMail, FiMapPin, FiPhone, FiSend } from 'react-icons/fi';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -107,7 +107,7 @@ export function Footer() {
                 className="flex-1 border border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-primary"
               />
               <button className="bg-primary text-white px-4 py-2 rounded-r-md text-sm font-medium hover:bg-blue-600 transition-colors">
-                Đăng Ký
+                <FiSend size={16} />
               </button>
             </div>
             
