@@ -1,7 +1,7 @@
 import { Box, Group, SimpleGrid, Title } from '@mantine/core';
 import { FiTrendingUp } from 'react-icons/fi';
-import { mockTrendingProducts } from '../../../data/UserData';
-import ProductCard from './ProductCard';
+import { mockTrendingProducts } from '../../../../data/UserData';
+import ProductCard from '../../Common/ProductCard';
 
 const ListProduct = () => {
     return (

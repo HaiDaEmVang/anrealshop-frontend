@@ -1,19 +1,20 @@
 import { Box, Button, Group, SimpleGrid, Title } from '@mantine/core';
-import { FiChevronRight, FiPackage } from 'react-icons/fi';
+import { FiChevronRight, FiStar } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { mockNewArrivals } from '../../../data/UserData';
-import ProductCard from './ProductCard';
-const NewArrivals = () => {
+import { mockFeaturedProducts } from '../../../../data/UserData';
+import ProductCard from '../../Common/ProductCard';
+
+const FeaturedProducts = () => {
   return (
-    <Box className="">
-      <Group justify="space-between" className="mb-4">
+    <Box>
+      <Group justify="space-between" className="mb-3">
         <Title order={4} className="flex items-center gap-2 text-slate-900">
-          <FiPackage size={24} className="text-green-500" />
-          <span>Hàng mới về</span>
+          <FiStar size={24} className="text-yellow-500" />
+          <span>Sản phẩm nổi bật</span>
         </Title>
         <Button
           component={Link}
-          to="/new-arrivals"
+          to="/featured-products"
           variant="subtle"
           color="blue"
           rightSection={<FiChevronRight size={16} />}
@@ -23,12 +24,11 @@ const NewArrivals = () => {
         </Button>
       </Group>
 
-      
       <SimpleGrid
-        cols={5}
+        cols={6}
         spacing="md"
       >
-        {mockNewArrivals.map((product) => (
+        {mockFeaturedProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
       </SimpleGrid>
@@ -36,4 +36,4 @@ const NewArrivals = () => {
   );
 };
 
-export default NewArrivals;
+export default FeaturedProducts;

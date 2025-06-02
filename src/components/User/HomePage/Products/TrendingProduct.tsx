@@ -1,8 +1,8 @@
 import { Box, Button, Group, SimpleGrid, Title } from '@mantine/core';
 import { FiChevronRight, FiTrendingUp } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { mockTrendingProducts } from '../../../data/UserData';
-import ProductCard from './ProductCard';
+import { mockTrendingProducts } from '../../../../data/UserData';
+import ProductCard from '../../Common/ProductCard';
 
 const TrendingProducts = () => {
   return (
