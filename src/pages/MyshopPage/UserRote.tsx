@@ -4,6 +4,7 @@ import { Footer } from '../../components/Footer/Footer'
 import ProductDetailPage from '../../components/User/ProductDetail/ProductDetailPage'
 import HomePage from '../../components/User/HomePage/HomePage'
 import ListProduct from '../../components/User/HomePage/Products/ListProduct'
+import CheckoutPage from '../../components/User/Checkout/CheckoutPage'
 
 const UserPage = () => {
   return (
@@ -15,7 +16,7 @@ const UserPage = () => {
           <Route path="/products" element={<ListProduct />} />
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/category/:categoryId" element={<ListProduct />} />
-          <Route path="/search" element={<ListProduct />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </div>
       <Footer />
