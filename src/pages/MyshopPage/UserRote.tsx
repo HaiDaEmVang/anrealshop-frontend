@@ -6,6 +6,7 @@ import HomePage from '../../components/User/HomePage/HomePage'
 import ListProduct from '../../components/User/HomePage/Products/ListProduct'
 import CheckoutPage from '../../components/User/Checkout/CheckoutPage'
 import CartPage from '../../components/User/Cart/CartPage'
+import SettingPage from '../../components/User/Setting.tsx/SettingPage'
 
 const UserPage = () => {
   return (
@@ -16,10 +17,9 @@ const UserPage = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ListProduct />} />
           <Route path="/products/:slug" element={<ProductDetailPage />} />
-          <Route path="/category/:categoryId" element={<ListProduct />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/carts" element={<CartPage />} />
+          <Route path="/settings" element={<SettingPage />} />
         </Routes>
       </div>
       <Footer />

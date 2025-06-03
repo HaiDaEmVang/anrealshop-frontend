@@ -194,7 +194,7 @@ const CartPage: React.FC = () => {
         <Grid gutter="xl">
           {/* Cột trái - danh sách sản phẩm */}
           <Grid.Col span={{ base: 12, md: 8 }}>
-            <Paper radius="md" shadow="sm" p="md" className="bg-white mb-6">
+            <Paper radius="md" shadow="sm" p="md" className="bg-white">
               {/* Sử dụng component ListProduct */}
               <ListProduct
                 cartItems={cartItems}
