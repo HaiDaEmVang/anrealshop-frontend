@@ -5,6 +5,7 @@ import ProductDetailPage from '../../components/User/ProductDetail/ProductDetail
 import HomePage from '../../components/User/HomePage/HomePage'
 import ListProduct from '../../components/User/HomePage/Products/ListProduct'
 import CheckoutPage from '../../components/User/Checkout/CheckoutPage'
+import CartPage from '../../components/User/Cart/CartPage'
 
 const UserPage = () => {
   return (
@@ -17,6 +18,8 @@ const UserPage = () => {
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/category/:categoryId" element={<ListProduct />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/carts" element={<CartPage />} />
         </Routes>
       </div>
       <Footer />
