@@ -15,6 +15,7 @@ import UserPage from './pages/MyshopPage/UserRote';
 function App() {
   const theme = createTheme({
     primaryColor: 'blue',
+    primaryShade: 5,
     colors: {
       blue: [
         '#f0faff', // 50

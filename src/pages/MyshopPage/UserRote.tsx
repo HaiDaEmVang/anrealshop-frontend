@@ -1,11 +1,12 @@
 import { Route, Routes } from 'react-router-dom'
-import { Header } from '../../components/header/Header'
 import { Footer } from '../../components/Footer/Footer'
-import ProductDetailPage from '../../components/User/ProductDetail/ProductDetailPage'
+import { Header } from '../../components/header/Header'
+import CartPage from '../../components/User/Cart/CartPage'
+import CheckoutPage from '../../components/User/Checkout/CheckoutPage'
+import FilterProductPage from '../../components/User/FilterProduct/FilterProductPage'
 import HomePage from '../../components/User/HomePage/HomePage'
 import ListProduct from '../../components/User/HomePage/Products/ListProduct'
-import CheckoutPage from '../../components/User/Checkout/CheckoutPage'
-import CartPage from '../../components/User/Cart/CartPage'
+import ProductDetailPage from '../../components/User/ProductDetail/ProductDetailPage'
 import SettingPage from '../../components/User/Setting.tsx/SettingPage'
 
 const UserPage = () => {
@@ -20,6 +21,7 @@ const UserPage = () => {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/carts" element={<CartPage />} />
           <Route path="/settings" element={<SettingPage />} />
+          <Route path="/search" element={<FilterProductPage />} />
         </Routes>
       </div>
       <Footer />
