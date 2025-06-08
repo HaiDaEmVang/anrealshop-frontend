@@ -1,19 +1,19 @@
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Chip,
+  Flex,
+  Group,
+  Paper,
+  Select,
+  Stack,
+  Text
+} from '@mantine/core';
 import React, { useMemo } from 'react';
 import {
-  Paper,
-  Text,
-  Button,
-  Group,
-  Chip,
-  Select,
-  ActionIcon,
-  Flex,
-  Box,
-  Stack // Thêm Stack từ Mantine
-} from '@mantine/core';
-import {
-  FiFilter,
   FiChevronRight,
+  FiFilter,
   FiTrash2
 } from 'react-icons/fi';
 import { BRANDS, ORIGINS, SIZES, SORT_OPTIONS } from '../../../data/FilterData';
@@ -30,7 +30,7 @@ interface FilterProps {
   onSortChange: (value: string) => void;
 }
 
-const Filter: React.FC<FilterProps> = ({
+const Filter: React.FC<FilterProps> = ({ 
   selectedBrands,
   selectedOrigins,
   selectedSizes,
@@ -46,21 +46,21 @@ const Filter: React.FC<FilterProps> = ({
                            selectedSizes.length > 0;
   
   const displayBrands = useMemo(() => {
-    return BRANDS.slice(0, 5).map(brand => ({
+    return BRANDS.slice(0, 3).map(brand => ({
       ...brand,
       selected: selectedBrands.includes(brand.value)
     }));
   }, [selectedBrands]);
   
   const displayOrigins = useMemo(() => {
-    return ORIGINS.slice(0, 5).map(origin => ({
+    return ORIGINS.slice(0, 3).map(origin => ({
       ...origin,
       selected: selectedOrigins.includes(origin.value)
     }));
   }, [selectedOrigins]);
 
   const displaySizes = useMemo(() => {
-    return SIZES.slice(0, 5).map(size => ({
+    return SIZES.slice(0, 3).map(size => ({
       ...size,
       selected: selectedSizes.includes(size.value)
     }));
@@ -68,7 +68,6 @@ const Filter: React.FC<FilterProps> = ({
   
   const showMoreBrands = BRANDS.length > 5;
   const showMoreOrigins = ORIGINS.length > 5;
-  const showMoreSizes = SIZES.length > 5;
 
   const handleBrandToggle = (value: string) => {
     if (selectedBrands.includes(value)) {
@@ -104,15 +103,15 @@ const Filter: React.FC<FilterProps> = ({
       >
         <Box className="flex-1 min-w-0 flex flex-wrap items-center gap-2 mr-2">
           <Group gap="xs" wrap="wrap" className="items-center">
-            <Text fw={500} size="sm" className="whitespace-nowrap">Thương hiệu:</Text>
+            <Text fw={500} size="sm" className="whitespace-nowrap !font-semibold">Thương hiệu:</Text>
             {displayBrands.map((brand) => (
               <Chip 
                 key={brand.value} 
                 checked={brand.selected}
                 variant={brand.selected ? "filled" : "outline"}
                 color={brand.selected ? "blue" : "gray"}
-                size="xs"
-                radius="sm"
+                size="sm"
+                radius="lg"
                 onClick={() => handleBrandToggle(brand.value)}
               >
                 {brand.label}
@@ -121,7 +120,7 @@ const Filter: React.FC<FilterProps> = ({
             {showMoreBrands && (
               <Button 
                 variant="subtle" 
-                size="xs" 
+                size="sm" 
                 rightSection={<FiChevronRight size={14} />} 
                 onClick={onOpenAllFilters} 
                 px={3}
@@ -131,15 +130,15 @@ const Filter: React.FC<FilterProps> = ({
             )}
 
             <Text color="dimmed" size="sm" className="mx-2">|</Text>
-            <Text fw={500} size="sm" className="whitespace-nowrap">Xuất xứ:</Text>
+            <Text fw={500} size="sm" className="whitespace-nowrap !font-semibold">Xuất xứ:</Text>
             {displayOrigins.map((origin) => (
               <Chip 
                 key={origin.value} 
                 checked={origin.selected}
                 variant={origin.selected ? "filled" : "outline"}
                 color={origin.selected ? "blue" : "gray"}
-                size="xs"
-                radius="sm"
+                size="sm"
+                radius="lg"
                 onClick={() => handleOriginToggle(origin.value)}
               >
                 {origin.label}
@@ -148,7 +147,7 @@ const Filter: React.FC<FilterProps> = ({
             {showMoreOrigins && (
               <Button 
                 variant="subtle" 
-                size="xs" 
+                size="sm" 
                 rightSection={<FiChevronRight size={14} />} 
                 onClick={onOpenAllFilters}
                 px={3}
@@ -158,21 +157,21 @@ const Filter: React.FC<FilterProps> = ({
             )}
 
             <Text color="dimmed" size="sm" className="mx-2">|</Text>
-            <Text fw={500} size="sm" className="whitespace-nowrap">Kích thước:</Text>
+            <Text fw={500} size="sm" className="whitespace-nowrap !font-semibold">Kích thước:</Text>
             {displaySizes.map((size) => (
               <Chip 
                 key={size.value} 
                 checked={size.selected}
                 variant={size.selected ? "filled" : "outline"}
                 color={size.selected ? "blue" : "gray"}
-                size="xs"
-                radius="sm"
+                size="sm"
+                radius="lg"
                 onClick={() => handleSizeToggle(size.value)}
               >
                 {size.label}
               </Chip>
             ))}
-            {showMoreSizes && (
+            {/* {showMoreSizes && (
               <Button 
                 variant="subtle" 
                 size="xs" 
@@ -182,7 +181,7 @@ const Filter: React.FC<FilterProps> = ({
               >
                 Xem thêm
               </Button>
-            )}
+            )} */}
           </Group>
         </Box>
         

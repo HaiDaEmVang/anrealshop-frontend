@@ -50,10 +50,10 @@ const Categories = () => {
                             alt={category.name}
                             className="mb-3 border-2 border-gray-100 shadow-sm"
                             styles={{
-                                root: { 
+                                root: {
                                     borderRadius: '50%' // Đảm bảo hình tròn hoàn toàn
                                 },
-                                image: { 
+                                image: {
                                     objectFit: 'cover',
                                     borderRadius: '50%' // Đảm bảo hình tròn hoàn toàn
                                 }

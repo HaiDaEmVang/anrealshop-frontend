@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import { Footer } from '../../components/Footer/Footer'
 import { Header } from '../../components/header/Header'
 import CartPage from '../../components/User/Cart/CartPage'
+import CategoryPage from '../../components/User/CategoryPage/CategoryPage'
 import CheckoutPage from '../../components/User/Checkout/CheckoutPage'
 import FilterProductPage from '../../components/User/FilterProduct/FilterProductPage'
 import HomePage from '../../components/User/HomePage/HomePage'
@@ -22,6 +23,7 @@ const UserPage = () => {
           <Route path="/carts" element={<CartPage />} />
           <Route path="/settings" element={<SettingPage />} />
           <Route path="/search" element={<FilterProductPage />} />
+          <Route path="/category/:slug" element={<CategoryPage />} />
         </Routes>
       </div>
       <Footer />
