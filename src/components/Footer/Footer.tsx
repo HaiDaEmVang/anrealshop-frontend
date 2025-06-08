@@ -20,7 +20,7 @@ export function Footer() {
                   <span className="text-contentText">Shop</span>
                 </div>
               </div>
-              <Text size="sm" className="!text-gray-500 mb-4">
+              <Text size="sm" className="!text-gray-500 !mb-2">
                 AnrealShop - Điểm đến mua sắm trực tuyến đáng tin cậy của bạn với các sản phẩm chất lượng và giá cả phải chăng.
               </Text>
               <div className="flex flex-col gap-2">
@@ -62,7 +62,7 @@ export function Footer() {
                   component="a" 
                   href="#" 
                   underline="never"
-                  className="!text-gray-500 !hover:text-primary transition-colors text-sm"
+                  className="!text-gray-500 hover:!text-primary hover:!ml-1 transition-all duration-200 !text-sm"
                 >
                   {link}
                 </Anchor>
@@ -86,7 +86,7 @@ export function Footer() {
                   component="a" 
                   href="#" 
                   underline="never"
-                  className="!text-gray-500 !hover:text-primary transition-colors text-sm"
+                className="!text-gray-500 hover:!text-primary hover:!ml-1 transition-all duration-200 !text-sm"
                 >
                   {link}
                 </Anchor>
@@ -106,7 +106,7 @@ export function Footer() {
                 placeholder="Nhập email của bạn"
                 className="flex-1 border border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-primary"
               />
-              <button className="bg-primary text-white px-4 py-2 rounded-r-md text-sm font-medium hover:bg-blue-600 transition-colors">
+              <button className="bg-primary text-white px-4 py-2 rounded-r-md text-sm font-medium hover:bg-primary/45 transition-colors">
                 <FiSend size={16} />
               </button>
             </div>
@@ -127,7 +127,7 @@ export function Footer() {
       <div className="bg-slate-100 py-4 border-t border-t-slate-200">
         <Container size="xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <Text size="sm" className="!text-gray-500">
+            <Text size="sm" className="!text-gray-500 ">
               © {currentYear} AnrealShop. Tất cả các quyền được bảo lưu.
             </Text>
             
