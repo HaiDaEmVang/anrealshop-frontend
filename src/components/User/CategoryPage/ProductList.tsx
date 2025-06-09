@@ -12,7 +12,7 @@ import {
   Stack
 } from '@mantine/core';
 import { type Product } from '../../../data/FilterData';
-import ProductCard from '../FilterProduct/ProductCart';
+import ProductCard from '../Common/ProductCard';
 
 interface ProductListProps {
   products: Product[];

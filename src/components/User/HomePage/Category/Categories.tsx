@@ -10,7 +10,7 @@ import {
 } from '@mantine/core';
 import { FiChevronRight, FiGrid } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { mockCategories } from '../../../data/UserData';
+import { mockCategories } from '../../../../data/UserData';
 
 const Categories = () => {
 
@@ -59,7 +59,7 @@ const Categories = () => {
                                 }
                             }}
                         />
-                        <Text size="sm" fw={600} ta="center" className="text-slate-900" lineClamp={2}>
+                        <Text size="sm" fw={600} ta="center" className="text-slate-900 hover:!text-primary" lineClamp={2}>
                             {category.name}
                         </Text>
                     </UnstyledButton>

@@ -3,7 +3,7 @@ import { Button, Container, Paper } from '@mantine/core';
 // Components
 import HeroBanner from './Banner/HeroBanner';
 import PromotionBanner from './Banner/PromationBanner';
-import Categories from '../Category/Categories';
+import Categories from './Category/Categories';
 import NewsletterSignup from '../Common/NewLetterSignup';
 import FeaturedProducts from './Products/FeatureProduct';
 import ListProduct from './Products/ListProduct';

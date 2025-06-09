@@ -1,5 +1,7 @@
 import { Carousel } from '@mantine/carousel';
 import { Box, Button, Grid, Overlay, Paper, Stack, Text, Title } from '@mantine/core';
+import Autoplay from 'embla-carousel-autoplay';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 const banners = [
@@ -50,6 +52,7 @@ const staticBanners = [
 ];
 
 const HeroBanner = () => {
+  const autoplay = useRef(Autoplay({ delay: 3000 }));
   return (
     <Grid gutter="md" >
       {/* Banner động chiếm 70% chiều rộng */}
@@ -60,6 +63,9 @@ const HeroBanner = () => {
           slideSize="100%"
           slideGap="md"
           loop
+          plugins={[autoplay.current]}
+          onMouseEnter={autoplay.current.stop}
+          onMouseLeave={autoplay.current.reset}
           className="rounded-md overflow-hidden"
           styles={{
             indicator: {
@@ -89,10 +95,10 @@ const HeroBanner = () => {
                 >
                   <Title order={1} className="mb-4 font-bold">{banner.title}</Title>
                   <Text size="xl" className="mb-8">{banner.description}</Text>
-                  <Button 
+                  <Button
                     component={Link}
                     to={banner.url}
-                    size="lg" 
+                    size="lg"
                     radius="md"
                     className="bg-primary hover:bg-primary-dark transition-colors"
                   >
@@ -108,14 +114,14 @@ const HeroBanner = () => {
       {/* Banner tĩnh chiếm 30% chiều rộng, chia thành 2 banner xếp dọc */}
       <Grid.Col span={{ base: 12, md: 3 }}>
         <Stack gap="md" style={{ height: '400px' }}>
-          {staticBanners.map((banner, index) => (
+          {staticBanners.map((banner) => (
             <Paper
               key={banner.id}
               radius="md"
               className="overflow-hidden relative flex-1 shadow-md group"
             >
               <Link to={banner.url} className="block h-full">
-                <Box 
+                <Box
                   className="h-full w-full relative transition-transform duration-500 group-hover:scale-105"
                   style={{
                     backgroundImage: `url(${banner.image})`,
@@ -130,20 +136,20 @@ const HeroBanner = () => {
                     zIndex={1}
                     className="transition-opacity duration-300 group-hover:opacity-90"
                   />
-                  
+
                   {/* Content container */}
                   <Box className="absolute inset-0 p-5 flex flex-col justify-end z-10">
                     {/* Badge-like component cho subtitle */}
-                    <Text 
+                    <Text
                       className=" font-medium text-sx mb-2 !text-white bg-opacity-80 
                                inline-block py-1 px-3 rounded-full self-start"
                     >
                       {banner.subtitle}
                     </Text>
-                    
+
                     {/* Tiêu đề với hiệu ứng hover */}
-                    <Title 
-                      order={4} 
+                    <Title
+                      order={4}
                       className="text-white mb-3 transition-transform duration-300"
                     >
                       {banner.title}

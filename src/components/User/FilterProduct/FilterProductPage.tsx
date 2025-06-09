@@ -15,10 +15,10 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { mockFeaturedProducts, type Product } from '../../../data/FilterData';
 
+import ProductCard from '../Common/ProductCard';
 import Breadcrumbs from './Breadcrumbs';
 import Filter from './Filter';
-import ModalFilter from './ModalFilter'; // Ensure ModalFilter also handles rating if needed
-import ProductCard from './ProductCart';
+import ModalFilter from './ModalFilter';
 
 interface ApiFilterParams {
   priceRange: [number, number];
