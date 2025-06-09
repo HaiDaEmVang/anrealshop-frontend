@@ -15,6 +15,7 @@ import {
     FiList,
     FiPlus
 } from 'react-icons/fi';
+import slugify from 'slugify';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 import CategoryTable from './CategoryTable';
 import CategoryTree from './CategoryTree';
@@ -171,14 +172,13 @@ const MOCK_CATEGORIES: Category[] = [
 
 const createSlug = (name: string): string => {
     if (!name) return '';
-    return name
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '')
-        .replace(/--+/g, '-')
-        .replace(/^-+|-+$/g, '');
+    return slugify(name, {
+        lower: true,
+        replacement: '-', 
+        locale: 'vi', 
+        strict: true,
+        trim: true       
+    });
 };
 
 const buildCategoryTree = (list: Category[], parentId: string | null = null): Category[] => {

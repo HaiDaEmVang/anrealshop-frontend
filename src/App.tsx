@@ -7,16 +7,15 @@ import '@mantine/notifications/styles.css';
 import '@mantine/tiptap/styles.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import { Footer } from './components/Footer/Footer';
-import { Header } from './components/header/Header';
-import { TopHeader } from './components/header/TopHeader';
 import AuthoPage from './pages/AuthoPage';
-import AdminPage from './pages/MyshopPage/AdminPage';
-import MyshopPage from './pages/MyshopPage/MyshopPage';
+import AdminPage from './pages/MyshopPage/AdminRoute';
+import MyshopPage from './pages/MyshopPage/MyshopRoute';
+import UserPage from './pages/MyshopPage/UserRote';
 
 function App() {
   const theme = createTheme({
     primaryColor: 'blue',
+    primaryShade: 5,
     colors: {
       blue: [
         '#f0faff', // 50
@@ -60,14 +59,7 @@ function App() {
               <Route path="/register" element={<AuthoPage />} />
               <Route path="/myshop/*" element={<MyshopPage />} />
               <Route path="admin/*" element={<AdminPage />} />
-              <Route path="/" element={
-                <>
-                  <TopHeader />
-                  <Header />
-                  <div>Home Page Content</div>
-                  <Footer />
-                </>
-              } />
+              <Route path="/*" element={<UserPage />}/>
             </Routes>
           </main>
         </div>
