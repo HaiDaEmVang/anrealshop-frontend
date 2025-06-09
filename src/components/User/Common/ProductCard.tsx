@@ -1,4 +1,5 @@
-import { Badge, Card, Group, Image, Rating, Text } from '@mantine/core';
+import { ActionIcon, Badge, Button, Card, Group, Image, Rating, Text } from '@mantine/core';
+import { FiHeart, FiShoppingCart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import type { Product } from '../../../data/UserData';
 
@@ -8,88 +9,150 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) => {
-  const { id, name, price, discountPrice, images, rating, reviewCount, isNew } = product;
+  const { id, name, price, discountPrice, images, rating, reviewCount, isNew, shop } = product;
   const discountPercentage = discountPrice ? Math.round(((price - discountPrice) / price) * 100) : 0;
 
   return (
     <Card
       shadow="sm"
       padding={0}
-      radius="md"
+      radius="lg"
       withBorder
-      className="h-full flex flex-col bg-white transition-all duration-300 hover:shadow-md overflow-hidden"
-      style={{ width: compact ? '151px' : '100%' }}
+      className="h-full flex flex-col bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group"
+      style={{
+        width: compact ? '180px' : '100%',
+        border: '1px solid #f1f3f4'
+      }}
     >
-      <Link to={`/product/${id}`} className="block no-underline">
-        {/* Card Wrapper */}
-        <div className="flex flex-col h-full">
-          {/* Image Section */}
-          <div className="relative">
-            <div className="overflow-hidden" style={{ aspectRatio: '1/1' }}>
+      {/* Card Wrapper */}
+      <div className="flex flex-col h-full">
+        {/* Image Section */}
+        <div className="relative overflow-hidden">
+          <Link to={`/products/${id}`} className="block no-underline">
+            <div className="overflow-hidden bg-gray-50" style={{ aspectRatio: '4/5' }}>
               <Image
                 src={images[0]}
                 alt={name}
-                className="transition-transform duration-300 hover:scale-105"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                className="transition-transform duration-500 group-hover:scale-110"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
               />
             </div>
+          </Link>
 
-            {/* Badges positioned on the image */}
-            <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
-              {isNew && (
-                <Badge color="green" className="font-medium text-xs">
-                  Mới
-                </Badge>
-              )}
-            </div>
+          {/* Badges positioned on the image */}
+          <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
+            {isNew && (
+              <Badge
+                color="green"
+                variant="filled"
+                className="font-medium text-xs shadow-sm"
+                radius="md"
+              >
+                Mới
+              </Badge>
+            )}
+            {discountPrice && (
+              <Badge
+                color="red"
+                variant="filled"
+                className="font-medium text-xs shadow-sm"
+                radius="md"
+              >
+                -{discountPercentage}%
+              </Badge>
+            )}
           </div>
 
-          {/* Content Section */}
-          <div className="p-3 flex flex-col flex-grow">
-            {/* Product Name */}
+          {/* Action buttons on hover */}
+          <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <ActionIcon
+              variant="filled"
+              color="white"
+              size="md"
+              radius="xl"
+              className="shadow-lg hover:scale-110 transition-transform duration-200 !bg-white !text-gray-700 hover:!text-red-500"
+            >
+              <FiHeart size={16} />
+            </ActionIcon>
+          </div>
+
+          {/* Quick add to cart button */}
+          <div className="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+            <Button
+              fullWidth
+              size="sm"
+              radius="md"
+              leftSection={<FiShoppingCart size={14} />}
+              className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg"
+            >
+              Thêm vào giỏ
+            </Button>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-4 flex flex-col flex-grow">
+          {/* Shop name */}
+          <Text size="xs" c="dimmed" className="mb-1 font-medium">
+            {shop.name}
+          </Text>
+
+          {/* Product Name */}
+          <Link to={`/products/${id}`} className="no-underline">
             <Text
               fw={500}
               lineClamp={2}
-              className="text-slate-900 text-sm !mb-1"
-              style={{ minHeight: '2.75rem' }}
+              className="text-slate-900 text-sm !mb-2 hover:text-primary transition-colors duration-200"
+              style={{ minHeight: '2.5rem' }}
             >
               {name}
             </Text>
+          </Link>
 
-            {/* Rating */}
-            <div className="mb-2">
-              <Group gap={4} wrap="nowrap">
-                <Rating value={rating} fractions={2} readOnly size="xs" />
-                <Text size="xs" c="dimmed">({reviewCount})</Text>
-              </Group>
-            </div>
+          {/* Rating */}
+          <div className="mb-3">
+            <Group gap={6} wrap="nowrap">
+              <Rating
+                value={rating}
+                fractions={2}
+                readOnly
+                size="xs"
+                color="orange"
+              />
+              <Text size="xs" c="dimmed" className="font-medium">
+                {rating} ({reviewCount})
+              </Text>
+            </Group>
+          </div>
 
-            {/* Price Section */}
-            <div className="mt-auto">
-              {/* Discounted Price */}
-              {discountPrice ? (
-                <>
-                  <Text fw={700} className="text-red-500" size="sm">
-                    {discountPrice.toLocaleString()}<sup>₫</sup>
-                  </Text>
-                  <Group gap={4}>
-                    <Badge size="sm"  radius="sm" className="font-normal ">-{discountPercentage}%</Badge>
-                    <Text td="line-through" c="dimmed" size="xs">
-                      {price.toLocaleString()}<sup>₫</sup>
-                    </Text>
-                  </Group>
-                </>
-              ) : (
-                <Text fw={700} className="text-slate-900" size="sm">
-                  {price.toLocaleString()}<sup>₫</sup>
+          {/* Price Section */}
+          <div className="mt-auto">
+            {discountPrice ? (
+              <Group gap={8} align="center" wrap="nowrap">
+                <Text fw={700} className="text-red-500 text-lg">
+                  {discountPrice.toLocaleString()}₫
                 </Text>
-              )}
-            </div>
+                <Text
+                  td="line-through"
+                  c="dimmed"
+                  size="sm"
+                  className="font-medium"
+                >
+                  {price.toLocaleString()}₫
+                </Text>
+              </Group>
+            ) : (
+              <Text fw={700} className="text-slate-900 text-lg">
+                {price.toLocaleString()}₫
+              </Text>
+            )}
           </div>
         </div>
-      </Link>
-
-
+      </div>
     </Card>
   );
 };

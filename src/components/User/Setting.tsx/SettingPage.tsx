@@ -1,120 +1,32 @@
 import {
     Box,
-    Button,
     Container,
-    Divider,
     Grid,
-    Group,
     NavLink,
     Paper,
-    Select,
-    Stack,
-    Switch,
-    Text,
-    Title
 } from '@mantine/core';
-import { useState } from 'react';
-import {
-    FiBell,
-    FiLock,
-    FiSave,
-    FiSettings,
-    FiUser
+import { 
+    FiBell, 
+    FiLock, 
+    FiSettings, 
+    FiUser,
+    FiShoppingBag
 } from 'react-icons/fi';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import Infor from './Infor';
 import Notification from './Notification';
 import Security from './Security';
-
-// Breadcrumbs component
-
+import Preferences from './Preferences';
+import OrderHistory from './OrderHistory/OrderHistory';
 
 const SettingPage = () => {
-    // Tab hiện tại
-    const [activeTab, setActiveTab] = useState<string>('profile');
-
-    // Render nội dung tab
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'profile':
-                return <Infor />;
-
-            case 'security':
-                return <Security />;
-
-            case 'notifications':
-                return <Notification />
-
-            case 'preferences':
-                return (
-                    <>
-                        <Title order={4} className="mb-4 text-slate-800">Tùy chọn người dùng</Title>
-
-                        <Box>
-                            <Text size="sm" fw={600} className="mb-3 text-slate-700">
-                                Ngôn ngữ và khu vực
-                            </Text>
-
-                            <Group grow className="mb-4">
-                                <Select
-                                    label="Ngôn ngữ"
-                                    placeholder="Chọn ngôn ngữ"
-                                    data={[
-                                        { value: 'vi', label: 'Tiếng Việt' },
-                                        { value: 'en', label: 'English' },
-                                    ]}
-                                    defaultValue="vi"
-                                />
-
-                                <Select
-                                    label="Múi giờ"
-                                    placeholder="Chọn múi giờ"
-                                    data={[
-                                        { value: 'Asia/Ho_Chi_Minh', label: '(GMT+7) Hồ Chí Minh' },
-                                        { value: 'Asia/Bangkok', label: '(GMT+7) Bangkok' },
-                                        { value: 'Asia/Singapore', label: '(GMT+8) Singapore' },
-                                        { value: 'Asia/Tokyo', label: '(GMT+9) Tokyo' },
-                                    ]}
-                                    defaultValue="Asia/Ho_Chi_Minh"
-                                />
-                            </Group>
-
-                            <Divider className="my-4" />
-
-                            <Text size="sm" fw={600} className="mb-3 text-slate-700">
-                                Hiển thị
-                            </Text>
-
-                            <Stack gap="xs" className="mb-4">
-                                <Group justify="apart">
-                                    <Text size="sm">Chế độ tối</Text>
-                                    <Switch />
-                                </Group>
-
-                                <Group justify="apart">
-                                    <Text size="sm">Hiệu ứng chuyển động</Text>
-                                    <Switch defaultChecked />
-                                </Group>
-
-                                <Group justify="apart">
-                                    <Text size="sm">Hiển thị giá có VAT</Text>
-                                    <Switch defaultChecked />
-                                </Group>
-                            </Stack>
-
-                            <Button
-                                className="mt-2 bg-primary hover:bg-picton-blue-600"
-                                leftSection={<FiSave size={16} />}
-                            >
-                                Lưu cài đặt
-                            </Button>
-                        </Box>
-                    </>
-                );
-
-            default:
-                return null;
-        }
+    const location = useLocation();
+    const navigate = useNavigate();
+    
+    // Determine which path is active
+    const isActive = (path: string) => {
+        return location.pathname === `/settings${path}`;
     };
 
     return (
@@ -125,34 +37,41 @@ const SettingPage = () => {
             <Grid gutter="md">
                 {/* Sidebar Navigation */}
                 <Grid.Col span={{ base: 12, md: 3 }}>
-                    <Paper shadow="sm" radius="md" className="overflow-hidden">
+                    <Paper shadow="sm" radius="md" className="overflow-hidden sticky top-4">
                         <div className="p-4">
                             <NavLink
                                 label="Thông tin cá nhân"
                                 leftSection={<FiUser size={16} />}
-                                active={activeTab === 'profile'}
-                                onClick={() => setActiveTab('profile')}
+                                active={isActive('/info')}
+                                onClick={() => navigate('/settings/info')}
                                 className="font-medium rounded-md"
                             />
                             <NavLink
                                 label="Bảo mật"
                                 leftSection={<FiLock size={16} />}
-                                active={activeTab === 'security'}
-                                onClick={() => setActiveTab('security')}
+                                active={isActive('/security')}
+                                onClick={() => navigate('/settings/security')}
                                 className="font-medium rounded-md"
                             />
                             <NavLink
                                 label="Thông báo"
                                 leftSection={<FiBell size={16} />}
-                                active={activeTab === 'notifications'}
-                                onClick={() => setActiveTab('notifications')}
+                                active={isActive('/notifications')}
+                                onClick={() => navigate('/settings/notifications')}
                                 className="font-medium rounded-md"
                             />
                             <NavLink
                                 label="Tùy chọn"
                                 leftSection={<FiSettings size={16} />}
-                                active={activeTab === 'preferences'}
-                                onClick={() => setActiveTab('preferences')}
+                                active={isActive('/preferences')}
+                                onClick={() => navigate('/settings/preferences')}
+                                className="font-medium rounded-md"
+                            />
+                            <NavLink
+                                label="Quản lý đơn hàng"
+                                leftSection={<FiShoppingBag size={16} />}
+                                active={isActive('/orders')}
+                                onClick={() => navigate('/settings/orders')}
                                 className="font-medium rounded-md"
                             />
                         </div>
@@ -162,7 +81,14 @@ const SettingPage = () => {
                 {/* Main Content */}
                 <Grid.Col span={{ base: 12, md: 9 }}>
                     <Paper shadow="sm" radius="md" p="lg" className="bg-white">
-                        {renderTabContent()}
+                        <Routes>
+                            <Route path="/" element={<Navigate to="/settings/info" replace />} />
+                            <Route path="/info" element={<Infor />} />
+                            <Route path="/security" element={<Security />} />
+                            <Route path="/notifications" element={<Notification />} />
+                            <Route path="/preferences" element={<Preferences />} />
+                            <Route path="/orders" element={<OrderHistory />} />
+                        </Routes>
                     </Paper>
                 </Grid.Col>
             </Grid>

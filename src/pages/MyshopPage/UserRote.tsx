@@ -9,6 +9,7 @@ import HomePage from '../../components/User/HomePage/HomePage'
 import ListProduct from '../../components/User/HomePage/Products/ListProduct'
 import ProductDetailPage from '../../components/User/ProductDetail/ProductDetailPage'
 import SettingPage from '../../components/User/Setting.tsx/SettingPage'
+import ShopPage from '../../components/User/Shop/ShopPage'
 
 const UserPage = () => {
   return (
@@ -21,9 +22,10 @@ const UserPage = () => {
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/carts" element={<CartPage />} />
-          <Route path="/settings" element={<SettingPage />} />
+          <Route path="/settings/*" element={<SettingPage />} />
           <Route path="/search" element={<FilterProductPage />} />
           <Route path="/category/:slug" element={<CategoryPage />} />
+          <Route path="/shop/:slug" element={<ShopPage />} />
         </Routes>
       </div>
       <Footer />
