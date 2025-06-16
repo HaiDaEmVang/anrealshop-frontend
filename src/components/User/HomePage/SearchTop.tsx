@@ -47,7 +47,7 @@ const SearchTop = () => {
   return (
     <Box className="top-search-terms">
       <Group justify="space-between" className="mb-6">
-        <Title order={3} className="flex items-center gap-2 text-slate-900">
+        <Title order={4} className="flex items-center gap-2 text-slate-900">
           <FiSearch size={24} className="text-blue-500" />
           <span>Từ khóa tìm kiếm hàng đầu</span>
         </Title>

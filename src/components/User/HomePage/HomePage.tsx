@@ -8,7 +8,7 @@ import NewsletterSignup from '../Common/NewLetterSignup';
 import FeaturedProducts from './Products/FeatureProduct';
 import ListProduct from './Products/ListProduct';
 import NewArrivals from './Products/NewArrivals';
-import SearchTop from './Products/SearchTop';
+import SearchTop from './SearchTop';
 import TrendingProducts from './Products/TrendingProduct';
 
 const HomePage = () => {
