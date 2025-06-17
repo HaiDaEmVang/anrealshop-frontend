@@ -1,15 +1,7 @@
 import { notifications } from '@mantine/notifications';
 import { FaCheckCircle } from 'react-icons/fa';
 
-interface NotificationSuccessProps {
-  title?: string;
-  message: string;
-}
-
-/**
- * Hiển thị thông báo thành công với biểu tượng check và màu primary
- */
-export const showSuccessNotification = ({ title = 'Thành công', message }: NotificationSuccessProps) => {
+export const showSuccessNotification = (title = 'Thành công', message : string) => {
   return notifications.show({
     title,
     message,
