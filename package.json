@@ -26,6 +26,7 @@
     "@tiptap/extension-underline": "^2.12.0",
     "@tiptap/react": "^2.12.0",
     "@tiptap/starter-kit": "^2.12.0",
+    "axios": "^1.10.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "embla-carousel-autoplay": "^7.1.0",

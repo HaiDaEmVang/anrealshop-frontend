@@ -16,7 +16,7 @@ import {
     FiPlus
 } from 'react-icons/fi';
 import slugify from 'slugify';
-import showSuccessNotification from '../../../Toast/NotificationSuccess';
+import showSuccessNotification from '../../Toast/NotificationSuccess';
 import CategoryTable from './CategoryTable';
 import CategoryTree from './CategoryTree';
 import DeleteCategoryModal from './ModalDelete';
