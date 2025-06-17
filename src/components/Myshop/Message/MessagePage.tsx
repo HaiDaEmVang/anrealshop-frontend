@@ -16,7 +16,7 @@ import ModalInforCustomer from './ModalInforCustomer';
 // Import mock data
 import { MOCK_CONVERSATIONS, MOCK_MESSAGES, QUICK_REPLIES } from '../../../data/mockData';
 import type { Attachment, Conversation, Message } from '../../../types/MessageTypes';
-import { getStatusColor } from '../../../untils/Untils';
+import { getStatusColor } from '../../../untils/TimeFormat';
 
 const MessagePage = () => {
     const [activeTab, setActiveTab] = useState<string | null>('customers');

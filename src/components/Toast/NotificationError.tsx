@@ -1,19 +1,11 @@
 import { notifications } from '@mantine/notifications';
 import { IconAlertCircle } from '@tabler/icons-react';
 
-interface NotificationErrorProps {
-  title?: string;
-  message: string;
-}
-
-/**
- * Hiển thị thông báo lỗi với biểu tượng cảnh báo và màu đỏ
- */
-export const showErrorNotification = ({ title = 'Lỗi', message }: NotificationErrorProps) => {
+export const showErrorNotification = (title = 'Lỗi', message : string) => {
   return notifications.show({
     title,
     message,
-    color: 'red', // Màu đỏ cho thông báo lỗi
+    color: 'red', 
     icon: <IconAlertCircle size={18} />,
     withBorder: true,
     autoClose: 5000,

@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   TextInput,
   PasswordInput,
@@ -14,8 +13,14 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
-import ResetPassword from './ResetPasswrod';
 import { useDisclosure } from '@mantine/hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import type { LoginRequest } from '../../types/AuthType';
+import type { AppDispatch, RootState } from '../../store/store';
+import { loginUser } from '../../feature/auth/authSlice';
+import showSuccessNotification from '../Toast/NotificationSuccess';
+import showErrorNotification from '../Toast/NotificationError';
+import ResetPassword from './ResetPasswrod';
 
 interface SignInFormValues {
   email: string;
@@ -24,7 +29,10 @@ interface SignInFormValues {
 }
 
 export function SignIn() {
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
+  const { status } = useSelector((state: RootState) => state.auth);
+  const isLoading = status === 'loading';
   const [opened, { open, close }] = useDisclosure(false);
 
   const form = useForm<SignInFormValues>({
@@ -48,15 +56,20 @@ export function SignIn() {
   });
 
   const handleSubmit = async (values: SignInFormValues) => {
-    setLoading(true);
+    const loginData: LoginRequest = {
+      username: values.email,
+      password: values.password,
+    };
+
     try {
-      console.log('Login values:', values);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } catch (error) {
-      console.error('Login error:', error);
-      form.setErrors({ password: 'Email hoặc mật khẩu không chính xác' });
-    } finally {
-      setLoading(false);
+      const resultAction = await dispatch(loginUser(loginData)).unwrap();
+      
+      const user = resultAction;
+      showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
+      navigate('/');
+
+    } catch (error: any) {
+      showErrorNotification('Đăng nhập thất bại', error || 'Email hoặc mật khẩu không chính xác.');
     }
   };
 
@@ -73,9 +86,7 @@ export function SignIn() {
               label="Email"
               placeholder="your@email.com"
               required
-              value={form.values.email}
-              onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-              error={form.errors.email}
+              {...form.getInputProps('email')}
               size="md"
             />
 
@@ -83,17 +94,14 @@ export function SignIn() {
               label="Mật khẩu"
               placeholder="Mật khẩu của bạn"
               required
-              value={form.values.password}
-              onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-              error={form.errors.password}
+              {...form.getInputProps('password')}
               size="md"
             />
 
             <Group justify="apart">
               <Checkbox
                 label="Ghi nhớ đăng nhập"
-                checked={form.values.rememberMe}
-                onChange={(event) => form.setFieldValue('rememberMe', event.currentTarget.checked)}
+                {...form.getInputProps('rememberMe', { type: 'checkbox' })}
               />
               <Anchor size="sm" component="button" type="button" className="text-primary" onClick={open}>
                 Quên mật khẩu?
@@ -103,7 +111,7 @@ export function SignIn() {
             <Button
               fullWidth
               type="submit"
-              loading={loading}
+              loading={isLoading}
               className="bg-primary hover:bg-primary/90 mt-4"
               size="md"
             >
@@ -137,9 +145,7 @@ export function SignIn() {
             Đăng ký ngay
           </Link>
         </Text>
-        {
-          opened && <ResetPassword opened={opened} close={close} />
-        }
+        {opened && <ResetPassword opened={opened} close={close} />}
       </div>
     </div>
   );

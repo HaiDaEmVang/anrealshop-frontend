@@ -17,7 +17,7 @@ import {
     FiUsers
 } from 'react-icons/fi';
 import type { Conversation } from '../../../types/MessageTypes';
-import { formatMessageTime } from '../../../untils/Untils';
+import { formatMessageTime } from '../../../untils/TimeFormat';
 
 interface ConversationListProps {
   conversations: Conversation[];
