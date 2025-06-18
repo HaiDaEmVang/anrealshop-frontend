@@ -14,13 +14,13 @@ import {
 import { useForm } from '@mantine/form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { useDisclosure } from '@mantine/hooks';
-import { useDispatch, useSelector } from 'react-redux';
-import type { LoginRequest } from '../../types/AuthType';
-import type { AppDispatch, RootState } from '../../store/store';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import { loginUser } from '../../feature/auth/authSlice';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import showErrorNotification from '../Toast/NotificationError';
 import ResetPassword from './ResetPasswrod';
+import type { LoginRequest } from '../../types/AuthType';
+import type { UserDto } from '../../types/UserType';
 
 interface SignInFormValues {
   email: string;
@@ -30,8 +30,8 @@ interface SignInFormValues {
 
 export function SignIn() {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const { status } = useSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
+  const { status } = useAppSelector((state) => state.auth); 
   const isLoading = status === 'loading';
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -56,20 +56,36 @@ export function SignIn() {
   });
 
   const handleSubmit = async (values: SignInFormValues) => {
+    form.clearErrors(); 
     const loginData: LoginRequest = {
-      username: values.email,
+      username: values.email, 
       password: values.password,
     };
 
     try {
       const resultAction = await dispatch(loginUser(loginData)).unwrap();
+      const user: UserDto = resultAction.user; 
       
-      const user = resultAction;
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
       navigate('/');
+    } catch (err: any) {
+      console.error('Login failed in component:', err);
 
-    } catch (error: any) {
-      showErrorNotification('Đăng nhập thất bại', error || 'Email hoặc mật khẩu không chính xác.');
+      let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
+      
+      if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
+        err.details.forEach((itemError: { field: string; message: string }) => {
+          const formField = itemError.field === 'username' ? 'email' : itemError.field;
+          if (form.values.hasOwnProperty(formField)) {
+            form.setFieldError(formField, itemError.message);
+          }
+        });
+        notificationMessage = err.message || 'Dữ liệu nhập vào không hợp lệ.';
+      } else {
+          notificationMessage = err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+      }
+
+     showErrorNotification('Đăng nhập thất bại', notificationMessage);
     }
   };
 
