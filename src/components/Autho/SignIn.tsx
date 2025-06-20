@@ -1,26 +1,29 @@
-import { Link, useNavigate } from 'react-router-dom';
 import {
-  TextInput,
-  PasswordInput,
-  Button,
-  Group,
-  Checkbox,
   Anchor,
-  Stack,
+  Button,
+  Checkbox,
   Divider,
+  Group,
+  PasswordInput,
+  Stack,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { useDisclosure } from '@mantine/hooks';
-import { useDispatch, useSelector } from 'react-redux';
+import { FaFacebook, FaGoogle } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS, BASE_API_URL } from '../../constant';
+import { fetchCurrentUser, loginUser } from '../../feature/auth/authSlice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
 import type { LoginRequest } from '../../types/AuthType';
-import type { AppDispatch, RootState } from '../../store/store';
-import { loginUser } from '../../feature/auth/authSlice';
-import showSuccessNotification from '../Toast/NotificationSuccess';
+import type { UserDto } from '../../types/UserType';
+import { validateEmail, validatePassword } from '../../untils/ValidateInput';
 import showErrorNotification from '../Toast/NotificationError';
+import showSuccessNotification from '../Toast/NotificationSuccess';
 import ResetPassword from './ResetPasswrod';
+import { useEffect } from 'react';
 
 interface SignInFormValues {
   email: string;
@@ -30,8 +33,8 @@ interface SignInFormValues {
 
 export function SignIn() {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const { status } = useSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
+  const { status } = useAppSelector((state) => state.auth);
   const isLoading = status === 'loading';
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -42,20 +45,13 @@ export function SignIn() {
       rememberMe: false,
     },
     validate: {
-      email: (value) => {
-        if (!value) return 'Email là bắt buộc';
-        if (!/^\S+@\S+$/.test(value)) return 'Email không hợp lệ';
-        return null;
-      },
-      password: (value) => {
-        if (!value) return 'Mật khẩu là bắt buộc';
-        if (value.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
-        return null;
-      },
+      email: (value) => { return validateEmail(value); },
+      password: (value) => { return validatePassword(value); },
     },
   });
 
   const handleSubmit = async (values: SignInFormValues) => {
+    form.clearErrors();
     const loginData: LoginRequest = {
       username: values.email,
       password: values.password,
@@ -63,15 +59,62 @@ export function SignIn() {
 
     try {
       const resultAction = await dispatch(loginUser(loginData)).unwrap();
-      
-      const user = resultAction;
+      const user: UserDto = resultAction.user;
+
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
       navigate('/');
+    } catch (err: any) {
+      console.error('Login failed in component:', err);
 
-    } catch (error: any) {
-      showErrorNotification('Đăng nhập thất bại', error || 'Email hoặc mật khẩu không chính xác.');
+      let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
+
+      if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
+        err.details.forEach((itemError: { field: string; message: string }) => {
+          const formField = itemError.field === 'username' ? 'email' : itemError.field;
+          if (form.values.hasOwnProperty(formField)) {
+            form.setFieldError(formField, itemError.message);
+          }
+        });
+        notificationMessage = err.message || 'Dữ liệu nhập vào không hợp lệ.';
+      } else {
+        notificationMessage = err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+      }
+
+      showErrorNotification('Đăng nhập thất bại', notificationMessage);
     }
   };
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${BASE_API_URL}${API_ENDPOINTS.AUTH.LOGIN_GOOGLE}`;
+  }
+
+  useEffect(() => {
+    const handleOAuthLogin = async () => {
+      const params = new URLSearchParams(location.search);
+      const successMessage = params.get('success');
+      const errorMessage = params.get('error');
+
+      if (successMessage) {
+        try {
+          const user: UserDto = await dispatch(fetchCurrentUser()).unwrap();
+          showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
+          navigate('/');
+        } catch (err: any) {
+          console.error('Login failed in component:', err);
+          let notificationMessage = err.message || 'Không thể lấy thông tin user.';          showErrorNotification('Đăng nhập thất bại', notificationMessage);
+        }
+      }
+      if (errorMessage) {
+        showErrorNotification('Đăng nhập thất bại', errorMessage);
+      }
+    };
+
+    handleOAuthLogin();
+  }, [location, navigate]);
+
+
+
+
 
   return (
     <div className="w-1/2 bg-white flex items-center justify-center p-8">
@@ -123,10 +166,12 @@ export function SignIn() {
         <Divider label="Hoặc đăng nhập với" labelPosition="center" my="lg" />
 
         <Group grow>
+
           <Button
             leftSection={<FaGoogle size={16} />}
             variant="outline"
             className="border-gray-300"
+            onClick={() => handleGoogleLogin()}
           >
             Google
           </Button>

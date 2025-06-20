@@ -8,150 +8,117 @@ import {
   Group,
   Text,
   Stack,
-  Title
+  Title,
 } from '@mantine/core';
-import { FiMail, FiLock } from 'react-icons/fi';
-import { useDisclosure } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
+import { FiMail } from 'react-icons/fi';
+import { validateEmail, validatePassword } from '../../untils/ValidateInput';
+import OtpService from '../../service/OtpService'; 
+import type { ResetPwRequest } from '../../types/UserType';
+import UserService from '../../service/UserService';
 
 interface ResetPasswordProps {
   opened: boolean;
   close: () => void;
 }
 
-interface FormValues {
-  email: string;
-  otp: string;
-  password: string;
-}
-
-interface FormErrors {
-  email: string;
-  otp: string;
-  password: string;
-}
-
 export function ResetPassword(props: ResetPasswordProps) {
-  const [valueForm, setValueForm] = useState<FormValues>({
-    email: '',
-    otp: '',
-    password: ''
-  });
-  const [errorForm, setErrorForm] = useState<FormErrors>({
-    email: '',
-    otp: '',
-    password: ''
-  });
-  
   const [otpSend, setOtpSend] = useState(false);
   const [otpSending, setOtpSending] = useState(false);
   const [verifyOtp, setVerifyOtp] = useState(false);
   const [resetting, setResetting] = useState(false);
-  
-  const [time, setTime] = useState(60);
-  const [timeRequest, setTimeRequest] = useState(0);
-  
-  const [visible, { toggle }] = useDisclosure(false);
-  
+  const [timeRequest, setTimeRequest] = useState(30);
+
+
+  const form = useForm({
+    mode: 'uncontrolled',
+    initialValues: {
+      email: '',
+      otp: '',
+      password: '',
+    },
+
+    validate: {
+      email: (value) => validateEmail(value),
+      otp: (value) => (otpSend && !verifyOtp && value.length !== 6 ? 'Mã OTP không hợp lệ' : null),
+      password: (value) => validatePassword(value)
+    },
+  });
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (timeRequest > 0) {
       interval = setInterval(() => {
-        setTimeRequest(prev => prev - 1);
+        setTimeRequest((prev) => prev - 1);
       }, 1000);
     }
     return () => clearInterval(interval);
   }, [timeRequest]);
-  
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.currentTarget;
-    setValueForm(prev => ({ ...prev, [name]: value }));
-    setErrorForm(prev => ({ ...prev, [name]: '' }));
-  };
-  
+
   const handleSendOTP = async () => {
-    // Validate email
-    if (!valueForm.email) {
-      setErrorForm(prev => ({ ...prev, email: 'Email là bắt buộc' }));
+    const emailError = form.validateField('email').hasError;
+    if (emailError) {
       return;
     }
-    
-    if (!validateEmail(valueForm.email)) {
-      setErrorForm(prev => ({ ...prev, email: 'Email không hợp lệ' }));
-      return;
-    }
-    
     setOtpSending(true);
     try {
-      // Here you would send a request to your API to send the OTP
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
-      
+      await OtpService.getOtp(form.values.email, 'RESET_PASSWORD');
       setOtpSend(true);
-      setTimeRequest(time);
-      // Show success message or notification here
     } catch (error) {
-      setErrorForm(prev => ({ ...prev, email: 'Không thể gửi OTP. Vui lòng thử lại.' }));
+      form.validateField('otp');
     } finally {
       setOtpSending(false);
     }
   };
-  
-  const handleVerifyOtp = async (otp: string) => {
-    setValueForm(prev => ({ ...prev, otp }));
-    
-    try {
-      // Here you would verify the OTP with your API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
-      setVerifyOtp(true);
-      // Show success message
-    } catch (error) {
-      setErrorForm(prev => ({ ...prev, otp: 'OTP không hợp lệ' }));
+
+  const handleVerifyOtp = async (otpValue: string) => {
+    form.setFieldValue('otp', otpValue);
+
+    if (otpValue.length === 6) {
+      try {
+        await OtpService.verifyOtp(form.values.email, otpValue);
+        setVerifyOtp(true);
+      } catch (error) {
+        form.setFieldError('otp', 'Mã OTP không hợp lệ');
+        setVerifyOtp(false);
+      }
+    } else {
+      form.setFieldError('otp', 'Mã OTP phải có 6 ký tự');
     }
   };
-  
+
   const handleChangeEmail = () => {
     setOtpSend(false);
     setVerifyOtp(false);
-    setValueForm(prev => ({ ...prev, otp: '', password: '' }));
-    setErrorForm({ email: '', otp: '', password: '' });
+    form.reset();
   };
-  
+
   const handleChangePass = async () => {
-    // Validate password
-    if (!valueForm.password) {
-      setErrorForm(prev => ({ ...prev, password: 'Mật khẩu là bắt buộc' }));
+    const passwordError = form.validateField('password').hasError;
+    if (passwordError) {
       return;
     }
-    
-    if (valueForm.password.length < 6) {
-      setErrorForm(prev => ({ ...prev, password: 'Mật khẩu phải có ít nhất 6 ký tự' }));
-      return;
-    }
-    
     setResetting(true);
+    const resetData: ResetPwRequest = {
+      email: form.values.email,
+      password: form.values.password,
+      otp: form.values.otp,
+    };
     try {
-      // Here you would send a request to your API to reset the password
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
-      
-      // Success - close the modal and show success message
+      await UserService.changePassword(resetData);
       props.close();
-      // You could show a notification here
+      form.reset();
     } catch (error) {
-      setErrorForm(prev => ({ ...prev, password: 'Không thể đặt lại mật khẩu. Vui lòng thử lại.' }));
+      form.setFieldError('password', 'Không thể đặt lại mật khẩu. Vui lòng thử lại.');
     } finally {
       setResetting(false);
     }
   };
-  
+
   return (
-    <Modal 
-      opened={props.opened} 
-      onClose={props.close} 
+    <Modal
+      opened={props.opened}
+      onClose={props.close}
       title={
         <Title order={4} className="text-slate-800 mb-2">
           Đặt lại mật khẩu
@@ -159,107 +126,102 @@ export function ResetPassword(props: ResetPasswordProps) {
       }
       centered
     >
-      <Stack gap="md">
-        {!verifyOtp && (
-          <Text size="sm" className="text-gray-500 -mt-2 mb-2">
-            Nhập email của bạn để nhận mã OTP đặt lại mật khẩu
-          </Text>
-        )}
-        
-        <TextInput
-          required
-          name="email"
-          error={errorForm.email}
-          value={valueForm.email}
-          onChange={handleChange}
-          disabled={otpSend}
-          leftSection={<FiMail className="w-5 h-5" />}
-          rightSection={
-            <Button 
-              size="xs" 
-              className="m-1" 
-              variant="filled" 
-              onClick={handleSendOTP}
-              disabled={valueForm.email.length === 0 || otpSend}
-              loading={otpSending}
-            >
-              Gửi OTP
-            </Button>
-          }
-          rightSectionWidth={100}
-          label="Email"
-          placeholder="Email của bạn"
-        />
-        
-        {otpSend && (
-          <>
-            <Text size="sm" className="text-gray-500 text-center">
-              Nhập mã OTP đã được gửi đến email của bạn
+      <form onSubmit={form.onSubmit(() => { })}>
+        <Stack gap="md">
+          {!verifyOtp && (
+            <Text size="sm" className="text-gray-500 -mt-2 mb-2">
+              Nhập email của bạn để nhận mã OTP đặt lại mật khẩu
             </Text>
-            <Group justify="center">
-              <PinInput
-                autoFocus
-                type="number"
-                length={6}
-                size="md"
-                onComplete={handleVerifyOtp}
-                onChange={(e) => setValueForm({...valueForm, 'otp': e})}
-                error={!!errorForm.otp}
-              />
-            </Group>
-            {errorForm.otp && (
-              <Text size="sm" color="red" className="text-center">
-                {errorForm.otp}
-              </Text>
-            )}
-            
-            <Group grow>
-              <Button 
-                variant="light" 
-                color="primary"
-                disabled={timeRequest > 0 || otpSending || verifyOtp} 
+          )}
+
+          <TextInput
+            required
+            label="Email"
+            placeholder="Email của bạn"
+            disabled={otpSend}
+            leftSection={<FiMail className="w-5 h-5" />}
+            rightSection={
+              <Button
+                size="xs"
+                className="m-1"
+                variant="filled"
                 onClick={handleSendOTP}
+                disabled={!form.values.email || otpSend || otpSending}
+                loading={otpSending}
               >
-                {timeRequest > 0 ? `${timeRequest}s` : "Gửi lại"}
+                Gửi OTP
               </Button>
-              <Button 
-                variant="filled" 
+            }
+            rightSectionWidth={100}
+            key={form.key('email')}
+            {...form.getInputProps('email')}
+          />
+
+          {otpSend && (
+            <>
+              <Text size="sm" className="text-gray-500 text-center">
+                Nhập mã OTP đã được gửi đến email của bạn
+              </Text>
+              <Group justify="center">
+                <PinInput
+                  autoFocus
+                  type="number"
+                  length={6}
+                  size="md"
+                  onComplete={handleVerifyOtp}
+                  onChange={(value) => form.setFieldValue('otp', value)}
+                // error={!!form.errors.otp} // Sử dụng lỗi từ useForm
+                />
+              </Group>
+              {form.errors.otp && (
+                <Text size="sm" color="red" className="text-center">
+                  {form.errors.otp}
+                </Text>
+              )}
+
+              <Group grow>
+                <Button
+                  variant="light"
+                  color="primary"
+                  disabled={timeRequest > 0 || otpSending || verifyOtp}
+                  onClick={handleSendOTP}
+                >
+                  {timeRequest > 0 ? `${timeRequest}s` : 'Gửi lại'}
+                </Button>
+                <Button
+                  variant="filled"
+                  className="bg-primary hover:bg-primary/90"
+                  onClick={handleChangeEmail}
+                >
+                  Đổi email
+                </Button>
+              </Group>
+            </>
+          )}
+
+          {verifyOtp && (
+            <>
+              <PasswordInput
+                required
+                label="Mật khẩu mới"
+                placeholder="Nhập mật khẩu mới"
+                key={form.key('password')}
+                {...form.getInputProps('password')}
+              />
+
+              <Button
+                fullWidth
+                variant="filled"
                 className="bg-primary hover:bg-primary/90"
-                onClick={handleChangeEmail}
+                onClick={handleChangePass}
+                loading={resetting}
               >
-                Đổi email
+                Đặt lại mật khẩu
               </Button>
-            </Group>
-          </>
-        )}
-        
-        {verifyOtp && (
-          <>
-            <PasswordInput
-              required
-              value={valueForm.password}
-              onChange={handleChange}
-              error={errorForm.password}
-              name='password'
-              leftSection={<FiLock className="w-5 h-5" />}
-              label="Mật khẩu mới"
-              visible={visible}
-              onVisibilityChange={toggle}
-              placeholder="Nhập mật khẩu mới"
-            />
-            
-            <Button 
-              fullWidth 
-              variant="filled" 
-              className="bg-primary hover:bg-primary/90"
-              onClick={handleChangePass}
-              loading={resetting}
-            >
-              Đặt lại mật khẩu
-            </Button>
-          </>
-        )}
-      </Stack>
+            </>
+          )}
+        </Stack>
+      </form>
     </Modal>
   );
 }

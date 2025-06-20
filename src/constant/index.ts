@@ -2,22 +2,28 @@ export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL
 export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE
 export const BASE_FE_URL = import.meta.env.VITE_BASE_FE_URL
-export const GOOGLE_LOGIN_URL=`${BASE_BE_URL}/oauth2/authorization/google`
+export const GOOGLE_LOGIN_URL = `${BASE_BE_URL}/oauth2/authorization/google`
 
 
 
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/login',
+    LOGIN_GOOGLE: '/oauth2/callback/google',
     LOGOUT: '/logout',
-    REGISTER: '/auth/register',
     REFRESH: '/refresh',
-    ME: '/user/me',
+  },
+  OTP: {
+    GET_OTP: '/otp',
+    VERIFY_OTP: '/otp/verify',
   },
   USERS: {
+    ME: '/user/me',
+    REGISTER: '/user/register',
     PROFILE: '/user/profile',
     UPDATE_PROFILE: '/user/update-profile',
     CHANGE_PASSWORD: '/user/change-password',
+    RESET_PASSWORD: '/user/reset-password',
   },
 };
 
@@ -100,7 +106,7 @@ export const QUERY_KEYS = {
 
 export const APP_CONFIG = {
   ITEMS_PER_PAGE: 10,
-  REQUEST_TIMEOUT: 30000, 
+  REQUEST_TIMEOUT: 30000,
 };
 
 export const LOCAL_STORAGE_KEYS = {
