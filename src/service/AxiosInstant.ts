@@ -79,4 +79,19 @@ axiosInstance.interceptors.response.use(
   }
 );
 
-export { axiosInstance };
+const axiosNoAuthInstance = axios.create({
+  baseURL: BASE_API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const axiosNoWithCredInstance = axios.create({
+  baseURL: BASE_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export { axiosInstance, axiosNoAuthInstance, axiosNoWithCredInstance };

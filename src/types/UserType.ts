@@ -27,3 +27,10 @@ export interface ProfileRequest {
   dob: string;
   avatarUrl?: string;
 }
+
+
+export interface ResetPwRequest  {
+  email: string;
+  password: string;
+  otp: string;
+}

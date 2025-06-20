@@ -4,6 +4,7 @@ import type { LoginRequest, LoginResponse } from '../../types/AuthType';
 import authService from '../../service/AuthService';
 import type { ProfileRequest, RegisterRequest, UserDto } from '../../types/UserType';
 import type { ErrorResponseDto } from '../../types/CommonType';
+import type { StringDecoder } from 'node:string_decoder';
 
 interface AuthError {
   message: string;
@@ -45,6 +46,7 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+
 
 export const fetchCurrentUser = createAsyncThunk(
   'auth/fetchCurrentUser',
@@ -169,9 +171,9 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.error = null;
       })
-      .addCase(updateUserProfile.rejected, (state, action ) => {
+      .addCase(updateUserProfile.rejected, (state, action) => {
         state.status = 'failed';
-         state.error = (action.payload as AuthError) || { message: 'Cập nhật thông tin thất bại.' };
+        state.error = (action.payload as AuthError) || { message: 'Cập nhật thông tin thất bại.' };
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
@@ -179,9 +181,9 @@ const authSlice = createSlice({
         state.status = 'idle';
         state.error = null;
       })
-      .addCase(logoutUser.rejected, (state, action ) => {
+      .addCase(logoutUser.rejected, (state, action) => {
         state.status = 'failed';
-         state.error = (action.payload as AuthError) || { message: 'Đăng xuất thất bại.' };
+        state.error = (action.payload as AuthError) || { message: 'Đăng xuất thất bại.' };
       })
       .addCase(registerUser.pending, (state) => {
         state.status = 'loading';
@@ -191,7 +193,7 @@ const authSlice = createSlice({
         state.status = 'succeeded';
         state.error = null;
       })
-      .addCase(registerUser.rejected, (state, action ) => {
+      .addCase(registerUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = (action.payload as AuthError) || { message: 'Đăng ký thất bại.' };
       });

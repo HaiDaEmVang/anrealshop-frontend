@@ -18,6 +18,7 @@ import type { RegisterRequest } from '../../types/UserType';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import { registerUser } from '../../feature/auth/authSlice';
 import showErrorNotification from '../Toast/NotificationError';
+import { validateAgreeTerms, validateConfirmPassword, validateEmail, validatePassword } from '../../untils/ValidateInput';
 
 interface SignUpFormValues {
   fullName: string;
@@ -44,23 +45,16 @@ export function SignUp() {
     validate: {
       fullName: (value) => (value ? null : 'Họ tên là bắt buộc'),
       email: (value) => {
-        if (!value) return 'Email là bắt buộc';
-        if (!/^\S+@\S+$/.test(value)) return 'Email không hợp lệ';
-        return null;
+        return validateEmail(value);
       },
       password: (value) => {
-        if (!value) return 'Mật khẩu là bắt buộc';
-        if (value.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
-        return null;
+        return validatePassword(value);
       },
       confirmPassword: (value, values) => {
-        if (!value) return 'Vui lòng xác nhận mật khẩu';
-        if (value !== values.password) return 'Mật khẩu không khớp';
-        return null;
+        return validateConfirmPassword(values.password, value);
       },
       agreeTerms: (value) => {
-        if (!value) return 'Bạn phải đồng ý với điều khoản của chúng tôi';
-        return null;
+        return validateAgreeTerms(value);
       },
     },
   });
