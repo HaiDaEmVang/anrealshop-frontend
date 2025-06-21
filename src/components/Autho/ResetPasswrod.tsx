@@ -1,21 +1,20 @@
-import { useState, useEffect } from 'react';
 import {
-  TextInput,
-  PasswordInput,
   Button,
-  Modal,
-  PinInput,
   Group,
-  Text,
+  Modal,
+  PasswordInput,
+  PinInput,
   Stack,
-  Title,
+  Text,
+  TextInput
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useEffect, useState } from 'react';
 import { FiMail } from 'react-icons/fi';
-import { validateEmail, validatePassword } from '../../untils/ValidateInput';
-import OtpService from '../../service/OtpService'; 
-import type { ResetPwRequest } from '../../types/UserType';
+import OtpService from '../../service/OtpService';
 import UserService from '../../service/UserService';
+import type { forgotPwRequest } from '../../types/UserType';
+import { validateEmail, validatePassword } from '../../untils/ValidateInput';
 
 interface ResetPasswordProps {
   opened: boolean;
@@ -31,7 +30,6 @@ export function ResetPassword(props: ResetPasswordProps) {
 
 
   const form = useForm({
-    mode: 'uncontrolled',
     initialValues: {
       email: '',
       otp: '',
@@ -99,13 +97,13 @@ export function ResetPassword(props: ResetPasswordProps) {
       return;
     }
     setResetting(true);
-    const resetData: ResetPwRequest = {
+    const resetData: forgotPwRequest = {
       email: form.values.email,
       password: form.values.password,
       otp: form.values.otp,
     };
     try {
-      await UserService.changePassword(resetData);
+      await UserService.forgotPassword(resetData);
       props.close();
       form.reset();
     } catch (error) {
@@ -120,9 +118,9 @@ export function ResetPassword(props: ResetPasswordProps) {
       opened={props.opened}
       onClose={props.close}
       title={
-        <Title order={4} className="text-slate-800 mb-2">
-          Đặt lại mật khẩu
-        </Title>
+        <div className="text-xl font-semibold text-slate-800">
+      Đặt lại mật khẩu
+    </div>
       }
       centered
     >
@@ -146,7 +144,7 @@ export function ResetPassword(props: ResetPasswordProps) {
                 className="m-1"
                 variant="filled"
                 onClick={handleSendOTP}
-                disabled={!form.values.email || otpSend || otpSending}
+                disabled={!form.values.email.trim() || otpSend || otpSending}
                 loading={otpSending}
               >
                 Gửi OTP

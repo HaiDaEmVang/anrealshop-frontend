@@ -23,7 +23,7 @@ import { validateEmail, validatePassword } from '../../untils/ValidateInput';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import ResetPassword from './ResetPasswrod';
-import { useEffect } from 'react';
+import { useEffect, useRef  } from 'react';
 
 interface SignInFormValues {
   email: string;
@@ -33,10 +33,12 @@ interface SignInFormValues {
 
 export function SignIn() {
   const navigate = useNavigate();
-  // const dispatch = useAppDispatch();
-  // const { status } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const { status } = useAppSelector((state) => state.auth);
   const isLoading = status === 'loading' ;
   const [opened, { open, close }] = useDisclosure(false);
+
+  const hasNotifiedRef = useRef(false);
 
   const form = useForm<SignInFormValues>({
     initialValues: {
@@ -51,37 +53,37 @@ export function SignIn() {
   });
 
   const handleSubmit = async (values: SignInFormValues) => {
-    // form.clearErrors();
-    // const loginData: LoginRequest = {
-    //   username: values.email,
-    //   password: values.password,
-    // };
+    form.clearErrors();
+    const loginData: LoginRequest = {
+      username: values.email,
+      password: values.password,
+    };
 
-    // try {
-    //   const resultAction = await dispatch(loginUser(loginData)).unwrap();
-    //   const user: UserDto = resultAction.user;
+    try {
+      const resultAction = await dispatch(loginUser(loginData)).unwrap();
+      const user: UserDto = resultAction.user;
 
-    //   showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
-    //   navigate('/');
-    // } catch (err: any) {
-    //   console.error('Login failed in component:', err);
+      showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
+      navigate('/');
+    } catch (err: any) {
+      console.error('Login failed in component:', err);
 
-    //   let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
+      let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
 
-    //   if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
-    //     err.details.forEach((itemError: { field: string; message: string }) => {
-    //       const formField = itemError.field === 'username' ? 'email' : itemError.field;
-    //       if (form.values.hasOwnProperty(formField)) {
-    //         form.setFieldError(formField, itemError.message);
-    //       }
-    //     });
-    //     notificationMessage = err.message || 'Dữ liệu nhập vào không hợp lệ.';
-    //   } else {
-    //     notificationMessage = err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
-    //   }
+      if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
+        err.details.forEach((itemError: { field: string; message: string }) => {
+          const formField = itemError.field === 'username' ? 'email' : itemError.field;
+          if (form.values.hasOwnProperty(formField)) {
+            form.setFieldError(formField, itemError.message);
+          }
+        });
+        notificationMessage = err.message || 'Dữ liệu nhập vào không hợp lệ.';
+      } else {
+        notificationMessage = err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+      }
 
-    //   showErrorNotification('Đăng nhập thất bại', notificationMessage);
-    // }
+      showErrorNotification('Đăng nhập thất bại', notificationMessage);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -89,32 +91,36 @@ export function SignIn() {
   }
 
   useEffect(() => {
-    // const handleOAuthLogin = async () => {
-    //   const params = new URLSearchParams(location.search);
-    //   const successMessage = params.get('success');
-    //   const errorMessage = params.get('error');
+    
+    const handleOAuthLogin = async () => {
+      if (hasNotifiedRef.current) return;
+      
+      const params = new URLSearchParams(location.search);
+      const successMessage = params.get('success');
+      const errorMessage = params.get('error');
 
-    //   if (successMessage) {
-    //     try {
-    //       const user: UserDto = await dispatch(fetchCurrentUser()).unwrap();
-    //       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
-    //       navigate('/');
-    //     } catch (err: any) {
-    //       console.error('Login failed in component:', err);
-    //       let notificationMessage = err.message || 'Không thể lấy thông tin user.';          showErrorNotification('Đăng nhập thất bại', notificationMessage);
-    //     }
-    //   }
-    //   if (errorMessage) {
-    //     showErrorNotification('Đăng nhập thất bại', errorMessage);
-    //   }
-    // };
-// 
-    // handleOAuthLogin();
-  }, [location, navigate]);
+      hasNotifiedRef.current = true;
+      if (successMessage) {
+        try {
+          const user: UserDto = await dispatch(fetchCurrentUser()).unwrap();
+          showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
+          navigate('/');
+        } catch (err: any) {
+          console.error('Login failed in component:', err);
+          let notificationMessage = err.message || 'Không thể lấy thông tin user.';          showErrorNotification('Đăng nhập thất bại', notificationMessage);
+        }
+      }else if (errorMessage) {
+        const timeoutId = setTimeout(() => {
+          params.delete('error');
+          navigate({ pathname: '/login', search: params.toString() }, { replace: true });
+          showErrorNotification('Đăng nhập thất bại', errorMessage);
+        }, 1000); 
+        return () => clearTimeout(timeoutId);
+      }
+    };
 
-
-
-
+    handleOAuthLogin();
+  }, []);
 
   return (
     <div className="w-1/2 bg-white flex items-center justify-center p-8">

@@ -11,11 +11,12 @@ export const API_ENDPOINTS = {
     LOGIN: '/login',
     LOGIN_GOOGLE: '/oauth2/callback/google',
     LOGOUT: '/logout',
-    REFRESH: '/refresh',
+    FORGOT_PASSWORD: '/forgot-password',
+    REFRESH: '/auth/refreshToken',
   },
   OTP: {
-    GET_OTP: '/otp',
-    VERIFY_OTP: '/otp/verify',
+    GET_OTP: '/otp/sendOtp',
+    VERIFY_OTP: '/otp/verifyOTP',
   },
   USERS: {
     ME: '/user/me',
