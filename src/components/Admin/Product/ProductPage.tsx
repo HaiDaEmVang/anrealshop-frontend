@@ -20,6 +20,7 @@ import {
     Tooltip
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
+import '@mantine/dates/styles.css';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import {

@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@mantine/core';
 import { FiArrowLeft } from 'react-icons/fi';
-import { SignIn } from '../components/Autho/SignIn';
-import { SignUp } from '../components/Autho/SignUp';
+import { SignIn } from '../../components/Autho/SignIn';
+import { SignUp } from '../../components/Autho/SignUp';
 
 export function AuthoPage() {
   const location = useLocation();

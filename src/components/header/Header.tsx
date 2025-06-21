@@ -1,25 +1,23 @@
 import {
-    ActionIcon,
     Button,
     CloseButton,
     Container,
     Divider,
+    Flex,
     Group,
     Input,
-    Text,
-    UnstyledButton,
     Menu,
-    Box,
-    Flex,
-    Stack
+    Stack,
+    Text,
+    UnstyledButton
 } from '@mantine/core';
-import { useState, useRef, useEffect } from 'react';
-import { FaSearch } from 'react-icons/fa';
-import { FiHome, FiShoppingCart, FiUser, FiPackage, FiLogOut, FiLogIn, FiMapPin } from 'react-icons/fi';
+import { useEffect, useRef, useState } from 'react';
 import { BiUser } from 'react-icons/bi';
+import { FaSearch } from 'react-icons/fa';
+import { FiHome, FiLogIn, FiLogOut, FiMapPin, FiPackage, FiShoppingCart, FiUser } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import SuggestSearch from '../header/SuggestSearch';
 import ModalAddress, { type Address } from '../header/ModalAddress';
+import SuggestSearch from '../header/SuggestSearch';
 
 // Dữ liệu danh mục
 const POPULAR_CATEGORIES = [
@@ -57,7 +55,8 @@ const SAVED_ADDRESSES: Address[] = [
     }
 ];
 
-export function Header() {
+
+const Header: React.FC = () => {
     const [searchValue, setSearchValue] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [addressModalOpened, setAddressModalOpened] = useState(false);
@@ -316,3 +315,5 @@ export function Header() {
         </header>
     );
 }
+
+export default Header;

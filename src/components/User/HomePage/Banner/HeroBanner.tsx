@@ -1,7 +1,9 @@
 import { Carousel } from '@mantine/carousel';
+import '@mantine/carousel/styles.css';
 import { Box, Button, Grid, Overlay, Paper, Stack, Text, Title } from '@mantine/core';
 import Autoplay from 'embla-carousel-autoplay';
 import { useRef } from 'react';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 const banners = [
@@ -67,17 +69,19 @@ const HeroBanner = () => {
           onMouseEnter={autoplay.current.stop}
           onMouseLeave={autoplay.current.reset}
           className="rounded-md overflow-hidden"
-          styles={{
-            indicator: {
-              width: 12,
-              height: 4,
-              transition: 'width 250ms ease',
-              '&[data-active]': {
-                width: 40,
+          withControls={false}
+            styles={{
+              indicator: {
+                width: 12,
+                height: 4,
+                transition: 'width 250ms ease',
+                '&[data-active]': {
+                  width: 40,
+                },
               },
-            }
-          }}
-        >
+            }}
+            
+          >
           {banners.map((banner) => (
             <Carousel.Slide key={banner.id}>
               <Paper

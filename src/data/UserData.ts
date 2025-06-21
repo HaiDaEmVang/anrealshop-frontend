@@ -340,7 +340,7 @@ export const mockFeaturedProducts: Product[] = [
     isFeatured: true
   },
   {
-    id: 'p4',
+    id: 'p5',
     name: 'Balo laptop chống sốc',
     price: 750000,
     discountPrice: 599000,
@@ -352,7 +352,7 @@ export const mockFeaturedProducts: Product[] = [
     isFeatured: true
   },
   {
-    id: 'p4',
+    id: 'p6',
     name: 'Balo laptop chống sốc',
     price: 750000,
     discountPrice: 599000,
@@ -389,7 +389,7 @@ export const mockNewArrivals: Product[] = [
     isNew: true
   },
   {
-    id: 'p6',
+    id: 'p7',
     name: 'Váy liền thân nữ',
     price: 450000,
     images: ['https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=387'],
@@ -400,7 +400,7 @@ export const mockNewArrivals: Product[] = [
     isNew: true
   },
   {
-    id: 'p7',
+    id: 'p8',
     name: 'Kính mát thời trang',
     price: 380000,
     discountPrice: 320000,
@@ -412,7 +412,7 @@ export const mockNewArrivals: Product[] = [
     isNew: true
   },
   {
-    id: 'p8',
+    id: 'p9',
     name: 'Đèn ngủ thông minh',
     price: 550000,
     images: ['https://images.unsplash.com/photo-1507146153580-69a1fe6d8aa1?q=80&w=1170'],
@@ -461,7 +461,7 @@ export const mockTrendingProducts: Product[] = [
     tags: ['trending']
   },
   {
-    id: 'p11',
+    id: 'p12',
     name: 'Laptop gaming Asus ROG',
     price: 32000000,
     discountPrice: 29500000,
@@ -473,7 +473,7 @@ export const mockTrendingProducts: Product[] = [
     tags: ['trending']
   },
   {
-    id: 'p11',
+    id: 'p13',
     name: 'Laptop gaming Asus ROG',
     price: 32000000,
     discountPrice: 29500000,

@@ -1,8 +1,9 @@
 import { Text } from '@mantine/core';
 import {
-    Link,
-    RichTextEditor as MantineRTE,
+  Link,
+  RichTextEditor as MantineRTE,
 } from '@mantine/tiptap';
+import '@mantine/tiptap/styles.css';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
 import Underline from '@tiptap/extension-underline';
