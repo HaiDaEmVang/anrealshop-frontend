@@ -4,8 +4,7 @@ import { axiosNoWithCredInstance } from "./AxiosInstant";
 
 const getOtp = async (email: string, type: OTP_TYPE): Promise<void> => {
     const response = await axiosNoWithCredInstance.post(
-        `${API_ENDPOINTS.OTP.GET_OTP}/${email}`,
-        { type }
+        `${API_ENDPOINTS.OTP.GET_OTP}/${email}?type=${type}`
     )
     return response.data;
 }

@@ -1,47 +1,43 @@
-import { useState, useEffect } from 'react';
 import {
-    Box,
-    Paper,
-    Title,
-    Group,
-    Badge,
-    Table,
-    Button,
-    Text,
-    Modal,
-    Stack,
-    Textarea,
-    LoadingOverlay,
-    Tabs,
     ActionIcon,
+    Avatar,
+    Badge,
+    Box,
+    Button,
+    Group,
+    LoadingOverlay,
     Menu,
-    Image,
+    Modal,
     Pagination,
-    Tooltip,
-    Select,
+    Paper,
+    Stack,
+    Table,
+    Tabs,
+    Text,
+    Textarea,
     TextInput,
-    Avatar
+    Title,
+    Tooltip
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import { DatePickerInput } from '@mantine/dates';
-type DateRangePickerValue = [Date | null, Date | null];
+import '@mantine/dates/styles.css';
+import { useDisclosure } from '@mantine/hooks';
+import { useEffect, useState } from 'react';
 import {
+    FiCalendar,
     FiCheck,
-    FiX,
-    FiEye,
     FiCheckCircle,
     FiClock,
+    FiEye,
     FiFilter,
-    FiMoreVertical,
-    FiCalendar,
-    FiSearch,
-    FiRefreshCw,
-    FiAlertTriangle,
-    FiEdit2,
-    FiShoppingBag,
+    FiGrid,
     FiList,
-    FiGrid
+    FiMoreVertical,
+    FiRefreshCw,
+    FiSearch,
+    FiX
 } from 'react-icons/fi';
+type DateRangePickerValue = [Date | null, Date | null];
 
 // Types
 interface User {

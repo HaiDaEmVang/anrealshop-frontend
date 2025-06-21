@@ -1,12 +1,12 @@
 import { notifications } from '@mantine/notifications';
-import { IconAlertCircle } from '@tabler/icons-react';
+import { TbFaceIdError } from "react-icons/tb";
 
 export const showErrorNotification = ( title = 'Lỗi', message :string ) => {
   return notifications.show({
     title,
     message,
     color: 'red', // Màu đỏ cho thông báo lỗi
-    icon: <IconAlertCircle size={18} />,
+    icon: <TbFaceIdError size={18} />,
     withBorder: true,
     autoClose: 5000,
     styles: (theme) => ({

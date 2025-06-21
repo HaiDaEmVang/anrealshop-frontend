@@ -23,7 +23,7 @@ import { validateEmail, validatePassword } from '../../untils/ValidateInput';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import ResetPassword from './ResetPasswrod';
-import { useEffect } from 'react';
+import { useEffect, useRef  } from 'react';
 
 interface SignInFormValues {
   email: string;
@@ -35,8 +35,10 @@ export function SignIn() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
-  const isLoading = status === 'loading';
+  const isLoading = status === 'loading' ;
   const [opened, { open, close }] = useDisclosure(false);
+
+  const hasNotifiedRef = useRef(false);
 
   const form = useForm<SignInFormValues>({
     initialValues: {
@@ -89,11 +91,15 @@ export function SignIn() {
   }
 
   useEffect(() => {
+    
     const handleOAuthLogin = async () => {
+      if (hasNotifiedRef.current) return;
+      
       const params = new URLSearchParams(location.search);
       const successMessage = params.get('success');
       const errorMessage = params.get('error');
 
+      hasNotifiedRef.current = true;
       if (successMessage) {
         try {
           const user: UserDto = await dispatch(fetchCurrentUser()).unwrap();
@@ -103,18 +109,18 @@ export function SignIn() {
           console.error('Login failed in component:', err);
           let notificationMessage = err.message || 'Không thể lấy thông tin user.';          showErrorNotification('Đăng nhập thất bại', notificationMessage);
         }
-      }
-      if (errorMessage) {
-        showErrorNotification('Đăng nhập thất bại', errorMessage);
+      }else if (errorMessage) {
+        const timeoutId = setTimeout(() => {
+          params.delete('error');
+          navigate({ pathname: '/login', search: params.toString() }, { replace: true });
+          showErrorNotification('Đăng nhập thất bại', errorMessage);
+        }, 1000); 
+        return () => clearTimeout(timeoutId);
       }
     };
 
     handleOAuthLogin();
-  }, [location, navigate]);
-
-
-
-
+  }, []);
 
   return (
     <div className="w-1/2 bg-white flex items-center justify-center p-8">

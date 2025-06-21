@@ -2,7 +2,7 @@ import { Anchor, Container, Grid, Group, Text, Title, UnstyledButton } from '@ma
 import { FaCcMastercard, FaCcVisa, FaCreditCard, FaFacebook, FaInstagram, FaPaypal, FaTwitter } from 'react-icons/fa';
 import { FiMail, FiMapPin, FiPhone, FiSend } from 'react-icons/fi';
 
-export function Footer() {
+const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -149,3 +149,5 @@ export function Footer() {
     </footer>
   );
 }
+
+export default Footer;

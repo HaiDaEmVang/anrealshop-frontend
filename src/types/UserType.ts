@@ -29,7 +29,7 @@ export interface ProfileRequest {
 }
 
 
-export interface ResetPwRequest  {
+export interface forgotPwRequest  {
   email: string;
   password: string;
   otp: string;

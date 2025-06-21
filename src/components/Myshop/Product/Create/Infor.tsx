@@ -7,6 +7,7 @@ import {
   Title
 } from '@mantine/core';
 import { type UseFormReturnType } from '@mantine/form';
+import '@mantine/tiptap/styles.css';
 import Highlight from '@tiptap/extension-highlight';
 import Image from '@tiptap/extension-image'; // Add this import
 import TextAlign from '@tiptap/extension-text-align';

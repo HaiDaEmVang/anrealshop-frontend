@@ -1,4 +1,5 @@
 import { Carousel } from '@mantine/carousel';
+import '@mantine/carousel/styles.css';
 import {
   ActionIcon,
   Badge,

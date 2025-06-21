@@ -1,16 +1,16 @@
 import { API_ENDPOINTS } from "../constant";
-import type { ResetPwRequest } from "../types/UserType";
+import type { forgotPwRequest } from "../types/UserType";
 import { axiosNoWithCredInstance } from "./AxiosInstant";
 
-const changePassword = async (resetPwRequest: ResetPwRequest) => {
+const forgotPassword = async (forgotPassword: forgotPwRequest) => {
     const response = await axiosNoWithCredInstance.post(
-        `${API_ENDPOINTS.USERS.RESET_PASSWORD}`,
-        resetPwRequest
+        `${API_ENDPOINTS.AUTH.FORGOT_PASSWORD}`,
+        forgotPassword
     )
     return response.data;
 }
 
 const UserService = {
-    changePassword
+    forgotPassword
 };
 export default UserService;
