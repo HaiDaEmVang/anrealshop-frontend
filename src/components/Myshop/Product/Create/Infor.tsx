@@ -17,7 +17,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { useEffect, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi'; // Add this import
 import BasicInfor from './BasicInfor';
-import MediaUpload from './MediaUpdate';
+import MediaUpload from './MediaUpload';
 import Shipping from './Shipping';
 import SkuDetails from './SkuDetails';
 import SkuInfor from './SkuInfor';

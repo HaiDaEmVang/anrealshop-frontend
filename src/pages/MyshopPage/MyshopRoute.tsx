@@ -24,7 +24,7 @@ const MyshopPage = () => {
             <Route path="dashboard" element={<div>Dashboard Content</div>} />
             <Route path="sale" element={<div>Sales Overview</div>} />
             <Route path="products" element={<ProductPage />} />
-            <Route path="products/create" element={<CreateProduct />} />
+            <Route path="product/create" element={<CreateProduct />} />
             <Route path="products/edit/:id" element={<ProductForm />} />
             <Route path="orders" element={<OrderPage />} />
             <Route path="orders/:id" element={<OrderDetailComp />} />

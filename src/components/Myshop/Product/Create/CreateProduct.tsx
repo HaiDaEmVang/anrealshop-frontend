@@ -252,7 +252,7 @@ const ProductForm = () => {
       </Paper>
 
       {/* Main Form Content - Hiển thị loading nếu đang tải dữ liệu */}
-      <Paper shadow="xs" p="md" radius="md" className="bg-white mb-20">
+      <Paper className="!bg-transparent mb-20">
         {isLoading ? (
           <div className="flex justify-center items-center py-8">
             <div className="animate-pulse flex flex-col items-center">

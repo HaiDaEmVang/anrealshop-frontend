@@ -10,3 +10,13 @@ export interface ErrorResponseDto {
   traceId?: string;
   details?: Array<ItemError>;
 }
+
+export interface MediaDto {
+  isUploading?: boolean;
+  isUploaded?: boolean;
+  file?: File;
+  id?: string;
+  thumbnailUrl?: string;
+  url: string;
+  type: 'IMAGE' | 'VIDEO';
+}

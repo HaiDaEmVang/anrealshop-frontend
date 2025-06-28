@@ -3,6 +3,8 @@ export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL
 export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE
 export const BASE_FE_URL = import.meta.env.VITE_BASE_FE_URL
 export const GOOGLE_LOGIN_URL = `${BASE_BE_URL}/oauth2/authorization/google`
+export const CLOUNDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
+export const CLOUNDINARY_NAME = import.meta.env.VITE_CLOUDINARY_NAME
 
 
 
@@ -12,7 +14,7 @@ export const API_ENDPOINTS = {
     LOGIN_GOOGLE: '/oauth2/callback/google',
     LOGOUT: '/logout',
     FORGOT_PASSWORD: '/forgot-password',
-    REFRESH: '/auth/refreshToken',
+    REFRESH: '/auth/refresh-token',
   },
   OTP: {
     GET_OTP: '/otp/sendOtp',
@@ -22,9 +24,16 @@ export const API_ENDPOINTS = {
     ME: '/user/me',
     REGISTER: '/user/register',
     PROFILE: '/user/profile',
-    UPDATE_PROFILE: '/user/update-profile',
     CHANGE_PASSWORD: '/user/change-password',
     RESET_PASSWORD: '/user/reset-password',
+  },
+  PRODUCTS: {
+    // BASE: '/products', 
+    CREATE: '/products/create',
+    // APPROVALS: '/products/approvals',
+    // SEARCH: '/products/search',
+    // CATEGORY: (slug: string) => `/products/category/${slug}`,
+    // SHOP: (slug: string) => `/products/shop/${slug}`,
   },
 };
 
