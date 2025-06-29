@@ -14,22 +14,31 @@ import {
   FiPlus,
   FiVideo,
 } from 'react-icons/fi';
-
-import type { MediaDto } from '../../../../types/CommonType';
-import { useMediaUpload } from '../../../../hooks/useMediaUpload';
-import AddMediaButton from './AddMediaButton';
+import type { MediaDto } from '../../../../../types/CommonType';
+import { useMediaUpload } from '../../../../../hooks/useMediaUpload';
+import showErrorNotification from '../../../../Toast/NotificationError';
 import MediaPreviewItem from './MediaReviewItem';
-import showErrorNotification from '../../../Toast/NotificationError';
+import AddMediaButton from './AddMediaButton';
+import type { useForm } from '@mantine/form';
+import type { ProductCreateRequest } from '../../../../../types/ProductType';
 
-interface MediaUploadProps {
-  media: MediaDto[];
-  setMedia: React.Dispatch<React.SetStateAction<MediaDto[]>>;
-}
 
-const MediaUpload = ({ media, setMedia }: MediaUploadProps) => {
+type Props = {
+  form: ReturnType<typeof useForm<ProductCreateRequest>>;
+};
+
+
+const MediaUpload = ({ form }: Props) => {
   const [collapsed, setCollapsed] = useState(false);
   const imageInputRef = useRef<HTMLButtonElement>(null);
   const videoInputRef = useRef<HTMLButtonElement>(null);
+
+  const media = form.values.media;
+  const setMedia = (value: MediaDto[] | ((prev: MediaDto[]) => MediaDto[])) => {
+    const prev = form.values.media; 
+    const next = typeof value === 'function' ? value(prev) : value;
+    form.setFieldValue('media', next);
+  };
 
   const { uploadImages, uploadVideo, removeMedia, reorderMedia } = useMediaUpload(media, setMedia);
 

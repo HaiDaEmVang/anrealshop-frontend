@@ -67,7 +67,7 @@ const SAMPLE_VALUES = {
     ]
 };
 
-const SkuDetails = ({ form }: SkuDetailsProps) => {
+// const SkuDetails = ({ form }: SkuDetailsProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const [attributes, setAttributes] = useState<VariantAttribute[]>([]);
     const [selectedClassificationType, setSelectedClassificationType] = useState<string | null>(null);

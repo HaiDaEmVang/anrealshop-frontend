@@ -1,24 +1,20 @@
 import {
   ActionIcon,
   Button,
+  Collapse,
+  Drawer,
   Group,
   MultiSelect,
-  NumberInput,
   Paper,
   Select,
   Stack,
   TextInput,
   Title,
-  Tooltip,
-  Text,
-  Divider,
-  Drawer,
-  Switch,
-  Collapse
+  Tooltip
 } from '@mantine/core';
-import { useState } from 'react';
-import { FiChevronDown, FiChevronUp, FiPlus, FiTag, FiSettings } from 'react-icons/fi';
 import type { UseFormReturnType } from '@mantine/form';
+import { useState } from 'react';
+import { FiChevronDown, FiChevronUp, FiPlus, FiSettings } from 'react-icons/fi';
 
 interface SkuAttribute {
   key: string;

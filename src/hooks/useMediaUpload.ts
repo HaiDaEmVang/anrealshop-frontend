@@ -5,7 +5,7 @@ import type { MediaDto } from '../types/CommonType';
 
 export function useMediaUpload(
   media: MediaDto[],
-  setMedia: React.Dispatch<React.SetStateAction<MediaDto[]>>
+  setMedia: (value: MediaDto[] | ((prev: MediaDto[]) => MediaDto[])) => void
 ) {
   const uploadImages = useCallback(async (files: File[] | null) => {
     if (!files || files.length === 0) return;
