@@ -10,6 +10,7 @@ export interface ProductCreateRequest {
   quantity: number;
   categoryId: string;
   weight: number;
+  attributes: AttributeRequest[];
   productSkus: ProductSkuRequest[];
   media: MediaDto[];
 }
@@ -19,5 +20,7 @@ export interface ProductSkuRequest {
   price: number;
   quantity: number;
   imageUrl: string;
-  attributes: AttributeRequest[];
+  attributeKeyName: string;
+  attributeValue: string[];
 }
+

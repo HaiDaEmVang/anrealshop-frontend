@@ -3,7 +3,7 @@ import '@mantine/tiptap/styles.css';
 import type { ProductCreateRequest } from '../../../../types/ProductType';
 import BasicInfor from './BasicInfo/BasicInfor';
 import MediaUpload from './uploadImage/MediaUpload';
-import SkuInfor from './SkuInfor';
+import SkuInfor from './AttributeInfo/AttributeInfor';
 
 interface ProductImage {
   file?: File;
@@ -75,11 +75,9 @@ const Infor = ({ form, isEditMode = false }: InforProps) => {
 
   return (
     <div>
-      {/* Media Upload Component */}
-      <MediaUpload form={form}/>
+      {/* <MediaUpload form={form}/> */}
 
-      {/* Basic Information Component */}
-      <BasicInfor form={form}/>
+      {/* <BasicInfor form={form}/> */}
 
       <SkuInfor form={form} />
 

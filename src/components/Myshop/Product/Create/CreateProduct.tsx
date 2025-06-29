@@ -12,49 +12,46 @@ const ProductForm = () => {
   const { id } = useParams();
   const isEditMode = !!id; // Kiểm tra xem đang ở chế độ chỉnh sửa hay không
   const form = useForm<ProductCreateRequest>({
-    initialValues: {
-      name: '',
-      description: defaultProductDescriptionHtml,
-      sortDescription: '',
-      price: 0,
-      discountPrice: 0,
-      quantity: 0,
-      categoryId: '',
-      weight: 0,
-      productSkus: [
-        {
-          sku: '',
-          price: 0,
-          quantity: 0,
-          imageUrl: '',
-          attributes: [
-            {
-              id: '',
-              attributeKeyName: '',
-              value: ''
-            }
-          ]
-        }
-      ],
-      media: []
-    },
-
-    validate: {
-      name: (value) => (value.trim().length === 0 ? 'Tên không được để trống' : null),
-      price: (value) => (value <= 0 ? 'Giá phải lớn hơn 0' : null),
-      quantity: (value) => (value < 0 ? 'Số lượng không hợp lệ' : null),
-      categoryId: (value) => (!value ? 'Chọn danh mục' : null),
-      weight: (value) => (value < 0 ? 'Cân nặng không hợp lệ' : null),
-      productSkus: (value) => {
-        if (!value.length) return 'Cần ít nhất 1 SKU';
-        for (const sku of value) {
-          if (!sku.sku || !sku.price || sku.quantity < 0)
-            return 'Thông tin SKU không hợp lệ';
-        }
-        return null;
+  initialValues: {
+    name: '',
+    description: defaultProductDescriptionHtml,
+    sortDescription: '',
+    price: 0,
+    discountPrice: 0,
+    quantity: 0,
+    categoryId: '',
+    weight: 0,
+    attributes: [],
+    productSkus: [
+      {
+        sku: '',
+        price: 0,
+        quantity: 0,
+        imageUrl: '',
+        attributeKeyName: '',
+        attributeValue: [],
       }
+    ],
+    media: []
+  },
+
+  validate: {
+    name: (value) => (value.trim().length === 0 ? 'Tên không được để trống' : null),
+    price: (value) => (value <= 0 ? 'Giá phải lớn hơn 0' : null),
+    quantity: (value) => (value < 0 ? 'Số lượng không hợp lệ' : null),
+    categoryId: (value) => (!value ? 'Chọn danh mục' : null),
+    weight: (value) => (value < 0 ? 'Cân nặng không hợp lệ' : null),
+    productSkus: (value) => {
+      if (!value || value.length === 0) return 'Cần ít nhất 1 SKU';
+      for (const sku of value) {
+        if (!sku.sku.trim()) return 'SKU không được để trống';
+        if (sku.price <= 0) return 'Giá SKU phải lớn hơn 0';
+        if (sku.quantity < 0) return 'Số lượng SKU không hợp lệ';
+      }
+      return null;
     }
-  });
+  }
+});
 
   const [media, setMedia] = useState<MediaDto[]>([]);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
