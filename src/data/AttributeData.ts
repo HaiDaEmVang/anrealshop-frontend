@@ -1,4 +1,17 @@
-import type { BaseAttribute } from "../types/AttributeType";
+import type { BaseAttribute, ProductAttribute } from "../types/AttributeType";
+
+export const attributeForSku: ProductAttribute[] = [
+  {
+    "attributeKeyName": "mau_sac",
+    "attributeKeyDisplay": "Màu sắc",
+    "value": ["Đỏ", "Xanh lam", "Đen", "Trắng", "Xám", "Hồng", "Vàng", "Xanh lá"]
+  },
+  {
+    "attributeKeyName": "kich_thuoc",
+    "attributeKeyDisplay": "Kích thước", 
+    "value": ["XS", "S", "M", "L", "XL", "XXL", "Freesize"]
+  }
+];
 
 export const attributeDatas: BaseAttribute[] = [
   {

@@ -12,3 +12,9 @@ export interface BaseAttribute {
   isMultiSelect: boolean;
   value: string[];
 }
+
+export interface ProductAttribute {
+  attributeKeyName: string;
+  attributeKeyDisplay: string;
+  value: string[];
+}

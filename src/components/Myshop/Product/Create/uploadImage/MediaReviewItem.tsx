@@ -1,8 +1,8 @@
 // components/MediaPreviewItem.tsx
 import { ActionIcon, Badge, Box, Group, Image, Loader } from '@mantine/core';
 import { FiChevronLeft, FiChevronRight, FiTrash2, FiVideo, FiXCircle } from 'react-icons/fi'; 
+import type { MediaDto } from '../../../../../types/CommonType';
 
-import type { MediaDto } from '../../../../types/CommonType';
 
 interface MediaPreviewItemProps {
   item: MediaDto;

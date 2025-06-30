@@ -17,6 +17,7 @@ export async function uploadToCloudinary(file: File, resourceType: 'image' | 'vi
     if (!res.ok) {
       const errorData = await res.json();
       console.error('Cloudinary upload error:', errorData);
+      throw new Error(`Upload failed: ${errorData.error?.message || 'Unknown error'}`);
     }
 
     const data = await res.json();

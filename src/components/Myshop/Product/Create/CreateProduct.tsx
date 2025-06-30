@@ -1,163 +1,117 @@
 import { Container, Paper } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { defaultProductDescriptionHtml } from '../../../../data/InitData';
 import type { MediaDto } from '../../../../types/CommonType';
 import type { ProductCreateRequest } from '../../../../types/ProductType';
 import Infor from './Infor';
 
-
 const ProductForm = () => {
   const { id } = useParams();
-  const isEditMode = !!id; // Kiểm tra xem đang ở chế độ chỉnh sửa hay không
+  const isEditMode = !!id;
+  
   const form = useForm<ProductCreateRequest>({
-  initialValues: {
-    name: '',
-    description: defaultProductDescriptionHtml,
-    sortDescription: '',
-    price: 0,
-    discountPrice: 0,
-    quantity: 0,
-    categoryId: '',
-    weight: 0,
-    attributes: [],
-    productSkus: [
-      {
-        sku: '',
-        price: 0,
-        quantity: 0,
-        imageUrl: '',
-        attributeKeyName: '',
-        attributeValue: [],
-      }
-    ],
-    media: []
-  },
+    initialValues: {
+      name: '',
+      description: defaultProductDescriptionHtml,
+      sortDescription: '',
+      price: 0,
+      discountPrice: 0,
+      quantity: 0,
+      categoryId: '',
+      weight: 0,
+      attributes: [],
+      productSkus: [],
+      media: []
+    },
 
-  validate: {
-    name: (value) => (value.trim().length === 0 ? 'Tên không được để trống' : null),
-    price: (value) => (value <= 0 ? 'Giá phải lớn hơn 0' : null),
-    quantity: (value) => (value < 0 ? 'Số lượng không hợp lệ' : null),
-    categoryId: (value) => (!value ? 'Chọn danh mục' : null),
-    weight: (value) => (value < 0 ? 'Cân nặng không hợp lệ' : null),
-    productSkus: (value) => {
-      if (!value || value.length === 0) return 'Cần ít nhất 1 SKU';
-      for (const sku of value) {
-        if (!sku.sku.trim()) return 'SKU không được để trống';
-        if (sku.price <= 0) return 'Giá SKU phải lớn hơn 0';
-        if (sku.quantity < 0) return 'Số lượng SKU không hợp lệ';
+    validate: {
+      name: (value) => (value.trim().length === 0 ? 'Tên không được để trống' : null),
+      price: (value) => (value <= 0 ? 'Giá phải lớn hơn 0' : null),
+      quantity: (value) => (value < 0 ? 'Số lượng không hợp lệ' : null),
+      categoryId: (value) => (!value ? 'Chọn danh mục' : null),
+      weight: (value) => (value < 0 ? 'Cân nặng không hợp lệ' : null),
+      productSkus: (value) => {
+        if (!value || value.length === 0) return null; 
+        for (const sku of value) {
+          if (!sku.sku.trim()) return 'SKU không được để trống';
+          if (sku.price <= 0) return 'Giá SKU phải lớn hơn 0';
+          if (sku.quantity < 0) return 'Số lượng SKU không hợp lệ';
+        }
+        return null;
       }
-      return null;
     }
-  }
-});
+  });
 
   const [media, setMedia] = useState<MediaDto[]>([]);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // useEffect(() => {
-  //   if (isEditMode) {
-  //     fetchProductData();
-  //   }
-  // }, [id]);
+  // Comprehensive form state logging
+  useEffect(() => {
+    console.log('🔍 Complete Form State Update:', {
+      action: 'formStateChange',
+      timestamp: new Date().toISOString(),
+      formValues: form.values,
+      errors: form.errors,
+      isDirty: form.isDirty(),
+      touchedFields: Object.keys(form.values).filter(key => form.isTouched(key)),
+      summary: {
+        hasName: !!form.values.name,
+        hasCategory: !!form.values.categoryId,
+        attributeCount: form.values.attributes.length,
+        skuCount: form.values.productSkus.length,
+        hasPrice: form.values.price > 0,
+        hasQuantity: form.values.quantity > 0
+      }
+    });
+  }, [form.values, form.errors]);
 
-  // // Giả lập API call để lấy dữ liệu sản phẩm khi ở chế độ chỉnh sửa
-  // const fetchProductData = async () => {
-  //   try {
-  //     setIsLoading(true);
+  // Track specific critical field changes
+  useEffect(() => {
+    if (form.values.name) {
+      console.log('📝 Product Name Changed:', {
+        action: 'nameChange',
+        timestamp: new Date().toISOString(),
+        value: form.values.name,
+        length: form.values.name.length
+      });
+    }
+  }, [form.values.name]);
 
-  //     // Giả lập gọi API - trong thực tế bạn sẽ gọi API thực
-  //     await new Promise(resolve => setTimeout(resolve, 500)); // Giả lập delay API
+  useEffect(() => {
+    if (form.values.price > 0) {
+      console.log('💰 Product Price Changed:', {
+        action: 'priceChange',
+        timestamp: new Date().toISOString(),
+        value: form.values.price,
+        formatted: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(form.values.price)
+      });
+    }
+  }, [form.values.price]);
 
-  //     // Dữ liệu mẫu - thay bằng API call thực tế
-  //     const productData = {
-  //       id: id,
-  //       name: 'Sản phẩm mẫu',
-  //       category_id: 'cat123',
-  //       description: '<p>Mô tả chi tiết sản phẩm</p>',
-  //       shortDescription: 'Mô tả ngắn về sản phẩm',
-  //       tags: ['thời trang', 'mới'],
-  //       sku: 'SP-001',
-  //       price: 150000,
-  //       comparePrice: 200000,
-  //       costPrice: 100000,
-  //       quantity: 50,
-  //       isActive: true,
-  //       isFeatured: true,
-  //       weight: 0.5,
-  //       length: 30,
-  //       width: 20,
-  //       height: 10,
-  //       variants: [],
-  //       seoTitle: 'Tiêu đề SEO',
-  //       seoDescription: 'Mô tả SEO',
-  //       seoKeywords: 'từ khóa, seo, sản phẩm',
-  //       location: 'Kho A',
-  //     };
+  useEffect(() => {
+    console.log('🏷️ Attributes Array Changed:', {
+      action: 'attributesChange',
+      timestamp: new Date().toISOString(),
+      count: form.values.attributes.length,
+      attributes: form.values.attributes,
+      attributeNames: form.values.attributes.map(attr => attr.attributeKeyName)
+    });
+  }, [form.values.attributes]);
 
-  //     // Dữ liệu ảnh mẫu
-  //     const mediaData = [
-  //       {
-  //         id: 'img1',
-  //         url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?q=80&w=300',
-  //         type: 'image' as const
-  //       },
-  //       {
-  //         id: 'img2',
-  //         url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=300',
-  //         type: 'image' as const
-  //       }
-  //     ];
-
-  //     // Cập nhật form với dữ liệu sản phẩm
-  //     form.setValues(productData);
-  //     // Cập nhật media
-  //     setMedia(mediaData);
-
-  //     // Đánh dấu form là "không thay đổi" sau khi nạp dữ liệu ban đầu
-  //     setIsDirty(false);
-
-  //   } catch (error) {
-  //     console.error('Error fetching product data:', error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // Breadcrumb items
-  // const breadcrumbItems = [
-  //   { title: 'Trang chủ', href: '/myshop' },
-  //   { title: 'Quản lý sản phẩm', href: '/myshop/products' },
-  //   { title: isEditMode ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới', href: '#' },
-  // ].map((item, index) => (
-  //   <Anchor component={Link} to={item.href} key={index} size="sm">
-  //     {item.title}
-  //   </Anchor>
-  // ));
-
-  // // Track form changes
-  // useEffect(() => {
-  //   if (Object.keys(form.values).some(key => form.isDirty(key))) {
-  //     setIsDirty(true);
-  //   }
-  // }, [form.values]);
-
-  // const handleSubmit = () => {
-  //   const validation = form.validate();
-  //   if (validation.hasErrors) {
-  //     console.log('Form has errors:', validation.errors);
-  //     return;
-  //   }
-
-  //   // Submit product to API
-  //   console.log(`${isEditMode ? 'Updating' : 'Submitting'} product:`, form.values, media);
-
-  //   // Giả lập API call
-  //   console.log(`Product ${isEditMode ? 'updated' : 'created'} successfully`);
-  // };
+  useEffect(() => {
+    console.log('📦 Product SKUs Changed:', {
+      action: 'skusChange',
+      timestamp: new Date().toISOString(),
+      count: form.values.productSkus.length,
+      skus: form.values.productSkus,
+      skuCodes: form.values.productSkus.map(sku => sku.sku),
+      totalValue: form.values.productSkus.reduce((sum, sku) => sum + (sku.price * sku.quantity), 0)
+    });
+  }, [form.values.productSkus]);
 
   const openPreview = () => {
     setIsPreviewOpen(true);
@@ -169,91 +123,6 @@ const ProductForm = () => {
 
   return (
     <Container fluid px="lg" py="md">
-      {/* Preview Modal */}
-      {/* <Modal
-        opened={isPreviewOpen}
-        onClose={closePreview}
-        size="85%"
-        padding={0}
-        centered
-        styles={{
-          header: { padding: '16px 24px', borderBottom: '1px solid #e9ecef' },
-          body: { padding: 0 },
-          content: {
-            borderRadius: '8px',
-            maxHeight: '90vh',
-            display: 'flex',
-            flexDirection: 'column'
-          },
-          inner: {
-            padding: '20px'
-          },
-          title: {
-            fontWeight: 600,
-            fontSize: '18px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          },
-          close: {
-            backgroundColor: '#f8f9fa',
-            '&:hover': {
-              backgroundColor: '#e9ecef'
-            }
-          }
-        }}
-        title={
-          <Group>
-            <FiEye size={20} className="text-primary" />
-            <Text>Xem trước sản phẩm</Text>
-          </Group>
-        }
-        transitionProps={{ transition: 'fade', duration: 300 }}
-      >
-        <div style={{
-          overflow: 'auto',
-          maxHeight: 'calc(90vh - 60px)',
-          padding: '0'
-        }}>
-          <Review
-            form={form}
-            media={media}
-            onBack={closePreview}
-            onSubmit={handleSubmit}
-            isPreview={true}
-          />
-        </div>
-      </Modal> */}
-
-      {/* Page Header */}
-      {/* <Paper
-        shadow="xs"
-        p="md"
-        mb="md"
-        radius="md"
-        className="border-b border-gray-200"
-      >
-        <Box mb="xs">
-          <Breadcrumbs separator={<FiChevronRight size={14} />}>
-            {breadcrumbItems}
-          </Breadcrumbs>
-        </Box>
-
-        <Group justify="space-between" align="center">
-          <Group>
-            <FiEdit3 size={24} className="text-primary" />
-            <Title order={2} size="h3">{isEditMode ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới'}</Title>
-          </Group>
-          <Text c="dimmed" size="sm">
-            {isEditMode
-              ? 'Chỉnh sửa thông tin sản phẩm của bạn'
-              : 'Nhập thông tin để tạo sản phẩm mới của bạn'
-            }
-          </Text>
-        </Group>
-      </Paper> */}
-
-      {/* Main Form Content - Hiển thị loading nếu đang tải dữ liệu */}
       <Paper className="!bg-transparent mb-20">
         {isLoading ? (
           <div className="flex justify-center items-center py-8">
@@ -270,47 +139,6 @@ const ProductForm = () => {
           />
         )}
       </Paper>
-
-      {/* Action Buttons - Fixed at Bottom */}
-      {/* <Paper
-        shadow="md"
-        p="md"
-        className="bg-white border-t fixed bottom-0 left-0 right-0 z-10"
-        style={{ boxShadow: '0 -2px 10px rgba(0,0,0,0.1)' }}
-      >
-        <Container fluid px="lg">
-          <Group justify="space-between">
-            <Text size="sm" c="dimmed" className="hidden md:block">
-              {isDirty ? 'Sản phẩm có thay đổi chưa được lưu' : isEditMode ? 'Chỉnh sửa thông tin sản phẩm của bạn' : 'Tạo và quản lý thông tin sản phẩm của bạn'}
-            </Text>
-            <Group>
-              <Button
-                leftSection={<FiEye size={16} />}
-                variant="outline"
-                onClick={openPreview}
-                radius="md"
-              >
-                Xem trước
-              </Button>
-              <Button
-                leftSection={<FiSave size={16} />}
-                variant="default"
-                radius="md"
-              >
-                Lưu nháp
-              </Button>
-              <Button
-                className="bg-primary hover:bg-primary/90"
-                // onClick={handleSubmit}
-                disabled={!isDirty}
-                radius="md"
-              >
-                {isEditMode ? 'Cập nhật sản phẩm' : 'Đăng sản phẩm'}
-              </Button>
-            </Group>
-          </Group>
-        </Container>
-      </Paper> */}
     </Container>
   );
 };

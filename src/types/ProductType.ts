@@ -20,7 +20,11 @@ export interface ProductSkuRequest {
   price: number;
   quantity: number;
   imageUrl: string;
+  attributes: ProductSkuAttribute[];
+}
+
+export interface ProductSkuAttribute {
   attributeKeyName: string;
-  attributeValue: string[];
+  value: string;
 }
 

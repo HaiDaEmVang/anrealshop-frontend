@@ -4,6 +4,7 @@ import type { ProductCreateRequest } from '../../../../types/ProductType';
 import BasicInfor from './BasicInfo/BasicInfor';
 import MediaUpload from './uploadImage/MediaUpload';
 import SkuInfor from './AttributeInfo/AttributeInfor';
+import SkuDetails from './SkuDetail/SkuDetails';
 
 interface ProductImage {
   file?: File;
@@ -17,22 +18,6 @@ interface CategoryItem {
   label: string;
   parent?: string;
 }
-
-const categories: CategoryItem[] = [
-  { value: 'thoi-trang-nam', label: 'Thời trang nam' },
-  { value: 'thoi-trang-nu', label: 'Thời trang nữ' },
-  { value: 'giay-dep', label: 'Giày dép' },
-  { value: 'phu-kien', label: 'Phụ kiện' },
-  { value: 'dien-tu', label: 'Điện tử' },
-];
-
-const tags = [
-  { value: 'hot', label: 'Hot' },
-  { value: 'bestseller', label: 'Bán chạy' },
-  { value: 'new', label: 'Mới' },
-  { value: 'sale', label: 'Giảm giá' },
-  { value: 'premium', label: 'Cao cấp' },
-];
 
 interface InforProps {
   form: UseFormReturnType<ProductCreateRequest>;
@@ -79,10 +64,9 @@ const Infor = ({ form, isEditMode = false }: InforProps) => {
 
       {/* <BasicInfor form={form}/> */}
 
-      <SkuInfor form={form} />
+      {/* <SkuInfor form={form} /> */}
 
-      {/* SKU Details */}
-      {/* <SkuDetails form={form} /> */}
+      <SkuDetails form={form} />
 
       {/* Shipping information */}
       {/* <Shipping form={form} /> */}
