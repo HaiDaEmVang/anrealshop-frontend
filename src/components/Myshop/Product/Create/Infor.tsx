@@ -5,6 +5,7 @@ import BasicInfor from './BasicInfo/BasicInfor';
 import MediaUpload from './uploadImage/MediaUpload';
 import SkuInfor from './AttributeInfo/AttributeInfor';
 import SkuDetails from './SkuDetail/SkuDetails';
+import Shipping from './Shipping/Shipping';
 
 interface ProductImage {
   file?: File;
@@ -66,10 +67,9 @@ const Infor = ({ form, isEditMode = false }: InforProps) => {
 
       {/* <SkuInfor form={form} /> */}
 
-      <SkuDetails form={form} />
+      {/* <SkuDetails form={form} /> */}
 
-      {/* Shipping information */}
-      {/* <Shipping form={form} /> */}
+      <Shipping form={form} />
 
     </div>
   );

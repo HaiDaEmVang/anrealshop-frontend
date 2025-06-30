@@ -21,6 +21,9 @@ const ProductForm = () => {
       quantity: 0,
       categoryId: '',
       weight: 0,
+      hight: 0,
+      length: 0,
+      width: 0,
       attributes: [],
       productSkus: [],
       media: []

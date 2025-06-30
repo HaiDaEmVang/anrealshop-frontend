@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { 
-  Paper, 
-  Title, 
-  Group, 
-  ActionIcon, 
-  Stack, 
-  NumberInput, 
+import {
+  Paper,
+  Title,
+  Group,
+  ActionIcon,
+  Stack,
+  NumberInput,
   Text,
   SimpleGrid
 } from '@mantine/core';
@@ -41,11 +41,9 @@ const Shipping = ({ form }: ShippingProps) => {
               placeholder="Nhập cân nặng sản phẩm"
               min={0}
               step={10}
-              value={form.values.weight}
-              onChange={(value) => form.setFieldValue('weight', value)}
+              {...form.getInputProps('weight')}
               rightSection={<Text size="sm" c="dimmed">gr</Text>}
               rightSectionWidth={40}
-              error={form.errors.weight}
             />
           </div>
 
@@ -55,38 +53,32 @@ const Shipping = ({ form }: ShippingProps) => {
               <NumberInput
                 placeholder="Dài"
                 min={0}
-                value={form.values.length}
-                onChange={(value) => form.setFieldValue('length', value)}
+                {...form.getInputProps('length')}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
-                error={form.errors.length}
               />
               <NumberInput
                 placeholder="Rộng"
                 min={0}
-                value={form.values.width}
-                onChange={(value) => form.setFieldValue('width', value)}
+                {...form.getInputProps('width')}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
-                error={form.errors.width}
               />
               <NumberInput
                 placeholder="Cao"
                 min={0}
-                value={form.values.height}
-                onChange={(value) => form.setFieldValue('height', value)}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
-                error={form.errors.height}
+                {...form.getInputProps('height')}
               />
             </SimpleGrid>
-            
+
             {(form.errors.length || form.errors.width || form.errors.height) && (
               <Text size="xs" c="red" mt={5}>
                 Vui lòng nhập kích thước hợp lệ
               </Text>
             )}
-            
+
             <Text size="xs" c="dimmed" mt={8}>
               Kích thước và cân nặng được sử dụng để tính phí vận chuyển
             </Text>

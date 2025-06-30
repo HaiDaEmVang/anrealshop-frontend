@@ -10,6 +10,9 @@ export interface ProductCreateRequest {
   quantity: number;
   categoryId: string;
   weight: number;
+  hight: number;
+  length: number;
+  width: number;
   attributes: AttributeRequest[];
   productSkus: ProductSkuRequest[];
   media: MediaDto[];
