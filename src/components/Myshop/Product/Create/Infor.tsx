@@ -1,78 +1,62 @@
+import { Stack } from '@mantine/core';
 import { type UseFormReturnType } from '@mantine/form';
 import '@mantine/tiptap/styles.css';
 import type { ProductCreateRequest } from '../../../../types/ProductType';
-import BasicInfor from './BasicInfo/BasicInfor';
-import MediaUpload from './uploadImage/MediaUpload';
 import SkuInfor from './AttributeInfo/AttributeInfor';
-import SkuDetails from './SkuDetail/SkuDetails';
+import BasicInfor from './BasicInfo/BasicInfor';
 import Shipping from './Shipping/Shipping';
-
-interface ProductImage {
-  file?: File;
-  url: string;
-  id?: string;
-  type: 'image' | 'video';
-}
-
-interface CategoryItem {
-  value: string;
-  label: string;
-  parent?: string;
-}
+import SkuDetails from './SkuDetail/SkuDetails';
+import MediaUpload from './uploadImage/MediaUpload';
+import { memo } from 'react';
 
 interface InforProps {
   form: UseFormReturnType<ProductCreateRequest>;
   isEditMode?: boolean;
 }
-const Infor = ({ form, isEditMode = false }: InforProps) => {
-  // const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
-  //   description: true
-  // });
-  
-  // const [tagsData, setTagsData] = useState(tags);
 
-  // const editor = useEditor({
-  //   extensions: [
-  //     StarterKit,
-  //     Underline,
-  //     Highlight,
-  //     TextAlign.configure({ types: ['heading', 'paragraph'] }),
-  //     Image,
-  //   ],
-  //   content: form.values.description || '',
-  //   onUpdate: ({ editor }) => {
-  //     form.setFieldValue('description', editor.getHTML());
-  //   },
-  // });
-
-  // // Update editor content when form values change
-  // useEffect(() => {
-  //   if (editor && form.values.description !== editor.getHTML()) {
-  //     editor.commands.setContent(form.values.description || '');
-  //   }
-  // }, [form.values.description, editor]);
-
-  // const toggleSection = (section: string) => {
-  //   setCollapsed(prev => ({
-  //     ...prev,
-  //     [section]: !prev[section]
-  //   }));
-  // };
-
+const Infor = memo(({ form, isEditMode = false }: InforProps) => {
   return (
-    <div>
-      {/* <MediaUpload form={form}/> */}
+    <Stack>
+      <MediaUpload
+        media={form.values.media} 
+        setMedia={(newMedia) => form.setFieldValue('media', newMedia)} 
+      />
 
-      {/* <BasicInfor form={form}/> */}
+      <BasicInfor 
+        name={form.values.name}
+        sortDescription={form.values.sortDescription}
+        price={form.values.price}
+        discountPrice={form.values.discountPrice}
+        categoryId={form.values.categoryId}
+        description={form.values.description}
+        nameError={form.errors.name}
+        sortDescriptionError={form.errors.sortDescription}
+        priceError={form.errors.price}
+        discountPriceError={form.errors.discountPrice}
+        categoryIdError={form.errors.categoryId}
+        onNameChange={(value) => form.setFieldValue('name', value)}
+        onSortDescriptionChange={(value) => form.setFieldValue('sortDescription', value)}
+        onPriceChange={(value) => form.setFieldValue('price', typeof value === 'string' ? parseFloat(value) || 0 : value)}
+        onDiscountPriceChange={(value) => form.setFieldValue('discountPrice', typeof value === 'string' ? parseFloat(value) || 0 : value)}
+        onCategoryIdChange={(value) => form.setFieldValue('categoryId', value)}
+        onDescriptionChange={(value) => form.setFieldValue('description', value)}
+      />
 
-      {/* <SkuInfor form={form} /> */}
+      <SkuInfor 
+        attributes={form.values.attributes}
+        onAttributesChange={(attributes) => form.setFieldValue('attributes', attributes)}
+      />
 
-      {/* <SkuDetails form={form} /> */}
+      <SkuDetails form={form} />
 
-      <Shipping form={form} />
-
-    </div>
+      <Shipping 
+        weightProps={{...form.getInputProps("weight")}} 
+        heightProps={{...form.getInputProps("height")}} 
+        withProps={{...form.getInputProps("width")}} 
+        lengthProps={{...form.getInputProps("length")}}
+      />
+    </Stack>
   );
-};
+});
 
 export default Infor;

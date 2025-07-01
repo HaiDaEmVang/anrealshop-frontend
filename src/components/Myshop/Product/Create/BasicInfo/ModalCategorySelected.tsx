@@ -8,7 +8,7 @@ import {
     Box,
     Divider
 } from '@mantine/core';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 import type { BaseCategoryDto } from '../../../../../types/CategoryType';
 
@@ -20,7 +20,7 @@ interface ModalCategorySelectedProps {
     selectedCategoryId?: string;
 }
 
-const ModalCategorySelected = ({ opened, onClose, onSelect, categories, selectedCategoryId }: ModalCategorySelectedProps) => {
+const ModalCategorySelected = memo(({ opened, onClose, onSelect, categories, selectedCategoryId }: ModalCategorySelectedProps) => {
     const [selectedPath, setSelectedPath] = useState<string[]>([]);
 
     useEffect(() => {
@@ -132,6 +132,6 @@ const ModalCategorySelected = ({ opened, onClose, onSelect, categories, selected
             </Group>
         </Modal>
     );
-};
+});
 
 export default ModalCategorySelected;

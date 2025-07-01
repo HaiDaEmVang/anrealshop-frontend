@@ -1,6 +1,7 @@
-import { Container, Paper } from '@mantine/core';
+import { Button, Container, Group, Modal, Paper, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { FiEye, FiSave } from 'react-icons/fi';
 import { useParams } from 'react-router-dom';
 import { defaultProductDescriptionHtml } from '../../../../data/InitData';
 import type { MediaDto } from '../../../../types/CommonType';
@@ -21,7 +22,7 @@ const ProductForm = () => {
       quantity: 0,
       categoryId: '',
       weight: 0,
-      hight: 0,
+      height: 0,
       length: 0,
       width: 0,
       attributes: [],
@@ -32,6 +33,11 @@ const ProductForm = () => {
     validate: {
       name: (value) => (value.trim().length === 0 ? 'Tên không được để trống' : null),
       price: (value) => (value <= 0 ? 'Giá phải lớn hơn 0' : null),
+      discountPrice: (value, values) => {
+        if (value < 0) return 'Giá khuyến mãi không hợp lệ';
+        if (value > 0 && value >= values.price) return 'Giá khuyến mãi phải nhỏ hơn giá gốc';
+        return null;
+      },
       quantity: (value) => (value < 0 ? 'Số lượng không hợp lệ' : null),
       categoryId: (value) => (!value ? 'Chọn danh mục' : null),
       weight: (value) => (value < 0 ? 'Cân nặng không hợp lệ' : null),
@@ -52,70 +58,10 @@ const ProductForm = () => {
   const [isDirty, setIsDirty] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Comprehensive form state logging
-  useEffect(() => {
-    console.log('🔍 Complete Form State Update:', {
-      action: 'formStateChange',
-      timestamp: new Date().toISOString(),
-      formValues: form.values,
-      errors: form.errors,
-      isDirty: form.isDirty(),
-      touchedFields: Object.keys(form.values).filter(key => form.isTouched(key)),
-      summary: {
-        hasName: !!form.values.name,
-        hasCategory: !!form.values.categoryId,
-        attributeCount: form.values.attributes.length,
-        skuCount: form.values.productSkus.length,
-        hasPrice: form.values.price > 0,
-        hasQuantity: form.values.quantity > 0
-      }
-    });
-  }, [form.values, form.errors]);
 
-  // Track specific critical field changes
-  useEffect(() => {
-    if (form.values.name) {
-      console.log('📝 Product Name Changed:', {
-        action: 'nameChange',
-        timestamp: new Date().toISOString(),
-        value: form.values.name,
-        length: form.values.name.length
-      });
-    }
-  }, [form.values.name]);
-
-  useEffect(() => {
-    if (form.values.price > 0) {
-      console.log('💰 Product Price Changed:', {
-        action: 'priceChange',
-        timestamp: new Date().toISOString(),
-        value: form.values.price,
-        formatted: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(form.values.price)
-      });
-    }
-  }, [form.values.price]);
-
-  useEffect(() => {
-    console.log('🏷️ Attributes Array Changed:', {
-      action: 'attributesChange',
-      timestamp: new Date().toISOString(),
-      count: form.values.attributes.length,
-      attributes: form.values.attributes,
-      attributeNames: form.values.attributes.map(attr => attr.attributeKeyName)
-    });
-  }, [form.values.attributes]);
-
-  useEffect(() => {
-    console.log('📦 Product SKUs Changed:', {
-      action: 'skusChange',
-      timestamp: new Date().toISOString(),
-      count: form.values.productSkus.length,
-      skus: form.values.productSkus,
-      skuCodes: form.values.productSkus.map(sku => sku.sku),
-      totalValue: form.values.productSkus.reduce((sum, sku) => sum + (sku.price * sku.quantity), 0)
-    });
-  }, [form.values.productSkus]);
-
+  useEffect(()=>{
+    console.log(form.values);
+  }, [form])
   const openPreview = () => {
     setIsPreviewOpen(true);
   };
@@ -124,8 +70,75 @@ const ProductForm = () => {
     setIsPreviewOpen(false);
   };
 
+  const handleSubmit = () => {
+    const validation = form.validate();
+    if (validation.hasErrors) {
+      console.log('Form has errors:', validation.errors);
+      return;
+    }
+
+    console.log(`${isEditMode ? 'Updating' : 'Submitting'} product:`, form.values, media);
+    console.log(`Product ${isEditMode ? 'updated' : 'created'} successfully`);
+  };
+
   return (
     <Container fluid px="lg" py="md">
+      {/* Preview Modal */}
+      <Modal
+        opened={isPreviewOpen}
+        onClose={closePreview}
+        size="90%"
+        padding={0}
+        centered
+        styles={{
+          header: { padding: '16px 24px', borderBottom: '1px solid #e9ecef' },
+          body: { padding: 0 },
+          content: {
+            borderRadius: '8px',
+            maxHeight: '95vh',
+            display: 'flex',
+            flexDirection: 'column'
+          },
+          inner: {
+            padding: '20px'
+          },
+          title: {
+            fontWeight: 600,
+            fontSize: '18px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          },
+          close: {
+            backgroundColor: '#f8f9fa',
+            '&:hover': {
+              backgroundColor: '#e9ecef'
+            }
+          }
+        }}
+        title={
+          <Group>
+            <FiEye size={20} className="text-primary" />
+            <Text>Xem trước sản phẩm</Text>
+          </Group>
+        }
+        transitionProps={{ transition: 'fade', duration: 300 }}
+      >
+        <div style={{
+          overflow: 'auto',
+          maxHeight: 'calc(95vh - 60px)',
+          padding: '0'
+        }}>
+          {/* <Review
+            form={form}
+            media={media}
+            onBack={closePreview}
+            onSubmit={handleSubmit}
+            isPreview={true}
+          /> */}
+        </div>
+      </Modal>
+
       <Paper className="!bg-transparent mb-20">
         {isLoading ? (
           <div className="flex justify-center items-center py-8">
@@ -141,6 +154,46 @@ const ProductForm = () => {
             isEditMode={isEditMode}
           />
         )}
+      </Paper>
+
+      <Paper
+        shadow="md"
+        p="md"
+        className="bg-white border-t fixed bottom-0 left-0 right-0 z-10"
+        style={{ boxShadow: '0 -2px 10px rgba(0,0,0,0.1)' }}
+      >
+        <Container fluid px="lg">
+          <Group justify="space-between">
+            <Text size="sm" c="dimmed" className="hidden md:block">
+              {isDirty ? 'Sản phẩm có thay đổi chưa được lưu' : isEditMode ? 'Chỉnh sửa thông tin sản phẩm của bạn' : 'Tạo và quản lý thông tin sản phẩm của bạn'}
+            </Text>
+            <Group>
+              <Button
+                leftSection={<FiEye size={16} />}
+                variant="outline"
+                onClick={openPreview}
+                radius="md"
+              >
+                Xem trước
+              </Button>
+              <Button
+                leftSection={<FiSave size={16} />}
+                variant="default"
+                radius="md"
+              >
+                Lưu nháp
+              </Button>
+              <Button
+                className="bg-primary hover:bg-primary/90"
+                onClick={handleSubmit}
+                disabled={!isDirty}
+                radius="md"
+              >
+                {isEditMode ? 'Cập nhật sản phẩm' : 'Đăng sản phẩm'}
+              </Button>
+            </Group>
+          </Group>
+        </Container>
       </Paper>
     </Container>
   );

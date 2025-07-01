@@ -1,4 +1,3 @@
-// components/MediaPreviewItem.tsx
 import { ActionIcon, Badge, Box, Group, Image, Loader } from '@mantine/core';
 import { FiChevronLeft, FiChevronRight, FiTrash2, FiVideo, FiXCircle } from 'react-icons/fi'; 
 import type { MediaDto } from '../../../../../types/CommonType';
@@ -33,13 +32,13 @@ const MediaPreviewItem = ({
       h={80}
     >
       {isMainImage && item.type === 'IMAGE' && (
-        <Badge className="absolute top-1 left-1 z-10" color="blue" size="xs">
+        <Badge className="absolute top-1 left-1 z-[8]" color="blue" size="xs">
           Chính
         </Badge>
       )}
 
       {item.type === 'VIDEO' && (
-        <Badge className="absolute top-1 left-1 z-10" color="red" size="xs">
+        <Badge className="absolute top-1 left-1 z-[8]" color="red" size="xs">
           Video
         </Badge>
       )}
@@ -51,7 +50,7 @@ const MediaPreviewItem = ({
           left={0}
           right={0}
           bottom={0}
-          className="flex items-center justify-center bg-black bg-opacity-50 z-20"
+          className="flex items-center justify-center bg-black bg-opacity-50 z-[8]"
         >
           <Loader color="white" size="sm" />
         </Box>
@@ -64,7 +63,7 @@ const MediaPreviewItem = ({
           left={0}
           right={0}
           bottom={0}
-          className="flex items-center justify-center bg-black bg-opacity-60 z-20"
+          className="flex items-center justify-center bg-black bg-opacity-60 z-[8]"
           title='Tải lên không thành công'
         >
           <FiXCircle size={30} className="text-red-500" />

@@ -7,41 +7,34 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { useRef, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import {
   FiChevronDown,
   FiChevronUp,
   FiPlus,
   FiVideo,
 } from 'react-icons/fi';
-import type { MediaDto } from '../../../../../types/CommonType';
 import { useMediaUpload } from '../../../../../hooks/useMediaUpload';
+import type { MediaDto } from '../../../../../types/CommonType';
 import showErrorNotification from '../../../../Toast/NotificationError';
-import MediaPreviewItem from './MediaReviewItem';
 import AddMediaButton from './AddMediaButton';
-import type { useForm } from '@mantine/form';
-import type { ProductCreateRequest } from '../../../../../types/ProductType';
+import MediaPreviewItem from './MediaReviewItem';
 
 
-type Props = {
-  form: ReturnType<typeof useForm<ProductCreateRequest>>;
-};
+interface MediaUploadProps {
+  media: MediaDto[]; 
+  setMedia: (value: MediaDto[] | ((prev: MediaDto[]) => MediaDto[])) => void;
+}
 
 
-const MediaUpload = ({ form }: Props) => {
+const MediaUpload = memo(({ media, setMedia }: MediaUploadProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const imageInputRef = useRef<HTMLButtonElement>(null);
   const videoInputRef = useRef<HTMLButtonElement>(null);
 
-  const media = form.values.media;
-  const setMedia = (value: MediaDto[] | ((prev: MediaDto[]) => MediaDto[])) => {
-    const prev = form.values.media; 
-    const next = typeof value === 'function' ? value(prev) : value;
-    form.setFieldValue('media', next);
-  };
-
-  const { uploadImages, uploadVideo, removeMedia, reorderMedia } = useMediaUpload(media, setMedia);
-
+  const { uploadImages, uploadVideo, removeMedia, reorderMedia } = useMediaUpload(
+    setMedia 
+  );
   const toggleSection = () => {
     setCollapsed((prev) => !prev);
   };
@@ -157,6 +150,6 @@ const MediaUpload = ({ form }: Props) => {
       )}
     </Paper>
   );
-};
+});
 
 export default MediaUpload;

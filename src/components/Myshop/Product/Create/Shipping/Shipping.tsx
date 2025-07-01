@@ -1,22 +1,25 @@
-import { useState } from 'react';
 import {
-  Paper,
-  Title,
-  Group,
   ActionIcon,
-  Stack,
+  Group,
   NumberInput,
+  Paper,
+  SimpleGrid,
+  Stack,
   Text,
-  SimpleGrid
+  Title,
+  type NumberInputProps
 } from '@mantine/core';
+import { useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import type { UseFormReturnType } from '@mantine/form';
 
 interface ShippingProps {
-  form: UseFormReturnType<any>;
+  weightProps: NumberInputProps, 
+  heightProps: NumberInputProps,  
+  withProps: NumberInputProps, 
+  lengthProps: NumberInputProps
 }
 
-const Shipping = ({ form }: ShippingProps) => {
+const Shipping = ({ weightProps, heightProps, withProps, lengthProps }: ShippingProps) => {
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleSection = () => {
@@ -41,7 +44,8 @@ const Shipping = ({ form }: ShippingProps) => {
               placeholder="Nhập cân nặng sản phẩm"
               min={0}
               step={10}
-              {...form.getInputProps('weight')}
+              // {...form.getInputProps('weight')}
+              {...weightProps}
               rightSection={<Text size="sm" c="dimmed">gr</Text>}
               rightSectionWidth={40}
             />
@@ -53,14 +57,14 @@ const Shipping = ({ form }: ShippingProps) => {
               <NumberInput
                 placeholder="Dài"
                 min={0}
-                {...form.getInputProps('length')}
+                {...lengthProps}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
               />
               <NumberInput
                 placeholder="Rộng"
                 min={0}
-                {...form.getInputProps('width')}
+                {...withProps}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
               />
@@ -69,11 +73,11 @@ const Shipping = ({ form }: ShippingProps) => {
                 min={0}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
-                {...form.getInputProps('height')}
+                {...heightProps}
               />
             </SimpleGrid>
 
-            {(form.errors.length || form.errors.width || form.errors.height) && (
+            {(lengthProps.error || withProps.error || heightProps.error) && (
               <Text size="xs" c="red" mt={5}>
                 Vui lòng nhập kích thước hợp lệ
               </Text>

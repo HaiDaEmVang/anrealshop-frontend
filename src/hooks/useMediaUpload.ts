@@ -1,11 +1,9 @@
-// hooks/useMediaUpload.ts
 import { useCallback } from 'react';
 import { uploadToCloudinary } from '../service/Cloundinary';
 import type { MediaDto } from '../types/CommonType';
 
 export function useMediaUpload(
-  media: MediaDto[],
-  setMedia: (value: MediaDto[] | ((prev: MediaDto[]) => MediaDto[])) => void
+  setFormMedia: (value: MediaDto[] | ((prev: MediaDto[]) => MediaDto[])) => void
 ) {
   const uploadImages = useCallback(async (files: File[] | null) => {
     if (!files || files.length === 0) return;
@@ -17,23 +15,24 @@ export function useMediaUpload(
       isUploaded: undefined
     }));
 
-    setMedia((prev) => [...prev, ...newMediaItems]);
+    setFormMedia((prev) => [...prev, ...newMediaItems]);
     let hasUploadErrors = false;
     const uploadPromises = newMediaItems.map(async (item) => {
       if (item.file) {
         try {
           const { secure_url, public_id } = await uploadToCloudinary(item.file, 'image');
-          setMedia((prev) =>
-            prev.map((m) =>
-              m.url === item.url
-                ? { ...m, url: secure_url, id: public_id, isUploading: false, isUploaded: true, file: undefined }
-                : m
-            )
+          setFormMedia((prev) =>
+            prev.map((m) => {
+              if (m.url === item.url) {
+                URL.revokeObjectURL(item.url);
+                return { ...m, url: secure_url, id: public_id, isUploading: false, isUploaded: true, file: undefined };
+              }
+              return m;
+            })
           );
-          URL.revokeObjectURL(item.url);
         } catch (error) {
           hasUploadErrors = true;
-          setMedia((prev) =>
+          setFormMedia((prev) =>
             prev.map((m) =>
               m.url === item.url
                 ? {
@@ -43,16 +42,16 @@ export function useMediaUpload(
                 }
                 : m
             )
-          )
+          );
         }
       }
-    })
+    });
 
     await Promise.allSettled(uploadPromises);
     if (hasUploadErrors) {
       throw new Error('Có ảnh tải lên không thành công. Vui lòng thử lại.');
     }
-  }, [setMedia]);
+  }, [setFormMedia]);
 
   const uploadVideo = useCallback(async (file: File | null) => {
     if (!file) return;
@@ -65,7 +64,7 @@ export function useMediaUpload(
       isUploaded: undefined,
     };
 
-    setMedia((prev) => {
+    setFormMedia((prev) => {
       const idx = prev.findIndex((m) => m.type === 'VIDEO');
       if (idx !== -1) {
         if (prev[idx].url.startsWith('blob:')) URL.revokeObjectURL(prev[idx].url);
@@ -80,49 +79,49 @@ export function useMediaUpload(
       const { secure_url, public_id } = await uploadToCloudinary(file, 'video');
       const thumbnailUrl = secure_url.replace(/\.(mp4|webm|mov)$/, '.jpg');
 
-      setMedia((prev) =>
+      setFormMedia((prev) =>
         prev.map((m) =>
           m.url === tempVideoUrl
-            ? { ...m, url: secure_url, thumbnailUrl, id: public_id, isUploading: false, isUploaded: true,  file: undefined }
+            ? { ...m, url: secure_url, thumbnailUrl, id: public_id, isUploading: false, isUploaded: true, file: undefined }
             : m
         )
       );
       URL.revokeObjectURL(tempVideoUrl);
     } catch (error) {
-      setMedia((prev) => 
-        prev.map((m) => 
-          m.url === tempVideoUrl 
-            ? { 
-                ...m, 
-                isUploading: false, 
-                isUploaded: false,
-              } 
+      setFormMedia((prev) =>
+        prev.map((m) =>
+          m.url === tempVideoUrl
+            ? {
+              ...m,
+              isUploading: false,
+              isUploaded: false,
+            }
             : m
         )
       );
-      URL.revokeObjectURL(tempVideoUrl); 
+      URL.revokeObjectURL(tempVideoUrl);
       throw new Error('Tải lên video không thành công. Vui lòng thử lại.');
     }
-  }, [setMedia]);
+  }, [setFormMedia]);
 
   const removeMedia = useCallback((index: number) => {
-    setMedia((prev) => {
+    setFormMedia((prev) => {
       const updated = [...prev];
       if (updated[index].url.startsWith('blob:')) URL.revokeObjectURL(updated[index].url);
       updated.splice(index, 1);
       return updated;
     });
-  }, [setMedia]);
+  }, [setFormMedia]);
 
   const reorderMedia = useCallback((index: number, direction: 'up' | 'down') => {
-    setMedia((prev) => {
+    setFormMedia((prev) => {
       const updated = [...prev];
       const newIndex = direction === 'up' ? index - 1 : index + 1;
       if (newIndex < 0 || newIndex >= updated.length) return prev;
       [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
       return updated;
     });
-  }, [setMedia]);
+  }, [setFormMedia]);
 
   return { uploadImages, uploadVideo, removeMedia, reorderMedia };
 }

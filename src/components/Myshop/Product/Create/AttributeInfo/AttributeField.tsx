@@ -1,31 +1,30 @@
 import { Select } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
-import { useCallback, useMemo } from 'react';
-import type { BaseAttribute } from '../../../../../types/AttributeType';
-import type { ProductCreateRequest } from '../../../../../types/ProductType';
+import { memo, useCallback, useMemo } from 'react';
+import type { BaseAttribute, AttributeRequest } from '../../../../../types/AttributeType';
 import { MultiSelectCreatable } from './MultiSelectedCreateable';
 
 interface AttributeFieldProps {
     attribute: BaseAttribute;
-    form: UseFormReturnType<ProductCreateRequest>;
+    formAttributes: AttributeRequest[];
+    onAttributesChange: (attributes: AttributeRequest[]) => void;
 }
 
-const AttributeField = ({ attribute, form }: AttributeFieldProps) => {
+const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: AttributeFieldProps) => {
     const { attributeKeyName, attributeKeyDisplay, value, isDefault, isMultiSelect } = attribute;
 
     const currentValue = useMemo(() => {
-        const attr = form.values.attributes.find(a => a.attributeKeyName === attributeKeyName);
+        const attr = formAttributes.find(a => a.attributeKeyName === attributeKeyName);
         return attr?.value || [];
-    }, [form.values.attributes, attributeKeyName]);
+    }, [formAttributes, attributeKeyName]);
 
     const updateForm = useCallback((values: string[]) => {
-        const attributes = form.values.attributes.filter(a => a.attributeKeyName !== attributeKeyName);
+        const attributes = formAttributes.filter(a => a.attributeKeyName !== attributeKeyName);
 
         if (values.length > 0) {
             attributes.push({ attributeKeyName, value: values });
         }
-        form.setFieldValue('attributes', attributes);
-    }, [form, attributeKeyName]);
+        onAttributesChange(attributes);
+    }, [formAttributes, onAttributesChange, attributeKeyName]);
 
     const handleMultiChange = useCallback((values: string[]) => {
         updateForm(values);
@@ -59,6 +58,6 @@ const AttributeField = ({ attribute, form }: AttributeFieldProps) => {
             onChange={handleSingleChange}
         />
     );
-};
+});
 
 export default AttributeField;

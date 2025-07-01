@@ -9,7 +9,7 @@ import {
   TextInput
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 interface CustomAttribute {
   attributeKeyName: string;
@@ -24,7 +24,7 @@ interface AttributeDrawerProps {
   onAdd: (attribute: CustomAttribute) => void;
 }
 
-const AttributeDrawer = ({ opened, onClose, onAdd }: AttributeDrawerProps) => {
+const AttributeDrawer = memo(({ opened, onClose, onAdd }: AttributeDrawerProps) => {
   const [values, setValues] = useState('');
 
   const form = useForm({
@@ -142,6 +142,6 @@ const AttributeDrawer = ({ opened, onClose, onAdd }: AttributeDrawerProps) => {
       </Stack>
     </Drawer>
   );
-};
+});
 
 export default AttributeDrawer;

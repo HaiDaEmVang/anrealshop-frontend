@@ -4,18 +4,18 @@ import {
   Paper,
   Title
 } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
-import { useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { attributeDatas } from '../../../../../data/AttributeData';
-import type { ProductCreateRequest } from '../../../../../types/ProductType';
+import type { AttributeRequest } from '../../../../../types/AttributeType';
 import AttributeSection from './AttributeSection';
 
 interface AttributeInforProps {
-  form: UseFormReturnType<ProductCreateRequest>;
+  attributes: AttributeRequest[];
+  onAttributesChange: (attributes: AttributeRequest[]) => void;
 }
 
-const AttributeInfor = ({ form }: AttributeInforProps) => {
+const AttributeInfor = memo(({ attributes, onAttributesChange }: AttributeInforProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [showMore, setShowMore] = useState(false);
 
@@ -35,13 +35,14 @@ const AttributeInfor = ({ form }: AttributeInforProps) => {
       {!collapsed && (
         <AttributeSection
           attributes={sortedAttributes}
-          form={form}
+          formAttributes={attributes}
+          onAttributesChange={onAttributesChange}
           showMore={showMore}
           onToggleMore={() => setShowMore(!showMore)}
         />
       )}
     </Paper>
   );
-};
+});
 
 export default AttributeInfor;

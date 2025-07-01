@@ -4,22 +4,27 @@ import {
     Group,
     Stack
 } from '@mantine/core';
-import type { UseFormReturnType } from '@mantine/form';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { FiChevronDown, FiChevronUp, FiPlus } from 'react-icons/fi';
-import type { BaseAttribute } from '../../../../../types/AttributeType';
-import type { ProductCreateRequest } from '../../../../../types/ProductType';
+import type { BaseAttribute, AttributeRequest } from '../../../../../types/AttributeType';
 import AttributeDrawer from './AttributeDrawer';
 import AttributeField from './AttributeField';
 
 interface AttributeSectionProps {
   attributes: BaseAttribute[];
-  form: UseFormReturnType<ProductCreateRequest>;
+  formAttributes: AttributeRequest[];
+  onAttributesChange: (attributes: AttributeRequest[]) => void;
   showMore: boolean;
   onToggleMore: () => void;
 }
 
-const AttributeSection = ({ attributes, form, showMore, onToggleMore }: AttributeSectionProps) => {
+const AttributeSection = memo(({ 
+  attributes, 
+  formAttributes, 
+  onAttributesChange, 
+  showMore, 
+  onToggleMore 
+}: AttributeSectionProps) => {
   const [drawerOpened, setDrawerOpened] = useState(false);
   const [customAttributes, setCustomAttributes] = useState<BaseAttribute[]>([]);
 
@@ -47,7 +52,8 @@ const AttributeSection = ({ attributes, form, showMore, onToggleMore }: Attribut
           <AttributeField 
             key={attribute.attributeKeyName}
             attribute={attribute} 
-            form={form} 
+            formAttributes={formAttributes}
+            onAttributesChange={onAttributesChange}
           />
         ))}
       </Group>
@@ -98,6 +104,6 @@ const AttributeSection = ({ attributes, form, showMore, onToggleMore }: Attribut
       />
     </>
   );
-};
+});
 
 export default AttributeSection;

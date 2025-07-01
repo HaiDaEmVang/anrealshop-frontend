@@ -4,32 +4,32 @@ import {
     Paper,
     Text
 } from '@mantine/core';
-import type { useForm } from '@mantine/form';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { FiGrid } from 'react-icons/fi';
+import type { ReactNode } from 'react';
 import { categories } from '../../../../../data/CategoryPageData';
-import type { ProductCreateRequest } from '../../../../../types/ProductType';
 import AutoComplateCustome from './AutoComplateCustome';
 import ModalCategorySelected from './ModalCategorySelected';
 
-type Props = {
-    form: ReturnType<typeof useForm<ProductCreateRequest>>;
-};
+interface CategoryInfoProps {
+    categoryId: string;
+    categoryIdError?: ReactNode;
+    onCategoryIdChange: (value: string) => void;
+}
 
-const CategoryInfo = ({ form }: Props) => {
+const CategoryInfo = memo(({ categoryId, categoryIdError, onCategoryIdChange }: CategoryInfoProps) => {
     const [modalOpened, setModalOpened] = useState(false);
-    const selectedCategoryId = form.values.categoryId;
 
-    const handleCategoryChange = (categoryId: string) => {
-        form.setFieldValue('categoryId', categoryId);
+    const handleCategoryChange = (categoryIdValue: string) => {
+        onCategoryIdChange(categoryIdValue);
     };
 
     const handleClearCategory = () => {
-        form.setFieldValue('categoryId', '');
+        onCategoryIdChange('');
     };
 
-    const handleModalSelect = (categoryId: string) => {
-        form.setFieldValue('categoryId', categoryId);
+    const handleModalSelect = (categoryIdValue: string) => {
+        onCategoryIdChange(categoryIdValue);
     };
 
     return (
@@ -50,16 +50,16 @@ const CategoryInfo = ({ form }: Props) => {
 
             <AutoComplateCustome
                 categories={categories}
-                value={selectedCategoryId}
+                value={categoryId}
                 onChange={handleCategoryChange}
                 onClear={handleClearCategory}
                 placeholder="Nhập để tìm kiếm danh mục..."
                 required
             />
 
-            {form.errors.categoryId && (
+            {categoryIdError && (
                 <Text size="xs" c="red" mt={5}>
-                    {form.errors.categoryId}
+                    {categoryIdError}
                 </Text>
             )}
 
@@ -68,10 +68,10 @@ const CategoryInfo = ({ form }: Props) => {
                 onClose={() => setModalOpened(false)}
                 onSelect={handleModalSelect}
                 categories={categories}
-                selectedCategoryId={selectedCategoryId}
+                selectedCategoryId={categoryId}
             />
         </Paper>
     );
-};
+});
 
 export default CategoryInfo;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { Checkbox, Combobox, Group, Input, Pill, PillsInput, useCombobox } from '@mantine/core';
 import { FiChevronDown } from 'react-icons/fi';
 
@@ -12,7 +12,7 @@ interface MultiSelectCreatableProps {
   icon?: any;
 }
 
-export function MultiSelectCreatable({
+export const MultiSelectCreatable = memo(({
   options,
   value,
   onChange,
@@ -20,7 +20,7 @@ export function MultiSelectCreatable({
   canCreate = false,
   label,
   icon: Icon
-}: MultiSelectCreatableProps) {
+}: MultiSelectCreatableProps) => {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
@@ -142,4 +142,4 @@ export function MultiSelectCreatable({
       </Combobox>
     </div>
   );
-}
+});

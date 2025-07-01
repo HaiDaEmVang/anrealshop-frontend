@@ -19,4 +19,4 @@ export interface MediaDto {
   thumbnailUrl?: string;
   url: string;
   type: 'IMAGE' | 'VIDEO';
-}
+} 
