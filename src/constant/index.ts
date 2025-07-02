@@ -35,6 +35,10 @@ export const API_ENDPOINTS = {
     // CATEGORY: (slug: string) => `/products/category/${slug}`,
     // SHOP: (slug: string) => `/products/shop/${slug}`,
   },
+  ATTRIBUTES: {
+    ATTRIBUTE_FOR_SHOP: '/attributes/my-shop',
+  }
+
 };
 
 

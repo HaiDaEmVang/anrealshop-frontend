@@ -7,20 +7,21 @@ import {
     Title
 } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import type { ProductAttribute } from '../../../../../types/AttributeType';
 import type { ProductCreateRequest } from '../../../../../types/ProductType';
 import AttributeSelecter from './AttributeSelecter';
 import SkuBulkAction from './SkuBlukAction';
 import SkuTable from './SkuTable';
-import type { ProductAttribute } from '../../../../../types/AttributeType';
 
 
 interface SkuDetailsProps {
     form: UseFormReturnType<ProductCreateRequest>;
+    attributeForSkuData: ProductAttribute[];
 }
 
-const SkuDetails = ({ form }: SkuDetailsProps) => {
+const SkuDetails = ({ form, attributeForSkuData }: SkuDetailsProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
     const [selectedClassificationType, setSelectedClassificationType] = useState<string | null>(null);
@@ -132,6 +133,7 @@ const SkuDetails = ({ form }: SkuDetailsProps) => {
             {!collapsed && (
                 <Stack>
                     <AttributeSelecter
+                        attributeForSku={attributeForSkuData || []}
                         attributes={attributes}
                         selectedClassificationType={selectedClassificationType}
                         onAttributesChange={setAttributes}

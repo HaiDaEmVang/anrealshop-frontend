@@ -10,10 +10,10 @@ import {
 } from '@mantine/core';
 import { useCallback, useMemo } from 'react';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
-import { attributeForSku } from '../../../../../data/AttributeData';
 import type { ProductAttribute } from '../../../../../types/AttributeType';
 
 interface AttributeSelecterProps {
+    attributeForSku: ProductAttribute[];
     attributes: ProductAttribute[];
     selectedClassificationType: string | null;
     onAttributesChange: (attributes: ProductAttribute[]) => void;
@@ -21,6 +21,7 @@ interface AttributeSelecterProps {
 }
 
 const AttributeSelecter = ({
+    attributeForSku,
     attributes,
     selectedClassificationType,
     onAttributesChange,
@@ -39,7 +40,7 @@ const AttributeSelecter = ({
                 value: attr.attributeKeyName,
                 label: attr.attributeKeyDisplay
             }));
-    }, [attributes]);
+    }, [attributes, attributeForSku]);
 
     const addClassification = useCallback(() => {
         if (!selectedClassificationType) return;
@@ -76,7 +77,7 @@ const AttributeSelecter = ({
     const getValueSuggestions = useCallback((classificationType: string) => {
         const attribute = attributeForSku.find(attr => attr.attributeKeyDisplay === classificationType);
         return attribute?.values.map(value => ({ value, label: value })) || [];
-    }, []);
+    }, [attributeForSku]);
 
     return (
         <Stack>

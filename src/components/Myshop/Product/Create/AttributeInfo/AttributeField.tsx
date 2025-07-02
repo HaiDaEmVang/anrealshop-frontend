@@ -10,22 +10,22 @@ interface AttributeFieldProps {
 }
 
 const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: AttributeFieldProps) => {
-    const { attributeKeyName, attributeKeyDisplay, value, isDefault, isMultiSelect } = attribute;
+    const { attributeKeyName, attributeKeyDisplay, values, isDefault, isMultiSelect } = attribute;
 
     const currentValue = useMemo(() => {
         const attr = formAttributes.find(a => a.attributeKeyName === attributeKeyName);
-        return attr?.value || [];
+        return attr?.values || [];
     }, [formAttributes, attributeKeyName]);
 
-    const updateForm = useCallback((values: string[]) => {
+    const updateForm = useCallback((valuess: string[]) => {
         const attributes = formAttributes.filter(a => a.attributeKeyName !== attributeKeyName);
 
-        if (values.length > 0) {
+        if (valuess.length > 0) {
             attributes.push(
                 {
                     attributeKeyName,
                     attributeKeyDisplay,
-                    value: values,
+                    values
                 }
             );
         }
@@ -43,7 +43,7 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
     if (isMultiSelect) {
         return (
             <MultiSelectCreatable
-                options={value}
+                options={values}
                 value={currentValue}
                 onChange={handleMultiChange}
                 placeholder={`Chọn ${attributeKeyDisplay.toLowerCase()}`}
@@ -57,7 +57,7 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
         <Select
             label={attributeKeyDisplay}
             placeholder={`Chọn ${attributeKeyDisplay.toLowerCase()}`}
-            data={value.map(val => ({ value: val, label: val }))}
+            data={values.map(val => ({ value: val, label: val }))}
             searchable
             clearable
             value={currentValue[0] || null}

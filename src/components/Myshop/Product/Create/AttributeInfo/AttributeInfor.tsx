@@ -4,23 +4,23 @@ import {
   Paper,
   Title
 } from '@mantine/core';
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { attributeDatas } from '../../../../../data/AttributeData';
 import AttributeSection from './AttributeSection';
-import type { ProductAttribute } from '../../../../../types/AttributeType';
+import type { BaseAttribute, ProductAttribute } from '../../../../../types/AttributeType';
 
 interface AttributeInforProps {
   attributes: ProductAttribute[];
   onAttributesChange: (attributes: ProductAttribute[]) => void;
+  attributeDatas: BaseAttribute[];
 }
 
-const AttributeInfor = memo(({ attributes, onAttributesChange }: AttributeInforProps) => {
+const AttributeInfor = memo(({ attributes, onAttributesChange, attributeDatas }: AttributeInforProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [showMore, setShowMore] = useState(false);
 
   const sortedAttributes = useMemo(() => 
-    [...attributeDatas].sort((a, b) => a.displayOrder - b.displayOrder), []
+    [...attributeDatas].sort((a, b) => a.displayOrder - b.displayOrder), [attributeDatas]
   );
 
   return (

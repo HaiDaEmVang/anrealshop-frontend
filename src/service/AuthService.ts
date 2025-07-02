@@ -33,13 +33,13 @@ const getProfile = async (): Promise<UserDto> => {
   return response.data;
 };
 
-const updateProfile = async (profileData: ProfileRequest): Promise<UserDto> => {
-  const response = await axiosInstance.put<UserDto>(
-    API_ENDPOINTS.USERS.UPDATE_PROFILE,
-    profileData
-  );
-  return response.data;
-};
+// const updateProfile = async (profileData: ProfileRequest): Promise<UserDto> => {
+//   const response = await axiosInstance.put<UserDto>(
+//     API_ENDPOINTS.USERS.UPDATE_PROFILE,
+//     profileData
+//   );
+//   return response.data;
+// };
 
 
 const logout = async (): Promise<void> => {
@@ -53,7 +53,7 @@ const authService = {
   login,
   refreshToken,
   getProfile,
-  updateProfile,
+  // updateProfile,
   logout,
   register,
 };

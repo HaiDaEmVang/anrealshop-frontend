@@ -1,13 +1,15 @@
 import { Stack } from '@mantine/core';
 import { type UseFormReturnType } from '@mantine/form';
 import '@mantine/tiptap/styles.css';
+import { memo, useEffect, useState } from 'react';
+import AttributeService from '../../../../service/AttributeService';
+import type { AttributeForShop } from '../../../../types/AttributeType';
 import type { ProductCreateRequest } from '../../../../types/ProductType';
 import SkuInfor from './AttributeInfo/AttributeInfor';
 import BasicInfor from './BasicInfo/BasicInfor';
 import Shipping from './Shipping/Shipping';
 import SkuDetails from './SkuDetail/SkuDetails';
 import MediaUpload from './uploadImage/MediaUpload';
-import { memo } from 'react';
 
 interface InforProps {
   form: UseFormReturnType<ProductCreateRequest>;
@@ -15,14 +17,32 @@ interface InforProps {
 }
 
 const Infor = memo(({ form, isEditMode = false }: InforProps) => {
+  const [attributeData, setAttributeData] = useState<AttributeForShop>();
+  const isCategorySelected = form.values.categoryId && form.values.categoryId.trim() !== '';
+
+  useEffect(() => {
+    const fetchAttributes = async () => {
+      try {
+        const data = await AttributeService.getAttributeForShop();
+        setAttributeData(data);
+      } catch (err) {
+        console.error("Lỗi lấy attribute:", err);
+      }
+    };
+
+    if (isCategorySelected) {
+      fetchAttributes();
+    }
+  }, [isCategorySelected]);
+
   return (
     <Stack>
       <MediaUpload
-        media={form.values.media} 
-        setMedia={(newMedia) => form.setFieldValue('media', newMedia)} 
+        media={form.values.media}
+        setMedia={(newMedia) => form.setFieldValue('media', newMedia)}
       />
 
-      <BasicInfor 
+      <BasicInfor
         name={form.values.name}
         sortDescription={form.values.sortDescription}
         price={form.values.price}
@@ -42,19 +62,24 @@ const Infor = memo(({ form, isEditMode = false }: InforProps) => {
         onDescriptionChange={(value) => form.setFieldValue('description', value)}
       />
 
-      <SkuInfor 
-        attributes={form.values.attributes}
-        onAttributesChange={(attributes) => form.setFieldValue('attributes', attributes)}
-      />
+      {isCategorySelected && (
+        <>
+          <SkuInfor
+            attributeDatas={attributeData?.attribute || []}
+            attributes={form.values.attributes}
+            onAttributesChange={(attributes) => form.setFieldValue('attributes', attributes)}
+          />
 
-      <SkuDetails form={form} />
+          <SkuDetails form={form} attributeForSkuData={attributeData?.attributeForSku || []} />
 
-      <Shipping 
-        weightProps={{...form.getInputProps("weight")}} 
-        heightProps={{...form.getInputProps("height")}} 
-        withProps={{...form.getInputProps("width")}} 
-        lengthProps={{...form.getInputProps("length")}}
-      />
+          <Shipping
+            weightProps={{ ...form.getInputProps("weight") }}
+            heightProps={{ ...form.getInputProps("height") }}
+            withProps={{ ...form.getInputProps("width") }}
+            lengthProps={{ ...form.getInputProps("length") }}
+          />
+        </>
+      )}
     </Stack>
   );
 });

@@ -5,11 +5,17 @@ export interface BaseAttribute {
   displayOrder: number;
   isDefault: boolean;
   isMultiSelect: boolean;
-  value: string[];
+  values: string[];
 }
 
 export interface ProductAttribute {
   attributeKeyName: string;
   attributeKeyDisplay: string;
   values: string[];
+}
+
+
+export interface AttributeForShop {
+  attribute: BaseAttribute[];
+  attributeForSku: ProductAttribute[];
 }
