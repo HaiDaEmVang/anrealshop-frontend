@@ -1,19 +1,19 @@
 import {
-    Button,
-    Collapse,
-    Group,
-    Stack
+  Button,
+  Collapse,
+  Group,
+  Stack
 } from '@mantine/core';
 import { memo, useState } from 'react';
 import { FiChevronDown, FiChevronUp, FiPlus } from 'react-icons/fi';
-import type { BaseAttribute, AttributeRequest } from '../../../../../types/AttributeType';
+import type { BaseAttribute, ProductAttribute, } from '../../../../../types/AttributeType';
 import AttributeDrawer from './AttributeDrawer';
 import AttributeField from './AttributeField';
 
 interface AttributeSectionProps {
   attributes: BaseAttribute[];
-  formAttributes: AttributeRequest[];
-  onAttributesChange: (attributes: AttributeRequest[]) => void;
+  formAttributes: ProductAttribute[];
+  onAttributesChange: (attributes: ProductAttribute[]) => void;
   showMore: boolean;
   onToggleMore: () => void;
 }

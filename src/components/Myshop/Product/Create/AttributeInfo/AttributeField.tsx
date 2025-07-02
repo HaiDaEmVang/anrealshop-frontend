@@ -1,12 +1,12 @@
 import { Select } from '@mantine/core';
 import { memo, useCallback, useMemo } from 'react';
-import type { BaseAttribute, AttributeRequest } from '../../../../../types/AttributeType';
+import type { BaseAttribute, ProductAttribute } from '../../../../../types/AttributeType';
 import { MultiSelectCreatable } from './MultiSelectedCreateable';
 
 interface AttributeFieldProps {
     attribute: BaseAttribute;
-    formAttributes: AttributeRequest[];
-    onAttributesChange: (attributes: AttributeRequest[]) => void;
+    formAttributes: ProductAttribute[];
+    onAttributesChange: (attributes: ProductAttribute[]) => void;
 }
 
 const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: AttributeFieldProps) => {
@@ -21,7 +21,13 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
         const attributes = formAttributes.filter(a => a.attributeKeyName !== attributeKeyName);
 
         if (values.length > 0) {
-            attributes.push({ attributeKeyName, value: values });
+            attributes.push(
+                {
+                    attributeKeyName,
+                    attributeKeyDisplay,
+                    value: values,
+                }
+            );
         }
         onAttributesChange(attributes);
     }, [formAttributes, onAttributesChange, attributeKeyName]);

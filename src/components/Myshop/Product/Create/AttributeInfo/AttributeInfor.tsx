@@ -7,12 +7,12 @@ import {
 import { memo, useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { attributeDatas } from '../../../../../data/AttributeData';
-import type { AttributeRequest } from '../../../../../types/AttributeType';
 import AttributeSection from './AttributeSection';
+import type { ProductAttribute } from '../../../../../types/AttributeType';
 
 interface AttributeInforProps {
-  attributes: AttributeRequest[];
-  onAttributesChange: (attributes: AttributeRequest[]) => void;
+  attributes: ProductAttribute[];
+  onAttributesChange: (attributes: ProductAttribute[]) => void;
 }
 
 const AttributeInfor = memo(({ attributes, onAttributesChange }: AttributeInforProps) => {

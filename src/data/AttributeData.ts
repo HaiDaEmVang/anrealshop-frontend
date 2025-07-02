@@ -4,12 +4,12 @@ export const attributeForSku: ProductAttribute[] = [
   {
     "attributeKeyName": "mau_sac",
     "attributeKeyDisplay": "Màu sắc",
-    "value": ["Đỏ", "Xanh lam", "Đen", "Trắng", "Xám", "Hồng", "Vàng", "Xanh lá"]
+    "values": ["Đỏ", "Xanh lam", "Đen", "Trắng", "Xám", "Hồng", "Vàng", "Xanh lá"]
   },
   {
     "attributeKeyName": "kich_thuoc",
     "attributeKeyDisplay": "Kích thước", 
-    "value": ["XS", "S", "M", "L", "XL", "XXL", "Freesize"]
+    "values": ["XS", "S", "M", "L", "XL", "XXL", "Freesize"]
   }
 ];
 

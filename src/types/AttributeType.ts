@@ -1,8 +1,3 @@
-export interface AttributeRequest {
-  id?: string;
-  attributeKeyName: string;
-  value: string[];
-}
 
 export interface BaseAttribute {
   attributeKeyName: string;
@@ -16,5 +11,5 @@ export interface BaseAttribute {
 export interface ProductAttribute {
   attributeKeyName: string;
   attributeKeyDisplay: string;
-  value: string[];
+  values: string[];
 }

@@ -1,4 +1,4 @@
-import type { AttributeRequest } from "./AttributeType";
+import type { ProductAttribute } from "./AttributeType";
 import type { MediaDto } from "./CommonType";
 
 export interface ProductCreateRequest {
@@ -13,7 +13,7 @@ export interface ProductCreateRequest {
   height: number;
   length: number;
   width: number;
-  attributes: AttributeRequest[];
+  attributes: ProductAttribute[];
   productSkus: ProductSkuRequest[];
   media: MediaDto[];
 }
@@ -23,11 +23,7 @@ export interface ProductSkuRequest {
   price: number;
   quantity: number;
   imageUrl: string;
-  attributes: ProductSkuAttribute[];
+  attributes: ProductAttribute[];
 }
 
-export interface ProductSkuAttribute {
-  attributeKeyName: string;
-  value: string;
-}
 

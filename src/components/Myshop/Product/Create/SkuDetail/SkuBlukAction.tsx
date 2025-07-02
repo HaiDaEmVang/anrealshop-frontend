@@ -13,18 +13,14 @@ import {
 import { useCallback, useMemo, useState } from 'react';
 import { FiGlobe, FiImage, FiSettings, FiUsers } from 'react-icons/fi';
 import { uploadToCloudinary } from '../../../../../service/Cloundinary';
+import type { ProductAttribute } from '../../../../../types/AttributeType';
 import type { ProductSkuRequest } from '../../../../../types/ProductType';
 import showErrorNotification from '../../../../Toast/NotificationError';
 import showSuccessNotification from '../../../../Toast/NotificationSuccess';
 
-interface VariantAttribute {
-    id: string;
-    name: string;
-    values: string[];
-}
 
 interface SkuBulkActionProps {
-    attributes: VariantAttribute[];
+    attributes: ProductAttribute[];
     skus: ProductSkuRequest[];
     onApplyBulk: (price: number | null, quantity: number | null, imageUrl?: string | null) => void;
     onApplyToGroup: (attributeName: string, attributeValue: string, price: number | null, quantity: number | null, imageUrl?: string | null) => void;
@@ -38,11 +34,11 @@ const SkuBulkAction = ({ attributes, skus, onApplyBulk, onApplyToGroup }: SkuBul
     const [selectedAttributeValue, setSelectedAttributeValue] = useState<string | null>(null);
 
     const attributeOptions = useMemo(() => 
-        attributes.map(attr => ({ value: attr.name, label: attr.name })), [attributes]
+        attributes.map(attr => ({ value: attr.attributeKeyDisplay, label: attr.attributeKeyDisplay })), [attributes]
     );
 
     const attributeValueOptions = useMemo(() => {
-        const attribute = attributes.find(attr => attr.name === selectedAttribute);
+        const attribute = attributes.find(attr => attr.attributeKeyDisplay === selectedAttribute);
         return attribute?.values.map(value => ({ value, label: value })) || [];
     }, [selectedAttribute, attributes]);
 
@@ -53,7 +49,7 @@ const SkuBulkAction = ({ attributes, skus, onApplyBulk, onApplyToGroup }: SkuBul
         return skus.filter(sku => 
             sku.attributes.some(attr => 
                 attr.attributeKeyName === attributeKey && 
-                attr.value === selectedAttributeValue
+                attr.values[0] === selectedAttributeValue[0]
             )
         ).length;
     }, [selectedAttribute, selectedAttributeValue, skus]);

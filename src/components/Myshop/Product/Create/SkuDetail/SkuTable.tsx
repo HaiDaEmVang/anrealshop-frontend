@@ -1,25 +1,20 @@
 import {
+    ActionIcon,
+    Group,
     Image,
     NumberInput,
     Table,
     Text,
     TextInput,
-    ActionIcon,
-    Group,
     Tooltip
 } from '@mantine/core';
 import { useCallback } from 'react';
 import { FiImage, FiTrash2, FiUpload } from 'react-icons/fi';
+import type { ProductAttribute } from '../../../../../types/AttributeType';
 import type { ProductSkuRequest } from '../../../../../types/ProductType';
 
-interface VariantAttribute {
-    id: string;
-    name: string;
-    values: string[];
-}
-
 interface SkuTableProps {
-    attributes: VariantAttribute[];
+    attributes: ProductAttribute[];
     skus: ProductSkuRequest[];
     onImageUpload: (skuId: string, file: File | null) => void;
     onSkuFieldUpdate: (skuId: string, field: string, value: any) => void;
@@ -43,7 +38,7 @@ const SkuTable = ({ attributes, skus, onImageUpload, onSkuFieldUpdate }: SkuTabl
     const getAttributeValueForDisplay = useCallback((sku: ProductSkuRequest, attributeName: string) => {
         const attributeKey = attributeName.toLowerCase().replace(/\s+/g, '_');
         const attribute = sku.attributes.find(attr => attr.attributeKeyName === attributeKey);
-        return attribute?.value || '-';
+        return attribute?.values || '-';
     }, []);
 
     return (
@@ -52,7 +47,7 @@ const SkuTable = ({ attributes, skus, onImageUpload, onSkuFieldUpdate }: SkuTabl
                 <Table.Thead>
                     <Table.Tr>
                         {attributes.map(attr => (
-                            <Table.Th key={attr.id}>{attr.name}</Table.Th>
+                            <Table.Th key={attr.attributeKeyName}>{attr.attributeKeyDisplay}</Table.Th>
                         ))}
                         <Table.Th>Hình ảnh</Table.Th>
                         <Table.Th>Giá</Table.Th>
@@ -64,8 +59,8 @@ const SkuTable = ({ attributes, skus, onImageUpload, onSkuFieldUpdate }: SkuTabl
                     {skus.map((sku, index) => (
                         <Table.Tr key={sku.sku}>
                             {attributes.map((attr) => (
-                                <Table.Td key={attr.id}>
-                                    {getAttributeValueForDisplay(sku, attr.name)}
+                                <Table.Td key={attr.attributeKeyName}>
+                                    {getAttributeValueForDisplay(sku, attr.attributeKeyDisplay)}
                                 </Table.Td>
                             ))}
                             <Table.Td>

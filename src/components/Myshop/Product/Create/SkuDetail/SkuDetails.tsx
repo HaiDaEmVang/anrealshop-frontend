@@ -13,12 +13,8 @@ import type { ProductCreateRequest } from '../../../../../types/ProductType';
 import AttributeSelecter from './AttributeSelecter';
 import SkuBulkAction from './SkuBlukAction';
 import SkuTable from './SkuTable';
+import type { ProductAttribute } from '../../../../../types/AttributeType';
 
-interface VariantAttribute {
-    id: string;
-    name: string;
-    values: string[];
-}
 
 interface SkuDetailsProps {
     form: UseFormReturnType<ProductCreateRequest>;
@@ -26,7 +22,7 @@ interface SkuDetailsProps {
 
 const SkuDetails = ({ form }: SkuDetailsProps) => {
     const [collapsed, setCollapsed] = useState(false);
-    const [attributes, setAttributes] = useState<VariantAttribute[]>([]);
+    const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
     const [selectedClassificationType, setSelectedClassificationType] = useState<string | null>(null);
 
     const formValues = useMemo(() => ({
@@ -43,7 +39,7 @@ const SkuDetails = ({ form }: SkuDetailsProps) => {
             if (index >= activeAttributes.length) return [current];
             const attr = activeAttributes[index];
             return attr.values.flatMap(value =>
-                combinations(index + 1, { ...current, [attr.name]: value })
+                combinations(index + 1, { ...current, [attr.attributeKeyDisplay]: value })
             );
         };
 
@@ -53,10 +49,10 @@ const SkuDetails = ({ form }: SkuDetailsProps) => {
                 .map(value => value.substring(0, 2).toUpperCase())
                 .join('-');
 
-            // Create ProductSkuAttribute array for each SKU
-            const attributesArray = Object.entries(combo).map(([key, value]) => ({
+            const attributesArray: ProductAttribute[] = Object.entries(combo).map(([key, value]) => ({
+                attributeKeyDisplay: key,
                 attributeKeyName: key.toLowerCase().replace(/\s+/g, '_'),
-                value: value
+                values: [value]
             }));
 
             return {
@@ -99,9 +95,9 @@ const SkuDetails = ({ form }: SkuDetailsProps) => {
 
     const handleGroupApply = useCallback((attributeName: string, attributeValue: string, price: number | null, quantity: number | null, imageUrl?: string | null) => {
         const updatedSkus = form.values.productSkus.map(sku => {
-            const hasMatchingAttribute = sku.attributes.some(attr => 
-                attr.attributeKeyName === attributeName.toLowerCase().replace(/\s+/g, '_') && 
-                attr.value === attributeValue
+            const hasMatchingAttribute = sku.attributes.some(attr =>
+                attr.attributeKeyName === attributeName.toLowerCase().replace(/\s+/g, '_') &&
+                attr.values[0] === attributeValue[0]
             );
 
             if (hasMatchingAttribute) {
@@ -114,7 +110,7 @@ const SkuDetails = ({ form }: SkuDetailsProps) => {
             }
             return sku;
         });
-        
+
         form.setFieldValue('productSkus', updatedSkus);
     }, [form]);
 
