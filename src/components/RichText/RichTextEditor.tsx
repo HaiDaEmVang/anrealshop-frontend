@@ -5,13 +5,15 @@ import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import { memo } from 'react';
+import { Text, type TextInputProps } from '@mantine/core';
 
 interface RichTextEditorProps {
-    value: string;
-    onChange: (value: string) => void;
+    descriptionProps: TextInputProps; 
 }
 
-const TextEditor = memo(({ value, onChange }: RichTextEditorProps) => {
+const TextEditor = memo(({ descriptionProps }: RichTextEditorProps) => {
+    const { value, onChange, error } = descriptionProps;
+
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -20,9 +22,14 @@ const TextEditor = memo(({ value, onChange }: RichTextEditorProps) => {
             Highlight,
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
         ],
-        content: value,
+        content: (value as string) || '<p></p',
         onUpdate: ({ editor }) => {
-            onChange(editor.getHTML());
+            const syntheticEvent = {
+                target: {
+                    value: editor.getHTML(),
+                },
+            } as React.ChangeEvent<HTMLInputElement>; 
+            onChange?.(syntheticEvent);
         },
     });
 
@@ -79,6 +86,7 @@ const TextEditor = memo(({ value, onChange }: RichTextEditorProps) => {
 
                 <MantineRichTextEditor.Content />
             </MantineRichTextEditor>
+            {error && <Text size="xs" c="red" mt={4}>{error}</Text>}
         </div>
     );
 });

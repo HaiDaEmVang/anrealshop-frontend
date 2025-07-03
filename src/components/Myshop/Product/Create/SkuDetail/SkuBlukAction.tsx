@@ -111,12 +111,14 @@ const SkuBulkAction = ({ attributes, skus, onApplyBulk, onApplyToGroup }: SkuBul
                         rightSection={<Text size="xs">₫</Text>}
                         id="bulk-price"
                         style={{ flex: 1 }}
+                        thousandSeparator=","
                     />
                     <NumberInput
                         placeholder="Tồn kho"
                         min={0}
                         id="bulk-stock"
                         style={{ flex: 1 }}
+                        thousandSeparator=","
                     />
                     <FileInput
                         placeholder="Chọn ảnh"

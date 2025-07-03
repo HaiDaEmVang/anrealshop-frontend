@@ -3,55 +3,42 @@ import {
     Group,
     NumberInput,
     Paper,
+    SimpleGrid,
     Stack,
     Textarea,
     TextInput,
-    Title
+    Title,
+    type AutocompleteProps,
+    type NumberInputProps,
+    type SelectProps,
+    type TextareaProps,
+    type TextInputProps
 } from '@mantine/core';
 import { memo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import type { ReactNode } from 'react';
 import RichTextEditor from '../../../../RichText/RichTextEditor';
 import CategoryInfo from './CategoryInfo';
 
 interface BasicInforProps {
-    name: string;
-    sortDescription: string;
-    price: number;
-    discountPrice: number;
-    categoryId: string;
-    description: string;
-    nameError?: ReactNode;
-    sortDescriptionError?: ReactNode;
-    priceError?: ReactNode;
-    discountPriceError?: ReactNode;
-    categoryIdError?: ReactNode;
-    onNameChange: (value: string) => void;
-    onSortDescriptionChange: (value: string) => void;
-    onPriceChange: (value: number | string) => void;
-    onDiscountPriceChange: (value: number | string) => void;
-    onCategoryIdChange: (value: string) => void;
-    onDescriptionChange: (value: string) => void;
+    isShowQuantity?: boolean;
+    nameProps: TextInputProps;
+    sortDescriptionProps: TextareaProps;
+    priceProps: NumberInputProps;
+    discountPriceProps: NumberInputProps;
+    categoryIdProps: SelectProps;
+    descriptionProps: TextInputProps;
+    quantityProps: NumberInputProps;
 }
 
-const BasicInfor = memo(({ 
-    name,
-    sortDescription,
-    price,
-    discountPrice,
-    categoryId,
-    description,
-    nameError,
-    sortDescriptionError,
-    priceError,
-    discountPriceError,
-    categoryIdError,
-    onNameChange,
-    onSortDescriptionChange,
-    onPriceChange,
-    onDiscountPriceChange,
-    onCategoryIdChange,
-    onDescriptionChange
+const BasicInfor = memo(({
+    isShowQuantity,
+    nameProps,
+    sortDescriptionProps,
+    priceProps,
+    discountPriceProps,
+    categoryIdProps,
+    descriptionProps,
+    quantityProps,
 }: BasicInforProps) => {
     const [collapsed, setCollapsed] = useState(false);
 
@@ -74,9 +61,7 @@ const BasicInfor = memo(({
                         label="Tên sản phẩm"
                         placeholder="Nhập tên sản phẩm"
                         required
-                        value={name}
-                        onChange={(event) => onNameChange(event.currentTarget.value)}
-                        error={nameError}
+                        {...nameProps}
                     />
 
                     <Textarea
@@ -85,20 +70,16 @@ const BasicInfor = memo(({
                         required
                         minRows={3}
                         maxRows={5}
-                        value={sortDescription}
-                        onChange={(event) => onSortDescriptionChange(event.currentTarget.value)}
-                        error={sortDescriptionError}
+                        {...sortDescriptionProps}
                     />
 
-                    <Group grow>
+                    <SimpleGrid cols={3} spacing="lg">
                         <NumberInput
                             label="Giá gốc"
                             placeholder="Nhập giá sản phẩm"
                             required
                             min={0}
-                            value={price}
-                            onChange={onPriceChange}
-                            error={priceError}
+                            {...priceProps}
                             thousandSeparator=",">
                         </NumberInput>
 
@@ -106,22 +87,30 @@ const BasicInfor = memo(({
                             label="Giá khuyến mãi"
                             placeholder="Nhập giá khuyến mãi"
                             min={0}
-                            value={discountPrice}
-                            onChange={onDiscountPriceChange}
-                            error={discountPriceError}
+                            {...discountPriceProps}
                             thousandSeparator=",">
                         </NumberInput>
-                    </Group>
 
-                    <CategoryInfo 
-                        categoryId={categoryId}
-                        categoryIdError={categoryIdError}
-                        onCategoryIdChange={onCategoryIdChange}
+                        <NumberInput
+                            label="Số lượng"
+                            placeholder="Nhập số lượng sản phẩm"
+                            min={0}
+                            disabled={!isShowQuantity}
+                            {...quantityProps}
+                            thousandSeparator=",">
+                        </NumberInput>
+                    </SimpleGrid>
+
+                    <CategoryInfo
+                        categoryIdProps={{
+                            ...categoryIdProps,
+                            value: categoryIdProps.value ?? undefined // Ensure value is string | undefined
+                        } as AutocompleteProps}
                     />
-                    
-                    <RichTextEditor 
-                        value={description}
-                        onChange={onDescriptionChange}
+
+                    <RichTextEditor
+                        descriptionProps={{
+                            ...descriptionProps}}
                     />
                 </Stack>
             )}

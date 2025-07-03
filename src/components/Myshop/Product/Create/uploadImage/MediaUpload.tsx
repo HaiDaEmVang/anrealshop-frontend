@@ -24,10 +24,11 @@ import MediaPreviewItem from './MediaReviewItem';
 interface MediaUploadProps {
   media: MediaDto[]; 
   setMedia: (value: MediaDto[] | ((prev: MediaDto[]) => MediaDto[])) => void;
+  error?: string;
 }
 
 
-const MediaUpload = memo(({ media, setMedia }: MediaUploadProps) => {
+const MediaUpload = memo(({ media, setMedia, error }: MediaUploadProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const imageInputRef = useRef<HTMLButtonElement>(null);
   const videoInputRef = useRef<HTMLButtonElement>(null);
@@ -141,6 +142,7 @@ const MediaUpload = memo(({ media, setMedia }: MediaUploadProps) => {
               )}
             </div>
           </div>
+          {error && <Text size="xs" c="red" mt={4}>{error}</Text>}
 
           <Text size="xs" c="dimmed" mt="xs">
             <b>Lưu ý:</b> Hình ảnh nên có tỉ lệ 1:1, kích thước tối thiểu 500x500 pixels và không quá 5MB.

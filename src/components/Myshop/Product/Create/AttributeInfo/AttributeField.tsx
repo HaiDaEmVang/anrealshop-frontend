@@ -17,6 +17,7 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
         return attr?.values || [];
     }, [formAttributes, attributeKeyName]);
 
+
     const updateForm = useCallback((valuess: string[]) => {
         const attributes = formAttributes.filter(a => a.attributeKeyName !== attributeKeyName);
 
@@ -25,7 +26,7 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
                 {
                     attributeKeyName,
                     attributeKeyDisplay,
-                    values
+                    values: valuess,
                 }
             );
         }

@@ -16,7 +16,7 @@ export interface MediaDto {
   isUploaded?: boolean;
   file?: File;
   id?: string;
-  thumbnailUrl?: string;
+  thumbnailUrl: string;
   url: string;
   type: 'IMAGE' | 'VIDEO';
 } 

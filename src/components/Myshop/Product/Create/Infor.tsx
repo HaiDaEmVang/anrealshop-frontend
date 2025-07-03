@@ -18,6 +18,7 @@ interface InforProps {
 
 const Infor = memo(({ form, isEditMode = false }: InforProps) => {
   const [attributeData, setAttributeData] = useState<AttributeForShop>();
+  const [isShowQuantity, setIsShowQuantity] = useState(true);
   const isCategorySelected = form.values.categoryId && form.values.categoryId.trim() !== '';
 
   useEffect(() => {
@@ -40,26 +41,18 @@ const Infor = memo(({ form, isEditMode = false }: InforProps) => {
       <MediaUpload
         media={form.values.media}
         setMedia={(newMedia) => form.setFieldValue('media', newMedia)}
+        error={form.errors.media as string | undefined}
       />
 
       <BasicInfor
-        name={form.values.name}
-        sortDescription={form.values.sortDescription}
-        price={form.values.price}
-        discountPrice={form.values.discountPrice}
-        categoryId={form.values.categoryId}
-        description={form.values.description}
-        nameError={form.errors.name}
-        sortDescriptionError={form.errors.sortDescription}
-        priceError={form.errors.price}
-        discountPriceError={form.errors.discountPrice}
-        categoryIdError={form.errors.categoryId}
-        onNameChange={(value) => form.setFieldValue('name', value)}
-        onSortDescriptionChange={(value) => form.setFieldValue('sortDescription', value)}
-        onPriceChange={(value) => form.setFieldValue('price', typeof value === 'string' ? parseFloat(value) || 0 : value)}
-        onDiscountPriceChange={(value) => form.setFieldValue('discountPrice', typeof value === 'string' ? parseFloat(value) || 0 : value)}
-        onCategoryIdChange={(value) => form.setFieldValue('categoryId', value)}
-        onDescriptionChange={(value) => form.setFieldValue('description', value)}
+        isShowQuantity={isShowQuantity}
+        nameProps={{ ...form.getInputProps('name') }}
+        sortDescriptionProps={{ ...form.getInputProps('sortDescription') }}
+        priceProps={{ ...form.getInputProps('price') }}
+        discountPriceProps={{ ...form.getInputProps('discountPrice') }}
+        categoryIdProps={{ ...form.getInputProps('categoryId') }}
+        descriptionProps={{ ...form.getInputProps('description') }}
+        quantityProps={{ ...form.getInputProps('quantity') }}
       />
 
       {isCategorySelected && (
@@ -70,12 +63,12 @@ const Infor = memo(({ form, isEditMode = false }: InforProps) => {
             onAttributesChange={(attributes) => form.setFieldValue('attributes', attributes)}
           />
 
-          <SkuDetails form={form} attributeForSkuData={attributeData?.attributeForSku || []} />
+          <SkuDetails form={form} attributeForSkuData={attributeData?.attributeForSku || []} setIsShowQuantity={setIsShowQuantity} />
 
           <Shipping
             weightProps={{ ...form.getInputProps("weight") }}
             heightProps={{ ...form.getInputProps("height") }}
-            withProps={{ ...form.getInputProps("width") }}
+            widthProps={{ ...form.getInputProps("width") }}
             lengthProps={{ ...form.getInputProps("length") }}
           />
         </>

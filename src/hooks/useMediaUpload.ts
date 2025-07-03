@@ -10,7 +10,8 @@ export function useMediaUpload(
     const newMediaItems: MediaDto[] = Array.from(files).map((file) => ({
       file,
       url: URL.createObjectURL(file),
-      type: 'IMAGE',
+      thumbnailUrl: '',
+      type: 'IMAGE' as const,
       isUploading: true,
       isUploaded: undefined
     }));
@@ -25,7 +26,7 @@ export function useMediaUpload(
             prev.map((m) => {
               if (m.url === item.url) {
                 URL.revokeObjectURL(item.url);
-                return { ...m, url: secure_url, id: public_id, isUploading: false, isUploaded: true, file: undefined };
+                return { ...m, url: secure_url, thumbnailUrl: secure_url, id: public_id, isUploading: false, isUploaded: true, file: undefined };
               }
               return m;
             })
@@ -59,6 +60,7 @@ export function useMediaUpload(
     const videoItem: MediaDto = {
       file,
       url: tempVideoUrl,
+      thumbnailUrl: '',
       type: 'VIDEO',
       isUploading: true,
       isUploaded: undefined,

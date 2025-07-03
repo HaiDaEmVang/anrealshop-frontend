@@ -9,8 +9,10 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { uploadToCloudinary } from '../../../../../service/Cloundinary';
 import type { ProductAttribute } from '../../../../../types/AttributeType';
 import type { ProductCreateRequest } from '../../../../../types/ProductType';
+import showErrorNotification from '../../../../Toast/NotificationError';
 import AttributeSelecter from './AttributeSelecter';
 import SkuBulkAction from './SkuBlukAction';
 import SkuTable from './SkuTable';
@@ -19,9 +21,10 @@ import SkuTable from './SkuTable';
 interface SkuDetailsProps {
     form: UseFormReturnType<ProductCreateRequest>;
     attributeForSkuData: ProductAttribute[];
+    setIsShowQuantity?: (value: boolean) => void;
 }
 
-const SkuDetails = ({ form, attributeForSkuData }: SkuDetailsProps) => {
+const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetailsProps) => {
     const [collapsed, setCollapsed] = useState(false);
     const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
     const [selectedClassificationType, setSelectedClassificationType] = useState<string | null>(null);
@@ -115,11 +118,23 @@ const SkuDetails = ({ form, attributeForSkuData }: SkuDetailsProps) => {
         form.setFieldValue('productSkus', updatedSkus);
     }, [form]);
 
-    const handleImageUpload = useCallback((skuId: string, file: File | null) => {
+    const handleImageUpload = useCallback(async (skuId: string, file: File | null) => { // <-- Thêm async
         if (!file) return;
-        const imageUrl = URL.createObjectURL(file);
-        updateSku(skuId, 'imageUrl', imageUrl);
+
+        try {
+            const result = await uploadToCloudinary(file, 'image');
+            updateSku(skuId, 'imageUrl', result.secure_url); 
+        } catch (error) {
+            showErrorNotification("Thông báo", "Không thể tải lên hình ảnh");
+        }
     }, [updateSku]);
+
+    useEffect(() => {
+        const willShowSkuBulkAction = form.values.productSkus?.length > 0;
+        if (setIsShowQuantity) {
+            setIsShowQuantity(!willShowSkuBulkAction);
+        }
+    }, [form.values.productSkus, setIsShowQuantity]);
 
     return (
         <Paper shadow="xs" p="md" mb="md" className="bg-white">

@@ -37,7 +37,7 @@ export const MultiSelectCreatable = memo(({
 
   const handleValueSelect = (val: string) => {
     setSearch('');
-
+    
     if (val === '$create') {
       const newValue = search.trim();
       setData((current) => [...current, newValue]);

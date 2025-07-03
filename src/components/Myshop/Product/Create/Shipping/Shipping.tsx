@@ -9,17 +9,17 @@ import {
   Title,
   type NumberInputProps
 } from '@mantine/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 interface ShippingProps {
   weightProps: NumberInputProps, 
   heightProps: NumberInputProps,  
-  withProps: NumberInputProps, 
+  widthProps: NumberInputProps, 
   lengthProps: NumberInputProps
 }
 
-const Shipping = ({ weightProps, heightProps, withProps, lengthProps }: ShippingProps) => {
+const Shipping = ({ weightProps, heightProps, widthProps, lengthProps }: ShippingProps) => {
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleSection = () => {
@@ -64,7 +64,7 @@ const Shipping = ({ weightProps, heightProps, withProps, lengthProps }: Shipping
               <NumberInput
                 placeholder="Rộng"
                 min={0}
-                {...withProps}
+                {...widthProps}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
               />
@@ -76,12 +76,6 @@ const Shipping = ({ weightProps, heightProps, withProps, lengthProps }: Shipping
                 {...heightProps}
               />
             </SimpleGrid>
-
-            {(lengthProps.error || withProps.error || heightProps.error) && (
-              <Text size="xs" c="red" mt={5}>
-                Vui lòng nhập kích thước hợp lệ
-              </Text>
-            )}
 
             <Text size="xs" c="dimmed" mt={8}>
               Kích thước và cân nặng được sử dụng để tính phí vận chuyển

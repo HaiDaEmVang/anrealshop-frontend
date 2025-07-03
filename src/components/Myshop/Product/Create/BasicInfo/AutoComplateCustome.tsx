@@ -1,8 +1,10 @@
+
 import {
     ActionIcon,
     Autocomplete,
     Box,
-    Text
+    Text,
+    type AutocompleteProps
 } from '@mantine/core';
 import { useCallback, useMemo, useState } from 'react';
 import { FiX } from 'react-icons/fi';
@@ -15,25 +17,24 @@ interface CategoryOption {
     fullPath: string;
 }
 
-interface AutoComplateCustomeProps {
+interface AutoComplateCustomeProps extends Omit<AutocompleteProps, 'value' | 'onChange' | 'onClear' | 'error' | 'data'> {
     categories: BaseCategoryDto[];
-    value?: string;
-    onChange: (value: string) => void;
-    onClear: () => void;
-    placeholder?: string;
-    error?: string;
-    required?: boolean;
+    value?: string | null; 
+    onChange: (value: string | null) => void;
+    onClear?: () => void;
+    error?: React.ReactNode; 
 }
 
 const AutoComplateCustome = ({
     categories,
     value,
     onChange,
-    onClear,
+    onClear, 
     placeholder = "Nhập để tìm kiếm...",
-    error
+    error,
+    ...rest 
 }: AutoComplateCustomeProps) => {
-    const [searchValue, setSearchValue] = useState('');
+    const [searchValue, setSearchValue] = useState(value || ''); 
 
     const buildCategoryPath = useCallback((categoryId: string): string => {
         const category = categories.find(cat => cat.id === categoryId);
@@ -53,7 +54,7 @@ const AutoComplateCustome = ({
 
     const categoryOptions = useMemo((): CategoryOption[] => {
         return categories
-            .filter(cat => !cat.hasChildren) 
+            .filter(cat => !cat.hasChildren)
             .map(category => ({
                 value: category.id,
                 label: category.name,
@@ -75,20 +76,23 @@ const AutoComplateCustome = ({
     const handleCategorySelect = (selectedValue: string) => {
         const selectedOption = categoryOptions.find(option => option.value === selectedValue);
         if (selectedOption) {
-            onChange(selectedOption.value);
-            setSearchValue('');
+            onChange(selectedOption.value); 
+            setSearchValue(selectedOption.fullPath);
         }
     };
 
-    const handleClear = () => {
-        onClear();
+    const handleClearInternal = () => {
+        onChange(null);
         setSearchValue('');
+        if (onClear) { 
+            onClear();
+        }
     };
 
     const handleSearchChange = (newSearchValue: string) => {
         setSearchValue(newSearchValue);
         if (value && newSearchValue !== selectedCategoryDisplay) {
-            onClear();
+            onChange(null); 
         }
     };
 
@@ -111,7 +115,7 @@ const AutoComplateCustome = ({
                         size="sm"
                         variant="subtle"
                         color="gray"
-                        onClick={handleClear}
+                        onClick={handleClearInternal} 
                     >
                         <FiX size={14} />
                     </ActionIcon>
@@ -151,6 +155,7 @@ const AutoComplateCustome = ({
                     margin: '2px 4px'
                 }
             }}
+            {...rest} 
         />
     );
 };

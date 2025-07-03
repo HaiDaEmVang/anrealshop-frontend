@@ -1,35 +1,29 @@
+
 import {
     Button,
     Group,
     Paper,
-    Text
+    type AutocompleteProps
 } from '@mantine/core';
 import { memo, useState } from 'react';
 import { FiGrid } from 'react-icons/fi';
-import type { ReactNode } from 'react';
 import { categories } from '../../../../../data/CategoryPageData';
 import AutoComplateCustome from './AutoComplateCustome';
 import ModalCategorySelected from './ModalCategorySelected';
 
 interface CategoryInfoProps {
-    categoryId: string;
-    categoryIdError?: ReactNode;
-    onCategoryIdChange: (value: string) => void;
+    categoryIdProps: AutocompleteProps;
 }
 
-const CategoryInfo = memo(({ categoryId, categoryIdError, onCategoryIdChange }: CategoryInfoProps) => {
+const CategoryInfo = memo(({ categoryIdProps }: CategoryInfoProps) => {
     const [modalOpened, setModalOpened] = useState(false);
 
-    const handleCategoryChange = (categoryIdValue: string) => {
-        onCategoryIdChange(categoryIdValue);
-    };
-
-    const handleClearCategory = () => {
-        onCategoryIdChange('');
-    };
-
     const handleModalSelect = (categoryIdValue: string) => {
-        onCategoryIdChange(categoryIdValue);
+        const formOnChange = categoryIdProps.onChange as (value: string | null) => void;
+        if (formOnChange) {
+            formOnChange(categoryIdValue);
+        }
+        setModalOpened(false); 
     };
 
     return (
@@ -50,25 +44,21 @@ const CategoryInfo = memo(({ categoryId, categoryIdError, onCategoryIdChange }: 
 
             <AutoComplateCustome
                 categories={categories}
-                value={categoryId}
-                onChange={handleCategoryChange}
-                onClear={handleClearCategory}
+                value={categoryIdProps.value}
+                onChange={categoryIdProps.onChange as (value: string | null) => void}
+                error={categoryIdProps.error}
                 placeholder="Nhập để tìm kiếm danh mục..."
-                required
+                required={categoryIdProps.required}
+                onClear={() => categoryIdProps.onChange && (categoryIdProps.onChange as (value: string | null) => void)('')}
+                description={categoryIdProps.error ? undefined : ''}
             />
-
-            {categoryIdError && (
-                <Text size="xs" c="red" mt={5}>
-                    {categoryIdError}
-                </Text>
-            )}
 
             <ModalCategorySelected
                 opened={modalOpened}
                 onClose={() => setModalOpened(false)}
                 onSelect={handleModalSelect}
                 categories={categories}
-                selectedCategoryId={categoryId}
+                selectedCategoryId={categoryIdProps.value as string} 
             />
         </Paper>
     );

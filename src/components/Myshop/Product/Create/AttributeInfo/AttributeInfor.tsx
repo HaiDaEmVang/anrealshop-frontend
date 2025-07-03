@@ -4,10 +4,10 @@ import {
   Paper,
   Title
 } from '@mantine/core';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import AttributeSection from './AttributeSection';
 import type { BaseAttribute, ProductAttribute } from '../../../../../types/AttributeType';
+import AttributeSection from './AttributeSection';
 
 interface AttributeInforProps {
   attributes: ProductAttribute[];
@@ -21,7 +21,7 @@ const AttributeInfor = memo(({ attributes, onAttributesChange, attributeDatas }:
 
   const sortedAttributes = useMemo(() => 
     [...attributeDatas].sort((a, b) => a.displayOrder - b.displayOrder), [attributeDatas]
-  );
+);
 
   return (
     <Paper shadow="xs" p="md" mb="md" className="bg-white">

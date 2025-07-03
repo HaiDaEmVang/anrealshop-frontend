@@ -40,6 +40,8 @@ const AttributeSection = memo(({
     setCustomAttributes(prev => [...prev, customAttribute]);
   };
 
+
+
   const renderGrid = (attributeList: BaseAttribute[]) => {
     const pairs = [];
     for (let i = 0; i < attributeList.length; i += 2) {
