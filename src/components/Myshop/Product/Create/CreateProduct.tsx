@@ -1,4 +1,4 @@
-import { Button, Container, Group, Modal, Paper, Text } from '@mantine/core';
+import { Button, Container, Group, LoadingOverlay, Modal, Paper, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { FiEye, FiSave } from 'react-icons/fi';
 import { useParams } from 'react-router-dom';
@@ -9,7 +9,7 @@ const ProductForm = () => {
   const { id } = useParams();
   const isEditMode = !!id;
 
-  const { form, handleSubmit } = useProductForm({ isEditMode });
+  const { form, handleSubmit, isLoading } = useProductForm({ isEditMode });
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -26,8 +26,26 @@ const ProductForm = () => {
     setIsPreviewOpen(false);
   };
 
+  const handleFormSubmit = async () => {
+    try {
+      await handleSubmit();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
+  };
+
   return (
-    <Container fluid px="lg" py="md">
+    <Container fluid px="lg" py="md" style={{ position: 'relative' }}>
+      <LoadingOverlay 
+        visible={isLoading} 
+        zIndex={1000}
+        overlayProps={{ 
+          radius: "sm", 
+          blur: 2,
+          backgroundOpacity: 0.5 
+        }}
+      />
+
       <Modal
         opened={isPreviewOpen}
         onClose={closePreview}
@@ -85,9 +103,9 @@ const ProductForm = () => {
 
       <Paper className="!bg-transparent mb-20">
         <Infor
-            form={form}
-            isEditMode={isEditMode}
-          />
+          form={form}
+          isEditMode={isEditMode}
+        />
       </Paper>
 
       <Paper
@@ -99,7 +117,14 @@ const ProductForm = () => {
         <Container fluid px="lg">
           <Group justify="space-between">
             <Text size="sm" c="dimmed" className="hidden md:block">
-              {isDirty ? 'Sản phẩm có thay đổi chưa được lưu' : isEditMode ? 'Chỉnh sửa thông tin sản phẩm của bạn' : 'Tạo và quản lý thông tin sản phẩm của bạn'}
+              {isLoading 
+                ? (isEditMode ? 'Đang cập nhật sản phẩm...' : 'Đang tạo sản phẩm...') 
+                : isDirty 
+                  ? 'Sản phẩm có thay đổi chưa được lưu' 
+                  : isEditMode 
+                    ? 'Chỉnh sửa thông tin sản phẩm của bạn' 
+                    : 'Tạo và quản lý thông tin sản phẩm của bạn'
+              }
             </Text>
             <Group>
               <Button
@@ -107,6 +132,7 @@ const ProductForm = () => {
                 variant="outline"
                 onClick={openPreview}
                 radius="md"
+                disabled={isLoading}
               >
                 Xem trước
               </Button>
@@ -114,13 +140,15 @@ const ProductForm = () => {
                 leftSection={<FiSave size={16} />}
                 variant="default"
                 radius="md"
+                disabled={isLoading}
               >
                 Lưu nháp
               </Button>
               <Button
                 className="bg-primary hover:bg-primary/90"
-                onClick={handleSubmit}
-                disabled={!isDirty}
+                onClick={handleFormSubmit}
+                disabled={!isDirty || isLoading}
+                loading={isLoading}
                 radius="md"
               >
                 {isEditMode ? 'Cập nhật sản phẩm' : 'Đăng sản phẩm'}

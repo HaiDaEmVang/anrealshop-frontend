@@ -1,34 +1,40 @@
 // useProductForm.ts
-import { isNotEmpty, useForm } from '@mantine/form';
-import type { ProductCreateRequest } from '../types/ProductType';
-import { defaultProductDescriptionHtml } from '../data/InitData';
+import { useForm } from '@mantine/form';
+import { useState } from 'react';
 import showErrorNotification from '../components/Toast/NotificationError';
+import showSuccessNotification from '../components/Toast/NotificationSuccess';
+import { defaultProductDescriptionHtml } from '../data/InitData';
 import ProductsService from '../service/ProductsService';
+import type { ProductCreateRequest } from '../types/ProductType';
 
 interface UseProductFormOptions {
     isEditMode: boolean;
 }
 
+
+const defaultInitialValues: ProductCreateRequest = {
+    name: '',
+    description: defaultProductDescriptionHtml,
+    sortDescription: '',
+    price: 0,
+    discountPrice: 0,
+    quantity: 0,
+    categoryId: '',
+    weight: 0,
+    height: 0,
+    length: 0,
+    width: 0,
+    attributes: [],
+    productSkus: [],
+    media: []
+};
+
 export const useProductForm = (options: UseProductFormOptions) => {
+    const [isLoading, setIsLoading] = useState(false);
     const { isEditMode } = options;
 
     const form = useForm<ProductCreateRequest>({
-        initialValues: {
-            name: '',
-            description: defaultProductDescriptionHtml,
-            sortDescription: '',
-            price: 0,
-            discountPrice: 0,
-            quantity: 0,
-            categoryId: '',
-            weight: 0,
-            height: 0,
-            length: 0,
-            width: 0,
-            attributes: [],
-            productSkus: [],
-            media: []
-        },
+        initialValues: defaultInitialValues,
         validate: {
             name: (value) => {
                 if (!value.trim()) return 'Tên sản phẩm không được để trống';
@@ -109,30 +115,46 @@ export const useProductForm = (options: UseProductFormOptions) => {
         }
     });
 
+    const clearForm = () => {
+        form.setValues(defaultInitialValues);
+        form.reset();
+    };
+
+
     const handleSubmit = async () => {
         form.validate();
         if (!form.isValid()) {
             showErrorNotification('Thông báo', 'Vui lòng nhập đầy đủ thông tin sản phẩm và kiểm tra các lỗi.');
             return;
         }
-        // form.values.categoryId = '026890fd-fd6d-4fd2-93e2-1b46727815ab'
-        // if(form.values.productSkus.length > 0){
-        //     const quantity = form.values.productSkus.reduce((total, sku) => total + (sku.quantity || 0), 0);
-        //     form.setFieldValue("quantity", quantity);
-        // }
-        // console.log('Form values:', form.values);
+        form.values.categoryId = '026890fd-fd6d-4fd2-93e2-1b46727815ab'
+        if(form.values.productSkus.length > 0){
+            const quantity = form.values.productSkus.reduce((total, sku) => total + (sku.quantity || 0), 0);
+            form.setFieldValue("quantity", quantity);
+        }
+        setIsLoading(true);
         // debugger;
-        // try {
-        //     const data = await ProductsService.create(form.values);
-        //     console.log('Product created successfully:', data);
-        //     showErrorNotification('Thành công', 'Sản phẩm đã được tạo thành công.');
-        // } catch (error) {
-        //     console.error('Error creating product:', error);
-        //     showErrorNotification('Lỗi', 'Không thể tạo sản phẩm. Vui lòng thử lại sau.');
-        //     return;
-        // }
+        try {
+            const data = await ProductsService.create(form.values);
+            console.log('Product created successfully:', data);
+            showSuccessNotification('Thành công', 'Sản phẩm đã được tạo thành công.');
+            clearForm();
+        } catch (err: any) {
+              let notificationMessage = err.message || 'Có trường chưa được nhập.';
+        
+              if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
+                notificationMessage = err.message || 'Dữ liệu nhập vào không hợp lệ.';
+              } else {
+                notificationMessage = err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+              }
+        
+              showErrorNotification('Tạo sản phẩm thất bại', notificationMessage);
+            
+        }finally {
+            setIsLoading(false);
+        }
 
     };
 
-    return { form, handleSubmit };
+    return { form, handleSubmit, isLoading };
 };
