@@ -1,5 +1,6 @@
 import type { Category } from '../components/User/CategoryPage/CategoryPage';
 import { mockFeaturedProducts, type Product } from '../data/FilterData';
+import type { BaseCategoryDto } from '../types/CategoryType';
 
 // Mock data for categories
 const MOCK_CATEGORIES: {[key: string]: Category} = {
@@ -37,6 +38,13 @@ const MOCK_CATEGORIES: {[key: string]: Category} = {
         imageUrl: 'https://i.imgur.com/wXuQ7bm.jpg',
         productCount: 32,
         slug: 'cameras'
+      },
+      { 
+        id: 'accessories', 
+        name: 'Phụ kiện', 
+        imageUrl: 'https://i.imgur.com/wXuQ7bm.jpg',
+        productCount: 211,
+        slug: 'accessories'
       },
       { 
         id: 'accessories', 
@@ -177,3 +185,107 @@ export const getCategoryProducts = async (categoryId: string, filters: any) : Pr
     }, 800);
   });
 };
+
+
+
+
+export const categories: BaseCategoryDto[] = [
+  {
+    id: '1',
+    name: 'Thời trang nữ',
+    parentId: null,
+    level: 0,
+    hasChildren: true
+  },
+  {
+    id: '2',
+    name: 'Đầm váy',
+    parentId: '1',
+    level: 1,
+    hasChildren: true
+  },
+  {
+    id: '3',
+    name: 'Áo sơ mi',
+    parentId: '1',
+    level: 1,
+    hasChildren: false
+  },
+  {
+    id: '4',
+    name: 'Thời trang nam',
+    parentId: null,
+    level: 0,
+    hasChildren: true
+  },
+  {
+    id: '5',
+    name: 'Áo thun nam',
+    parentId: '4',
+    level: 1,
+    hasChildren: false
+  },
+  {
+    id: '6',
+    name: 'Quần',
+    parentId: '4',
+    level: 1,
+    hasChildren: true
+  },
+  {
+    id: '7',
+    name: 'Phụ kiện',
+    parentId: null,
+    level: 0,
+    hasChildren: false
+  },
+  {
+    id: '8',
+    name: 'Áo khoác nữ',
+    parentId: '1',
+    level: 1,
+    hasChildren: false
+  },
+  {
+    id: '9',
+    name: 'Quần âu nam',
+    parentId: '6',
+    level: 2,
+    hasChildren: false
+  },
+  {
+    id: '10',
+    name: 'Quần jean',
+    parentId: '6',
+    level: 2,
+    hasChildren: false
+  },
+  {
+    id: '11',
+    name: 'Quần đùi',
+    parentId: '6',
+    level: 2,
+    hasChildren: false
+  },
+  {
+    id: '12',
+    name: 'Đầm dạ hội',
+    parentId: '2',
+    level: 2,
+    hasChildren: false
+  },
+  {
+    id: '13',
+    name: 'Đầm công sở',
+    parentId: '2',
+    level: 2,
+    hasChildren: false
+  },
+  {
+    id: '14',
+    name: 'Đầm maxi',
+    parentId: '2',
+    level: 2,
+    hasChildren: false
+  }
+];

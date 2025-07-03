@@ -1,22 +1,25 @@
-import { useState } from 'react';
-import { 
-  Paper, 
-  Title, 
-  Group, 
-  ActionIcon, 
-  Stack, 
-  NumberInput, 
+import {
+  ActionIcon,
+  Group,
+  NumberInput,
+  Paper,
+  SimpleGrid,
+  Stack,
   Text,
-  SimpleGrid
+  Title,
+  type NumberInputProps
 } from '@mantine/core';
+import { useEffect, useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import type { UseFormReturnType } from '@mantine/form';
 
 interface ShippingProps {
-  form: UseFormReturnType<any>;
+  weightProps: NumberInputProps, 
+  heightProps: NumberInputProps,  
+  widthProps: NumberInputProps, 
+  lengthProps: NumberInputProps
 }
 
-const Shipping = ({ form }: ShippingProps) => {
+const Shipping = ({ weightProps, heightProps, widthProps, lengthProps }: ShippingProps) => {
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleSection = () => {
@@ -41,11 +44,10 @@ const Shipping = ({ form }: ShippingProps) => {
               placeholder="Nhập cân nặng sản phẩm"
               min={0}
               step={10}
-              value={form.values.weight}
-              onChange={(value) => form.setFieldValue('weight', value)}
+              // {...form.getInputProps('weight')}
+              {...weightProps}
               rightSection={<Text size="sm" c="dimmed">gr</Text>}
               rightSectionWidth={40}
-              error={form.errors.weight}
             />
           </div>
 
@@ -55,38 +57,26 @@ const Shipping = ({ form }: ShippingProps) => {
               <NumberInput
                 placeholder="Dài"
                 min={0}
-                value={form.values.length}
-                onChange={(value) => form.setFieldValue('length', value)}
+                {...lengthProps}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
-                error={form.errors.length}
               />
               <NumberInput
                 placeholder="Rộng"
                 min={0}
-                value={form.values.width}
-                onChange={(value) => form.setFieldValue('width', value)}
+                {...widthProps}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
-                error={form.errors.width}
               />
               <NumberInput
                 placeholder="Cao"
                 min={0}
-                value={form.values.height}
-                onChange={(value) => form.setFieldValue('height', value)}
                 rightSection={<Text size="sm" c="dimmed">cm</Text>}
                 rightSectionWidth={40}
-                error={form.errors.height}
+                {...heightProps}
               />
             </SimpleGrid>
-            
-            {(form.errors.length || form.errors.width || form.errors.height) && (
-              <Text size="xs" c="red" mt={5}>
-                Vui lòng nhập kích thước hợp lệ
-              </Text>
-            )}
-            
+
             <Text size="xs" c="dimmed" mt={8}>
               Kích thước và cân nặng được sử dụng để tính phí vận chuyển
             </Text>
