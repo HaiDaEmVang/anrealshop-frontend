@@ -27,3 +27,40 @@ export interface ProductSkuRequest {
 }
 
 
+export interface MyShopProductListResponse {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  products: MyShopProductDto[];
+}
+
+export interface MyShopProductDto {
+  id: string;
+  name: string;
+  thumbnailUrl: string;
+  urlSlug: string;
+  categoryId: string;
+  discountPrice: number;
+  quantity: number;
+  sold: number;
+  status: string;
+  visible: boolean;
+  createdAt: string;
+  productSkus: MyShopProductSkuDto[];
+}
+
+export interface ProductStatusDto {
+  id: string;
+  name: string;
+  count: number;
+}
+
+export interface MyShopProductSkuDto {
+  id: string;
+  sku: string;
+  imageUrl: string;
+  price: number;
+  quantity: number;
+  sold: number;
+  createdAt: string;
+}

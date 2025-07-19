@@ -3,7 +3,6 @@ import '@mantine/carousel/styles.css';
 import { Box, Button, Grid, Overlay, Paper, Stack, Text, Title } from '@mantine/core';
 import Autoplay from 'embla-carousel-autoplay';
 import { useRef } from 'react';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 const banners = [
@@ -54,7 +53,7 @@ const staticBanners = [
 ];
 
 const HeroBanner = () => {
-  const autoplay = useRef(Autoplay({ delay: 3000 }));
+  const autoplay = useRef(Autoplay({ delay: 3000, stopOnInteraction: false }));
   return (
     <Grid gutter="md" >
       {/* Banner động chiếm 70% chiều rộng */}
@@ -66,8 +65,8 @@ const HeroBanner = () => {
           slideGap="md"
           loop
           plugins={[autoplay.current]}
-          onMouseEnter={autoplay.current.stop}
-          onMouseLeave={autoplay.current.reset}
+          onMouseEnter={() => autoplay.current?.stop()}
+onMouseLeave={() => autoplay.current?.reset()}
           className="rounded-md overflow-hidden"
           withControls={false}
             styles={{
