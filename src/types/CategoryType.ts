@@ -2,6 +2,7 @@
 export interface BaseCategoryDto {
     id: string;
     name: string;
+    urlSlug?: string;
     parentId?: string | null;
     level?: number;
     urlPath?: string;

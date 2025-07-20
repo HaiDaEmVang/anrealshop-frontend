@@ -43,11 +43,13 @@ export interface MyShopProductDto {
   discountPrice: number;
   quantity: number;
   sold: number;
-  status: string;
+  status: ProductStatus;
   visible: boolean;
   createdAt: string;
-  productSkus: MyShopProductSkuDto[];
+  productSkus?: MyShopProductSkuDto[];
 }
+
+export type ProductStatus = 'ALL' | 'ACTIVE' | 'VIOLATION' | 'PENDING' | 'HIDDEN';
 
 export interface ProductStatusDto {
   id: string;

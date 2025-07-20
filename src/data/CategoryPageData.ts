@@ -289,3 +289,100 @@ export const categories: BaseCategoryDto[] = [
     hasChildren: false
   }
 ];
+
+
+
+
+export const categorySuggestData: BaseCategoryDto[] = [
+  {
+    id: '1',
+    name: 'Điện tử',
+    urlPath: 'Danh mục > Điện tử',
+    urlSlug: 'dien-tu'
+  },
+  {
+    id: '2',
+    name: 'Thời trang',
+    urlPath: 'Danh mục > Thời trang',
+    urlSlug: 'thoi-trang'
+  },
+  {
+    id: '3',
+    name: 'Gia dụng',
+    urlPath: 'Danh mục > Gia dụng',
+    urlSlug: 'gia-dung'
+  },
+  {
+    id: '4',
+    name: 'Sách & Văn phòng phẩm',
+    urlPath: 'Danh mục > Sách & Văn phòng phẩm',
+    urlSlug: 'sach-van-phong-pham'
+  },
+  {
+    id: '5',
+    name: 'Thể thao & Du lịch',
+    urlPath: 'Danh mục > Thể thao & Du lịch',
+    urlSlug: 'the-thao-du-lich'
+  },
+  {
+    id: '6',
+    name: 'Mẹ & Bé',
+    urlPath: 'Danh mục > Mẹ & Bé',
+    urlSlug: 'me-be'
+  },
+  {
+    id: '7',
+    name: 'Làm đẹp & Sức khỏe',
+    urlPath: 'Danh mục > Làm đẹp & Sức khỏe',
+    urlSlug: 'lam-dep-suc-khoe'
+  },
+  {
+    id: '8',
+    name: 'Xe cộ',
+    urlPath: 'Danh mục > Xe cộ',
+    urlSlug: 'xe-co'
+  },
+  {
+    id: '9',
+    name: 'Nhà cửa & Đời sống',
+    urlPath: 'Danh mục > Nhà cửa & Đời sống',
+    urlSlug: 'nha-cua-doi-song'
+  },
+  {
+    id: '10',
+    name: 'Thú cưng',
+    urlPath: 'Danh mục > Thú cưng',
+    urlSlug: 'thu-cung'
+  },
+  // Sub-categories examples
+  {
+    id: '11',
+    name: 'Điện thoại & Phụ kiện',
+    urlPath: 'Danh mục > Điện tử > Điện thoại & Phụ kiện',
+    urlSlug: 'dien-thoai-phu-kien'
+  },
+  {
+    id: '12',
+    name: 'Áo nam',
+    urlPath: 'Danh mục > Thời trang > Áo nam',
+    urlSlug: 'ao-nam'
+  },
+  {
+    id: '13',
+    name: 'Áo nữ',
+    urlPath: 'Danh mục > Thời trang > Áo nữ',
+    urlSlug: 'ao-nu'
+  },
+  {
+    id: '14',
+    name: 'Laptop',
+    urlPath: 'Danh mục > Điện tử > Laptop',
+    urlSlug: 'laptop'
+  },
+  {
+    id: '15',
+    name: 'Nồi cơm điện',
+    urlPath: 'Danh mục > Gia dụng > Nồi cơm điện',
+    urlSlug: 'noi-com-dien'
+  }
+];

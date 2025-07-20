@@ -90,7 +90,7 @@ const AutoComplateCustome = ({
     };
 
     const handleSearchChange = (newSearchValue: string) => {
-        setSearchValue(newSearchValue);
+        setSearchValue(newSearchValue); 
         if (value && newSearchValue !== selectedCategoryDisplay) {
             onChange(null); 
         }
