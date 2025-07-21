@@ -1,38 +1,20 @@
 import { Badge, Tabs } from '@mantine/core';
-import { useCallback, useEffect, useState } from 'react';
-import { productStatusDefaultData } from '../../../../../data/ProductData';
 import { useProductStatusColor, useProductStatusIcon } from '../../../../../hooks/useProductStatus';
-import ProductsService from '../../../../../service/ProductsService';
 import type { ProductStatus, ProductStatusDto } from '../../../../../types/ProductType';
 
 interface FilterByStatusProps {
   selectedStatus: ProductStatus;
   onStatusChange: (status: ProductStatus) => void;
+  productStatusData: ProductStatusDto[];
 }
 
-const FilterByStatus = ({ selectedStatus, onStatusChange }: FilterByStatusProps) => {
+const FilterByStatus = ({ selectedStatus, onStatusChange, productStatusData }: FilterByStatusProps) => {
   const { getStatusIcon } = useProductStatusIcon();
   const { getStatusColor, getStatusIconColor } = useProductStatusColor();
-
+selectedStatus
   const handleStatusChange = (value: string | null) => {
     onStatusChange(value as ProductStatus);
   };
-
-  const [productStatusData, setStatusMetadata] = useState<ProductStatusDto[]>(productStatusDefaultData);
-  const fetchStatusMetadata = useCallback(async () => {
-    try {
-      const metadata = await ProductsService.getProductStatusMetadata();
-      setStatusMetadata(metadata);
-      return metadata;
-    } catch (err: any) {
-      setStatusMetadata(productStatusDefaultData);
-      throw err;
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchStatusMetadata();
-  }, [fetchStatusMetadata]);
 
   return (
     <div className="p-4 pb-0">

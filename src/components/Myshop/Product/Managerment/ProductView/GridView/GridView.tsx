@@ -13,6 +13,7 @@ interface GridViewProps {
   onSelectAll: (checked: boolean) => void;
   onSelectProduct: (id: string, checked: boolean) => void;
   onToggleStatus: (id: string, visible: boolean) => void;
+  onRefresh: () => void;
 }
 
 const GridView = ({
@@ -21,6 +22,7 @@ const GridView = ({
   selectedProducts,
   onSelectProduct,
   onToggleStatus,
+  onRefresh
 }: GridViewProps) => {
   
   if (isLoading) {
@@ -38,6 +40,7 @@ const GridView = ({
               isSelected={selectedProducts.includes(product.id)}
               onSelect={onSelectProduct}
               onToggleStatus={onToggleStatus}
+              onRefresh={onRefresh}
             />
           </Grid.Col>
         ))}

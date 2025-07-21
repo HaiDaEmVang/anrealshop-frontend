@@ -15,6 +15,7 @@ interface ListViewProps {
   onSelectAll: (checked: boolean) => void;
   onSelectProduct: (id: string, checked: boolean) => void;
   onToggleStatus: (id: string, visible: boolean) => void;
+  onRefresh?: () => void;
 }
 
 const ListView = ({
@@ -24,6 +25,7 @@ const ListView = ({
   onSelectAll,
   onSelectProduct,
   onToggleStatus,
+  onRefresh,
 }: ListViewProps) => {
 
   if (isLoading) {
@@ -58,6 +60,7 @@ const ListView = ({
               isSelected={selectedProducts.includes(product.id)}
               onSelect={onSelectProduct}
               onToggleStatus={onToggleStatus}
+              onRefresh={onRefresh}
             />
           ))}
         </Table.Tbody>

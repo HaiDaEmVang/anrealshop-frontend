@@ -1,13 +1,15 @@
 import { useState, useCallback, useEffect } from 'react';
 import ProductsService from '../service/ProductsService';
-import type { 
-    MyShopProductDto, 
-    MyShopProductListResponse, 
-    ProductCreateRequest, 
+import type {
+    MyShopProductDto,
+    MyShopProductListResponse,
+    ProductCreateRequest,
     ProductStatus,
+    ProductStatusDto,
 } from '../types/ProductType';
 import showErrorNotification from '../components/Toast/NotificationError';
 import showSuccessNotification from '../components/Toast/NotificationSuccess';
+import { productStatusDefaultData } from '../data/ProductData';
 
 interface UseProductOptions {
     autoFetch?: boolean;
@@ -44,6 +46,8 @@ export const useProduct = (options: UseProductOptions = {}) => {
         isEmpty: true
     });
 
+    const [statusMetadata, setStatusMetadata] = useState<ProductStatusDto[]>(productStatusDefaultData);
+
     // Fetch products with error handling
     const fetchProducts = useCallback(async (params?: {
         page?: number;
@@ -69,13 +73,13 @@ export const useProduct = (options: UseProductOptions = {}) => {
 
         try {
             const response: MyShopProductListResponse = await ProductsService.getMyShopProducts(params);
-            
+
             setState(prev => ({
                 ...prev,
                 products: response.products || [],
                 totalCount: response.totalCount || 0,
                 totalPages: response.totalPages || 0,
-                currentPage: (params?.page || 0) + 1, 
+                currentPage: (params?.page || 0) + 1,
                 isLoading: false,
                 error: null,
                 isEmpty: !response.products || response.products.length === 0
@@ -84,7 +88,7 @@ export const useProduct = (options: UseProductOptions = {}) => {
             return response;
         } catch (err: any) {
             const errorMessage = getErrorMessage(err);
-            
+
             setState(prev => ({
                 ...prev,
                 isLoading: false,
@@ -112,10 +116,33 @@ export const useProduct = (options: UseProductOptions = {}) => {
 
             setState(prev => ({
                 ...prev,
-                products: prev.products.map(p => 
+                products: prev.products.map(p =>
                     p.id === id ? { ...p, visible } : p
                 )
             }));
+
+            return true;
+        } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
+            showErrorNotification('Lỗi cập nhật sản phẩm', errorMessage);
+            throw err;
+        }
+    }, []);
+
+    const updateVisibilityMultible = useCallback(async (ids: string[], visible: boolean) => {
+        try {
+            await ProductsService.updateProductsVisibility(ids, visible);
+            const statusText = visible ? 'hiển thị' : 'ẩn';
+            showSuccessNotification('Thành công', `Sản phẩm đã được ${statusText}.`);
+
+            for (const id of ids) {
+                setState(prev => ({
+                    ...prev,
+                    products: prev.products.map(p =>
+                        p.id === id ? { ...p, visible } : p
+                    )
+                }));
+            }
 
             return true;
         } catch (err: any) {
@@ -151,6 +178,18 @@ export const useProduct = (options: UseProductOptions = {}) => {
         });
     }, []);
 
+    const fetchStatusMetadata = useCallback(async () => {
+        console.log('Fetching product status metadata');
+        try {
+            const metadata = await ProductsService.getProductStatusMetadata();
+            setStatusMetadata(metadata);
+            return metadata;
+        } catch (err: any) {
+            setStatusMetadata(productStatusDefaultData);
+            return productStatusDefaultData;
+        }
+    }, []);
+
     // Auto fetch on mount if enabled
     useEffect(() => {
         if (autoFetch) {
@@ -161,10 +200,13 @@ export const useProduct = (options: UseProductOptions = {}) => {
     return {
         // State
         ...state,
+        statusMetadata,
 
         // Actions
         fetchProducts,
+        fetchStatusMetadata,
         updateVisibility,
+        updateVisibilityMultible,
         refresh,
         reset,
 
@@ -177,20 +219,40 @@ export const useProduct = (options: UseProductOptions = {}) => {
 };
 
 export const useProductDelete = () => {
+    const [isLoading, setIsLoading] = useState(false);
     const deleteProduct = useCallback(async (id: string) => {
         try {
+            setIsLoading(true);
             await ProductsService.deleteProduct(id);
             showSuccessNotification('Thành công', 'Sản phẩm đã được xóa thành công.');
-            
+
             return true;
         } catch (err: any) {
             const errorMessage = getErrorMessage(err);
             showErrorNotification('Lỗi xóa sản phẩm', errorMessage);
             throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+    const deleteProducts = useCallback(async (ids: string[]) => {
+        try {
+            setIsLoading(true);
+            await ProductsService.deleteProducts(ids);
+            showSuccessNotification('Thành công', 'Sản phẩm đã được xóa thành công.');
+            return true;
+        } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
+            showErrorNotification('Lỗi xóa sản phẩm', errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
         }
     }, []);
     return {
-        deleteProduct
+        deleteProduct,
+        deleteProducts,
+        isLoading
     };
 }
 
@@ -200,7 +262,7 @@ const getErrorMessage = (error: any): string => {
     if (error.response?.data?.message) {
         return error.response.data.message;
     }
-    
+
     // Fallback cho các lỗi network hoặc không có response
     if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
         return 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet.';

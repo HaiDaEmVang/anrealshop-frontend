@@ -61,7 +61,7 @@ const FilterProduct = ({
     const fetchProductSuggestions = async () => {
       try {
         const suggestions = await getProductNameSuggestions(debouncedSearchQuery);
-        setProductNameSuggestions(suggestions);
+        setProductNameSuggestions([...new Set(suggestions)]);
       } catch (error) {
         setProductNameSuggestions([]);
       }

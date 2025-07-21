@@ -18,13 +18,15 @@ interface ProductCardProps {
   isSelected: boolean;
   onSelect: (id: string, checked: boolean) => void;
   onToggleStatus: (id: string, visible: boolean) => void;
+  onRefresh: () => void;
 }
 
-const ProductCard = ({ 
-  product, 
-  isSelected, 
-  onSelect, 
-  onToggleStatus, 
+const ProductCard = ({
+  product,
+  isSelected,
+  onSelect,
+  onToggleStatus,
+  onRefresh
 }: ProductCardProps) => {
   const { getStatusIcon } = useProductStatusIcon();
   const { getStatusColor, getStatusIconColor } = useProductStatusColor();
@@ -40,11 +42,11 @@ const ProductCard = ({
   const statusLabel = getStatusLabel(product.status);
 
   return (
-    <Card 
-      padding="md" 
-      radius="md" 
+    <Card
+      padding="md"
+      radius="md"
       withBorder
-      style={{ 
+      style={{
         position: 'relative',
         opacity: 1,
         // opacity: product.isUpdating ? 0.7 : 1,
@@ -74,19 +76,19 @@ const ProductCard = ({
           <Loader size="sm" />
         </div>
       )} */}
-      
+
       {/* Checkbox selection */}
       <Box style={{ position: 'absolute', top: 8, left: 8, zIndex: 1 }}>
         <Checkbox
           checked={isSelected}
           onChange={(e) => onSelect(product.id, e.currentTarget.checked)}
-          // disabled={product.isUpdating}
+        // disabled={product.isUpdating}
         />
       </Box>
 
       {/* Status Badge */}
       <Box style={{ position: 'absolute', top: 8, right: 8, zIndex: 1 }}>
-        <Badge 
+        <Badge
           leftSection={<StatusIcon size={16} style={{ color: statusIconColor }} />}
           color={statusColor}
           variant="light"
@@ -95,10 +97,10 @@ const ProductCard = ({
           {statusLabel}
         </Badge>
       </Box>
-      
+
       {/* Product Image */}
       <Card.Section className="" >
-        <div style={{ 
+        <div style={{
           position: 'relative',
           width: '100%',
           height: 180,
@@ -112,7 +114,7 @@ const ProductCard = ({
             height={160}
             fallbackSrc="https://placehold.co/400x300?text=No+Image"
             alt={product.name}
-            style={{ 
+            style={{
               objectFit: 'cover',
               transition: 'transform 0.3s ease',
               width: '100%',
@@ -150,17 +152,26 @@ const ProductCard = ({
 
       {/* Actions */}
       <Group justify="space-between" mt="sm" pt="xs" style={{ borderTop: '1px solid #f0f0f0' }}>
-        <Switch 
-          size="sm" 
-          checked={product.status === 'ACTIVE'} 
+        <Switch
+          size="sm"
+          checked={product.status === 'ACTIVE'}
           onChange={() => onToggleStatus(product.id, product.status !== 'ACTIVE')}
           disabled={product.status === 'VIOLATION' || product.status === 'PENDING'}
           label="Hiển thị"
           labelPosition="left"
+          classNames={{
+            track: product.status === 'VIOLATION' || product.status === 'PENDING'
+              ? 'cursor-not-allowed'
+              : '!cursor-pointer',
+            input: 'cursor-pointer',
+            label: 'cursor-pointer'
+          }}
         />
         <ProductActionMenu
           productId={product.id}
           // disabled={product.isUpdating}
+          productName={product.name}
+          onRefresh={onRefresh}
         />
       </Group>
     </Card>

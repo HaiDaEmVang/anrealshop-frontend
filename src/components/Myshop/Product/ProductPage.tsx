@@ -8,11 +8,12 @@ import FilterProduct from './Managerment/Filter/FilterProduct';
 import ListView from './Managerment/ProductView/ListView/ListView';
 import GridView from './Managerment/ProductView/GridView/GridView';
 import type { MyShopProductDto, ProductStatus } from '../../../types/ProductType';
-import { useProduct } from '../../../hooks/useProduct';
+import { useProduct, useProductDelete } from '../../../hooks/useProduct';
 import type { BaseCategoryDto } from '../../../types/CategoryType';
 import Pagination from './Managerment/ProductView/Pagination';
 import NonProductFound from './Managerment/ProductView/NonProductFound';
 import CheckboxSelected from './Managerment/ProductView/CheckboxSelected';
+import { productStatusDefaultData } from '../../../data/ProductData';
 
 const ProductPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -27,9 +28,9 @@ const ProductPage = () => {
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [activePage, setActivePage] = useState(1);
 
-
   const {
     products,
+    statusMetadata,
     totalCount,
     totalPages,
     currentPage,
@@ -37,7 +38,9 @@ const ProductPage = () => {
     error,
     isEmpty,
     fetchProducts,
+    fetchStatusMetadata,
     updateVisibility,
+    updateVisibilityMultible,
     refresh
   } = useProduct({
     autoFetch: false,
@@ -58,11 +61,16 @@ const ProductPage = () => {
       categoryId: category?.urlSlug || category?.id || undefined,
       sortBy: sortBy || undefined
     });
+    setSelectedProductIds([]);
   }, [activePage, viewMode, status, searchQuery, category, sortBy, fetchProducts]);
 
   useEffect(() => {
     loadProducts();
   }, [status, activePage])
+
+  useEffect(() => {
+    fetchStatusMetadata();
+  }, [fetchStatusMetadata]);
 
   const handleStatusChange = useCallback((newStatus: ProductStatus) => {
     setStatus(newStatus);
@@ -83,6 +91,7 @@ const ProductPage = () => {
     }
   };
 
+
   const handleSelectProduct = (productId: string, checked: boolean) => {
     if (checked) {
       setSelectedProductIds(prev => [...prev, productId]);
@@ -94,10 +103,16 @@ const ProductPage = () => {
   const handleToggleStatus = useCallback((productId: string, visible: boolean) => {
     updateVisibility(productId, visible)
       .then(() => {
+        fetchStatusMetadata();
         loadProducts();
       })
   }, [loadProducts, updateVisibility]);
 
+
+  const handleRefresh = useCallback(() => {
+    fetchStatusMetadata();
+    loadProducts();
+  }, [fetchStatusMetadata, loadProducts]);
 
 
   // Breadcrumb items
@@ -162,6 +177,7 @@ const ProductPage = () => {
         <FilterByStatus
           selectedStatus={status}
           onStatusChange={handleStatusChange}
+          productStatusData={statusMetadata}
         />
         <FilterProduct
           searchQuery={searchQuery}
@@ -173,19 +189,21 @@ const ProductPage = () => {
           onFetchWithParam={onFetchWithParam}
         />
 
-        {isEmpty && (
+        {isEmpty && !isLoading && (
           <NonProductFound
             searchQuery={searchQuery}
             category={category}
           />
         )}
 
-        {!isEmpty && (
+        {!isEmpty &&  (
           <div className={viewMode === 'list' ? 'pl-8 pr-4' : 'pl-6 pr-4'}>
             <CheckboxSelected
-              selectedCount={selectedProductIds.length}
-              totalCount={products.length}
+              selectedProductIds={selectedProductIds}
+              products={products}
+              updateVisibilityMultible={updateVisibilityMultible}
               onSelectAll={handleSelectAll}
+              onRefresh={handleRefresh}
             />
           </div>
         )}
@@ -198,6 +216,7 @@ const ProductPage = () => {
             onSelectAll={handleSelectAll}
             onSelectProduct={handleSelectProduct}
             onToggleStatus={handleToggleStatus}
+            onRefresh={handleRefresh}
           />
         ) : (
           <GridView
@@ -207,6 +226,7 @@ const ProductPage = () => {
             onSelectAll={handleSelectAll}
             onSelectProduct={handleSelectProduct}
             onToggleStatus={handleToggleStatus}
+            onRefresh={handleRefresh}
           />
         )}
 
@@ -219,7 +239,7 @@ const ProductPage = () => {
         />
       </Paper>
 
-      
+
     </Container>
   );
 };

@@ -73,6 +73,17 @@ const getProductStatusMetadata = async (): Promise<ProductStatusDto[]> => {
 };
 
 
+const deleteProducts = async (ids: string[]): Promise<void> => {
+    await axiosInstance.delete(API_ENDPOINTS.PRODUCTS.DELETE_MULTIPLE, {
+        data: ids  
+    });
+};
+
+const updateProductsVisibility = async (ids: string[], visible = true): Promise<void> => {
+    await axiosInstance.put(API_ENDPOINTS.PRODUCTS.UPDATE_MULTIPLE_VISIBILITY, 
+        ids, { params: { visible }});
+};
+
 
 const ProductsService = {
     create,
@@ -82,7 +93,9 @@ const ProductsService = {
     deleteProduct,
     updateVisibility,
     getProductNameSuggestions,
-    getProductStatusMetadata
+    getProductStatusMetadata,
+    deleteProducts,
+    updateProductsVisibility,
 };
 
 export default ProductsService;

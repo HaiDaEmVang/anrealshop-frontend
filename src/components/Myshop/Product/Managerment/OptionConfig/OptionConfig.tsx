@@ -1,27 +1,19 @@
 import {
-  Menu,
+  ActionIcon,
   Button,
   Group,
-  ActionIcon,
+  Menu,
   Tooltip,
 } from '@mantine/core';
 import {
-  FiSettings,
-  FiTool,
-  FiPlus,
-  FiDownload,
-  FiUpload,
-  FiTrash2,
-  FiCopy,
-  FiTag,
   FiGrid,
-  FiList,
   FiLayers,
+  FiList,
+  FiPlus,
+  FiSettings,
+  FiTag
 } from 'react-icons/fi';
-import { useDisclosure } from '@mantine/hooks';
 import { Link } from 'react-router-dom';
-import ImportModal from './ImportModal';
-import BulkDeleteProductModal from './BulkDeleteProductModal';
 
 interface OptionConfigProps {
   viewMode: 'grid' | 'list';
@@ -29,12 +21,6 @@ interface OptionConfigProps {
 }
 
 const OptionConfig = ({ viewMode, onViewModeChange }: OptionConfigProps) => {
-  const [importModalOpened, { open: openImportModal, close: closeImportModal }] = useDisclosure(false);
-  const [bulkDeleteModalOpened, { open: openBulkDeleteModal, close: closeBulkDeleteModal }] = useDisclosure(false);
-
-  const handleBulkDelete = () => {
-    console.log('Bulk delete confirmed');
-  };
 
   return (
   <div className="">
@@ -74,44 +60,7 @@ const OptionConfig = ({ viewMode, onViewModeChange }: OptionConfigProps) => {
         </Menu>
 
         {/* Công cụ xử lý hàng loạt */}
-        <Menu shadow="md" width={220} position="bottom-start">
-          <Menu.Target>
-            <Button
-              leftSection={<FiTool size={16} />}
-              variant="light"
-              color="dark"
-              className="bg-gray-800 text-white hover:bg-gray-700 border-gray-700 transition-colors duration-200"
-            >
-              Công cụ xử lý hàng loạt
-            </Button>
-          </Menu.Target>
-
-          <Menu.Dropdown>
-            <Menu.Item
-              leftSection={<FiUpload size={14} />}
-              onClick={openImportModal}
-            >
-              Nhập từ Excel/CSV
-            </Menu.Item>
-            <Menu.Item leftSection={<FiDownload size={14} />}>
-              Xuất ra Excel
-            </Menu.Item>
-            <Menu.Divider />
-            <Menu.Item
-              leftSection={<FiCopy size={14} />}
-              color="blue"
-            >
-              Nhân bản sản phẩm
-            </Menu.Item>
-            <Menu.Item
-              leftSection={<FiTrash2 size={14} />}
-              color="red"
-              onClick={openBulkDeleteModal}
-            >
-              Xóa hàng loạt
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
+        
 
           <Link to="/myshop/product/create">
             <Button
@@ -159,17 +108,7 @@ const OptionConfig = ({ viewMode, onViewModeChange }: OptionConfigProps) => {
         </Group>
       </Group>
 
-      {/* Modals */}
-      <ImportModal 
-        opened={importModalOpened} 
-        onClose={closeImportModal} 
-      />
       
-      <BulkDeleteProductModal 
-        opened={bulkDeleteModalOpened} 
-        onClose={closeBulkDeleteModal}
-        onConfirm={handleBulkDelete}
-      />
     </div>
   );
 };

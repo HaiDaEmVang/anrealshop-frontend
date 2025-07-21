@@ -17,6 +17,7 @@ interface ProductTableRowProps {
   isSelected: boolean;
   onSelect: (id: string, checked: boolean) => void;
   onToggleStatus: (id: string, visible: boolean) => void;
+  onRefresh?: () => void;
 }
 
 
@@ -25,6 +26,7 @@ const ProductTableRow = ({
   isSelected,
   onSelect,
   onToggleStatus,
+  onRefresh,
 }: ProductTableRowProps) => {
   const { getStatusIcon } = useProductStatusIcon();
   const { getStatusColor, getStatusIconColor } = useProductStatusColor();
@@ -101,11 +103,20 @@ const ProductTableRow = ({
             size="sm"
             checked={product.status === 'ACTIVE'}
             onChange={() => onToggleStatus(product.id, product.status !== 'ACTIVE')}
-          disabled={product.status === 'VIOLATION' || product.status === 'PENDING'}
+            disabled={product.status === 'VIOLATION' || product.status === 'PENDING'}
+            classNames={{
+              track: product.status === 'VIOLATION' || product.status === 'PENDING'
+                ? 'cursor-not-allowed'
+                : '!cursor-pointer',
+              input: 'cursor-pointer',
+              label: 'cursor-pointer'
+            }}
           />
           <ProductActionMenu
             productId={product.id}
-          // disabled={product.isUpdating}
+            // disabled={product.isUpdating}
+            productName={product.name}
+            onRefresh={onRefresh}
           />
         </Group>
       </Table.Td>
