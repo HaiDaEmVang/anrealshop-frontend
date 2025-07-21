@@ -23,46 +23,42 @@ interface OptionConfigProps {
 const OptionConfig = ({ viewMode, onViewModeChange }: OptionConfigProps) => {
 
   return (
-  <div className="">
-    <Group justify="space-between">
-      <Group>
-        {/* Cài đặt sản phẩm */}
-        <Menu shadow="md" width={220} position="bottom-start">
-          <Menu.Target>
-            <Button
-              leftSection={<FiSettings size={16} />}
-              variant="light"
-              color="dark"
-              className="bg-gray-800 text-white hover:bg-gray-700 border-gray-700 transition-colors duration-200"
-            >
-              Cài đặt sản phẩm
-            </Button>
-          </Menu.Target>
+    <div className="">
+      <Group justify="space-between">
+        <Group>
+          {/* Cài đặt sản phẩm */}
+          <Menu shadow="md" width={220} position="bottom-start">
+            <Menu.Target>
+              <Button
+                leftSection={<FiSettings size={16} />}
+                variant="light"
+                color="dark"
+                className="bg-gray-800 text-white hover:bg-gray-700 border-gray-700 transition-colors duration-200"
+              >
+                Cài đặt sản phẩm
+              </Button>
+            </Menu.Target>
 
-          <Menu.Dropdown>
-            <Menu.Label>Tùy chỉnh hiển thị</Menu.Label>
-            <Menu.Item leftSection={<FiGrid size={14} />}>
-              Hiển thị thuộc tính
-            </Menu.Item>
-            <Menu.Item leftSection={<FiTag size={14} />}>
-              Quản lý thẻ
-            </Menu.Item>
-            <Menu.Divider />
+            <Menu.Dropdown>
+              <Menu.Label>Tùy chỉnh hiển thị</Menu.Label>
+              <Menu.Item leftSection={<FiGrid size={14} />}>
+                Hiển thị thuộc tính
+              </Menu.Item>
+              <Menu.Item leftSection={<FiTag size={14} />}>
+                Quản lý thẻ
+              </Menu.Item>
+              <Menu.Divider />
 
-            <Menu.Label>Phân loại</Menu.Label>
-            <Menu.Item leftSection={<FiLayers size={14} />}>
-              Quản lý danh mục
-            </Menu.Item>
-            <Menu.Item leftSection={<FiList size={14} />}>
-              Trường tùy chỉnh
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-
-        {/* Công cụ xử lý hàng loạt */}
-        
-
-          <Link to="/myshop/product/create">
+              <Menu.Label>Phân loại</Menu.Label>
+              <Menu.Item leftSection={<FiLayers size={14} />}>
+                Quản lý danh mục
+              </Menu.Item>
+              <Menu.Item leftSection={<FiList size={14} />}>
+                Trường tùy chỉnh
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+          <Link to="/myshop/products/create">
             <Button
               leftSection={<FiPlus size={16} />}
               variant="filled"
@@ -108,7 +104,7 @@ const OptionConfig = ({ viewMode, onViewModeChange }: OptionConfigProps) => {
         </Group>
       </Group>
 
-      
+
     </div>
   );
 };

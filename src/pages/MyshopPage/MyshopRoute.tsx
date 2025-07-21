@@ -18,13 +18,13 @@ const MyshopPage = () => {
       </Suspense>
 
       <div className="flex-1 bg-gray-50">
-        <Suspense fallback={<div>Loading...</div>}>
+        {/* <Suspense fallback={<div>Loading...</div>}> */}
           <Routes>
             <Route index element={<Navigate to="/myshop/dashboard" replace />} />
             <Route path="dashboard" element={<div>Dashboard Content</div>} />
             <Route path="sale" element={<div>Sales Overview</div>} />
             <Route path="products" element={<ProductPage />} />
-            <Route path="product/create" element={<CreateProduct />} />
+            <Route path="products/create" element={<CreateProduct />} />
             <Route path="products/edit/:id" element={<ProductForm />} />
             <Route path="orders" element={<OrderPage />} />
             <Route path="orders/:id" element={<OrderDetailComp />} />
@@ -32,7 +32,7 @@ const MyshopPage = () => {
             <Route path="settings" element={<Setting />} />
             <Route path="*" element={<div>Page not found</div>} />
           </Routes>
-        </Suspense>
+        {/* </Suspense> */}
       </div>
     </div>
   );

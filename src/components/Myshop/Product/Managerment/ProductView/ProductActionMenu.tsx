@@ -3,6 +3,7 @@ import { ActionIcon, Menu } from '@mantine/core';
 import { FiEdit2, FiCopy, FiTrash2, FiMoreVertical } from 'react-icons/fi';
 import { useProductDelete } from '../../../../../hooks/useProduct';
 import ConfirmDeleteModal from '../Modal/ConfirmDeleteModal';
+import { useNavigate } from 'react-router-dom';
 
 interface ProductActionMenuProps {
   productId: string;
@@ -17,10 +18,13 @@ const ProductActionMenu = ({
   productName = 'Sản phẩm',
   onRefresh,
 }: ProductActionMenuProps) => {
+  const navigate = useNavigate();
   const { deleteProduct, isLoading } = useProductDelete();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+
   const handleEdit = () => {
+    navigate(`/myshop/products/edit/${productId}`);
   };
   
   const handleDuplicate = () => {

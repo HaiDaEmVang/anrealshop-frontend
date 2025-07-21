@@ -4,7 +4,7 @@ import { FiEye, FiSave } from 'react-icons/fi';
 import { useParams } from 'react-router-dom';
 import Infor from './Infor';
 import { useProductForm } from '../../../../hooks/useProductForm';
-
+ 
 const ProductForm = () => {
   const { id } = useParams();
   const isEditMode = !!id;

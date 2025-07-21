@@ -18,7 +18,7 @@ const HeroBannerSkeleton = () => (
 const CategorySkeleton = () => (
   <SimpleGrid cols={{ base: 2, xs: 3, sm: 4, md: 6 }} spacing="md">
     {Array(6).fill(0).map((_, i) => (
-      <Stack key={i} align="center" spacing="sm">
+      <Stack key={i} align="center" gap="sm">
         <Skeleton height={80} width={80} radius={100} animate />
         <Skeleton height={16} width="80%" radius="sm" animate />
       </Stack>
@@ -48,7 +48,7 @@ const ProductGridSkeleton = () => (
     </Group>
     <SimpleGrid cols={{ base: 2, xs: 2, sm: 3, md: 4, lg: 5 }} spacing="md">
       {Array(5).fill(0).map((_, i) => (
-        <Stack key={i} spacing="xs">
+        <Stack key={i} gap="xs">
           <Skeleton height={200} radius="md" animate />
           <Skeleton height={16} width="70%" radius="sm" animate />
           <Skeleton height={14} width="50%" radius="sm" animate />
@@ -69,7 +69,7 @@ const PromotionBannerSkeleton = () => (
 
 const NewsletterSkeleton = () => (
   <Paper p="xl" radius="md">
-    <Stack align="center" spacing="md">
+    <Stack align="center" gap="md">
       <Skeleton height={30} width="60%" radius="sm" animate />
       <Skeleton height={16} width="80%" radius="sm" animate />
       <Group justify="center" style={{ width: '100%' }}>

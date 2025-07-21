@@ -1,21 +1,31 @@
 
-import { useState, useEffect, useCallback } from 'react';
 import { Anchor, Box, Breadcrumbs, Container, Group, Paper, Text, Title } from '@mantine/core';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiShoppingBag } from 'react-icons/fi';
-import FilterByStatus from './Managerment/Filter/FilterByStatus';
-import OptionConfig from './Managerment/OptionConfig/OptionConfig';
-import FilterProduct from './Managerment/Filter/FilterProduct';
-import ListView from './Managerment/ProductView/ListView/ListView';
-import GridView from './Managerment/ProductView/GridView/GridView';
-import type { MyShopProductDto, ProductStatus } from '../../../types/ProductType';
-import { useProduct, useProductDelete } from '../../../hooks/useProduct';
+import { useProduct } from '../../../hooks/useProduct';
 import type { BaseCategoryDto } from '../../../types/CategoryType';
-import Pagination from './Managerment/ProductView/Pagination';
-import NonProductFound from './Managerment/ProductView/NonProductFound';
-import CheckboxSelected from './Managerment/ProductView/CheckboxSelected';
-import { productStatusDefaultData } from '../../../data/ProductData';
+import type { ProductStatus } from '../../../types/ProductType';
+import {
+  CheckboxSelectedSkeleton,
+  FilterControlsSkeleton,
+  OptionConfigSkeleton,
+  PaginationSkeleton,
+  ProductGridSkeleton,
+  ProductListSkeleton,
+  StatusFilterSkeleton,
+} from './Managerment/Skeleton';
+
+const FilterByStatus = lazy(() => import('./Managerment/Filter/FilterByStatus'));
+const OptionConfig = lazy(() => import('./Managerment/OptionConfig/OptionConfig'));
+const FilterProduct = lazy(() => import('./Managerment/Filter/FilterProduct'));
+const CheckboxSelected = lazy(() => import('./Managerment/ProductView/CheckboxSelected'));
+const GridView = lazy(() => import('./Managerment/ProductView/GridView/GridView'));
+const ListView = lazy(() => import('./Managerment/ProductView/ListView/ListView'));
+const NonProductFound = lazy(() => import('./Managerment/ProductView/NonProductFound'));
+const Pagination = lazy(() => import('./Managerment/ProductView/Pagination'));
 
 const ProductPage = () => {
+
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // State cho filters
@@ -33,15 +43,12 @@ const ProductPage = () => {
     statusMetadata,
     totalCount,
     totalPages,
-    currentPage,
     isLoading,
-    error,
     isEmpty,
     fetchProducts,
     fetchStatusMetadata,
     updateVisibility,
     updateVisibilityMultible,
-    refresh
   } = useProduct({
     autoFetch: false,
     initialParams: {
@@ -161,10 +168,12 @@ const ProductPage = () => {
         radius="md"
         className="bg-white"
       >
-        <OptionConfig
+        <Suspense fallback={<OptionConfigSkeleton />}>
+          <OptionConfig
           viewMode={viewMode}
           onViewModeChange={setViewMode}
         />
+        </Suspense>
       </Paper>
 
       {/* Filters */}
@@ -174,11 +183,14 @@ const ProductPage = () => {
         radius="md"
         className="bg-white"
       >
+        <Suspense fallback={<StatusFilterSkeleton />}>
         <FilterByStatus
           selectedStatus={status}
           onStatusChange={handleStatusChange}
           productStatusData={statusMetadata}
         />
+        </Suspense>
+        <Suspense fallback={<FilterControlsSkeleton />}>
         <FilterProduct
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -188,6 +200,7 @@ const ProductPage = () => {
           onSortChange={setSortBy}
           onFetchWithParam={onFetchWithParam}
         />
+        </Suspense>
 
         {isEmpty && !isLoading && (
           <NonProductFound
@@ -198,6 +211,7 @@ const ProductPage = () => {
 
         {!isEmpty &&  (
           <div className={viewMode === 'list' ? 'pl-8 pr-4' : 'pl-6 pr-4'}>
+            <Suspense fallback={<CheckboxSelectedSkeleton />}>
             <CheckboxSelected
               selectedProductIds={selectedProductIds}
               products={products}
@@ -205,20 +219,24 @@ const ProductPage = () => {
               onSelectAll={handleSelectAll}
               onRefresh={handleRefresh}
             />
+            </Suspense>
           </div>
         )}
 
         {viewMode === 'list' && !isEmpty ? (
-          <ListView
-            products={products}
-            isLoading={isLoading}
-            selectedProducts={selectedProductIds}
-            onSelectAll={handleSelectAll}
-            onSelectProduct={handleSelectProduct}
-            onToggleStatus={handleToggleStatus}
-            onRefresh={handleRefresh}
-          />
+          <Suspense fallback={<ProductListSkeleton />}>
+            <ListView
+              products={products}
+              isLoading={isLoading}
+              selectedProducts={selectedProductIds}
+              onSelectAll={handleSelectAll}
+              onSelectProduct={handleSelectProduct}
+              onToggleStatus={handleToggleStatus}
+              onRefresh={handleRefresh}
+            />
+          </Suspense>
         ) : (
+          <Suspense fallback={<ProductGridSkeleton />}>
           <GridView
             products={products}
             isLoading={isLoading}
@@ -228,8 +246,11 @@ const ProductPage = () => {
             onToggleStatus={handleToggleStatus}
             onRefresh={handleRefresh}
           />
+          </Suspense>
         )}
+        
 
+        <Suspense fallback={<PaginationSkeleton />}>
         <Pagination
           currentPage={activePage}
           totalPages={totalPages}
@@ -237,6 +258,7 @@ const ProductPage = () => {
           itemsPerPage={viewMode === 'list' ? 10 : 12}
           onPageChange={setActivePage}
         />
+        </Suspense>
       </Paper>
 
 
