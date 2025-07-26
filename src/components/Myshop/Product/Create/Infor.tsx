@@ -89,7 +89,7 @@ const Infor = memo(({ form, isEditMode = false, isLoadingData = false }: InforPr
           setIsLoading(false);
         }
       }, 2000);
-    }
+    } 
 
     return () => {
       if (timer) clearTimeout(timer);
@@ -123,11 +123,13 @@ const Infor = memo(({ form, isEditMode = false, isLoadingData = false }: InforPr
 
       <BasicInfor
         isShowQuantity={isShowQuantity}
+        isEditMode={isEditMode}
         nameProps={{ ...form.getInputProps('name') }}
         sortDescriptionProps={{ ...form.getInputProps('sortDescription') }}
         priceProps={{ ...form.getInputProps('price') }}
         discountPriceProps={{ ...form.getInputProps('discountPrice') }}
         categoryIdProps={{ ...form.getInputProps('categoryId') }}
+        categoryPathProps={{ ...form.getInputProps('categoryPath') }}
         descriptionProps={{ ...form.getInputProps('description') }}
         quantityProps={{ ...form.getInputProps('quantity') }}
       />

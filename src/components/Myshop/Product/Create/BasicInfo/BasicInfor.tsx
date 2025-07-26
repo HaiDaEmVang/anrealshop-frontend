@@ -14,37 +14,87 @@ import {
     type TextareaProps,
     type TextInputProps
 } from '@mantine/core';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
+import { useDebouncedCallback } from '@mantine/hooks';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import RichTextEditor from '../../../../RichText/RichTextEditor';
 import CategoryInfo from './CategoryInfo';
+import type { BaseCategoryDto } from '../../../../../types/CategoryType';
+import { CategoryService } from '../../../../../service/CategoryService';
 
 interface BasicInforProps {
     isShowQuantity?: boolean;
+    isEditMode?: boolean;
     nameProps: TextInputProps;
     sortDescriptionProps: TextareaProps;
     priceProps: NumberInputProps;
     discountPriceProps: NumberInputProps;
     categoryIdProps: SelectProps;
+    categoryPathProps: AutocompleteProps;
     descriptionProps: TextInputProps;
     quantityProps: NumberInputProps;
 }
 
 const BasicInfor = memo(({
     isShowQuantity,
+    isEditMode = false,
     nameProps,
     sortDescriptionProps,
     priceProps,
     discountPriceProps,
     categoryIdProps,
+    categoryPathProps,
     descriptionProps,
     quantityProps,
 }: BasicInforProps) => {
     const [collapsed, setCollapsed] = useState(false);
+    const [categoriesSuggestions, setCategoriesSuggestions] = useState<BaseCategoryDto[]>([]);
 
     const toggleSection = () => {
         setCollapsed(prev => !prev);
     };
+
+    useEffect(() => {
+        if (isEditMode) return;
+        const fetchCategoriesSuggestions = async () => {
+            try {
+                const data = await CategoryService.getCategorySuggestionsByNameProduct(nameProps.value as string);
+                setCategoriesSuggestions(data);
+                if (!categoryIdProps.value && data.length > 0) {
+                    const formOnChange = categoryIdProps.onChange as (value: string | null) => void;
+                    formOnChange?.(data[0].id);
+                }
+                if (categoryPathProps.onChange && data.length > 0) {
+                    const cateSelected = data[0];
+                    const pathValue = cateSelected.urlPath || cateSelected.name;
+                    const pathOnChange = categoryPathProps.onChange as (value: string) => void;
+                    pathOnChange(pathValue);
+                } else if (categoryPathProps.onChange && !categoryIdProps.value) {
+                    const pathOnChange = categoryPathProps.onChange as (value: string) => void;
+                    pathOnChange('');
+                }
+            } catch (err) {
+                console.error("Lỗi lấy category:", err);
+                setCategoriesSuggestions([]);
+            }
+        };
+
+        const value = nameProps.value as string;
+        if (value && value.trim() !== '' && value.trim().length >= 10 && value.trim().length <= 255) {
+            fetchCategoriesSuggestions();
+        } else {
+            setCategoriesSuggestions([]);
+        }
+    }, [nameProps.value]);
+
+    const handleCategorySearchChange = useDebouncedCallback(async (searchValue: string) => {
+        try {
+            const data = await CategoryService.getCategorySuggestions(searchValue);
+            setCategoriesSuggestions(data);
+        } catch (err) {
+            console.error("Lỗi lấy category suggestions từ search:", err);
+        }
+    }, 500);
 
     return (
         <Paper shadow="xs" p="md" mb="md" className="bg-white">
@@ -104,13 +154,20 @@ const BasicInfor = memo(({
                     <CategoryInfo
                         categoryIdProps={{
                             ...categoryIdProps,
-                            value: categoryIdProps.value ?? undefined 
+                            value: categoryIdProps.value ?? undefined
                         } as AutocompleteProps}
+                        categoryPathProps={{
+                            ...categoryPathProps,
+                            value: categoryPathProps.value ?? undefined
+                        } as AutocompleteProps}
+                        categories={categoriesSuggestions}
+                        onSearchChange={handleCategorySearchChange}
                     />
 
                     <RichTextEditor
                         descriptionProps={{
-                            ...descriptionProps}}
+                            ...descriptionProps
+                        }}
                     />
                 </Stack>
             )}

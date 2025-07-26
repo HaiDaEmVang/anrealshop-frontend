@@ -110,7 +110,8 @@ export const useProductForm = ( isEditMode = false ) => {
                 }
                 return null;
             }
-        }
+        },
+        validateInputOnChange: ['name'],
     });
 
     useEffect(() => {

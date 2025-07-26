@@ -11,17 +11,26 @@ import {
 import { useState, useEffect, memo } from 'react';
 import { FiChevronRight } from 'react-icons/fi';
 import type { BaseCategoryDto } from '../../../../../types/CategoryType';
+import { CategoryService } from '../../../../../service/CategoryService';
 
 interface ModalCategorySelectedProps {
     opened: boolean;
     onClose: () => void;
-    onSelect: (categoryId: string) => void;
-    categories: BaseCategoryDto[];
+    onSelect: (categoryId: string, path: string) => void;
     selectedCategoryId?: string;
 }
 
-const ModalCategorySelected = memo(({ opened, onClose, onSelect, categories, selectedCategoryId }: ModalCategorySelectedProps) => {
+const ModalCategorySelected = memo(({ opened, onClose, onSelect, selectedCategoryId }: ModalCategorySelectedProps) => {
     const [selectedPath, setSelectedPath] = useState<string[]>([]);
+    const [categories, setCategories] = useState<BaseCategoryDto[]>([]);
+
+    useEffect(() => {
+        const fetchAllCategories = async () => {
+            const categories = await CategoryService.getCategoryForShop();
+            setCategories(categories);
+        }
+        fetchAllCategories();
+    }, []);
 
     useEffect(() => {
         if (opened && selectedCategoryId) {
@@ -42,7 +51,7 @@ const ModalCategorySelected = memo(({ opened, onClose, onSelect, categories, sel
     }, [opened, selectedCategoryId, categories]);
 
     const getCategoriesByLevel = (level: number) => {
-        const parentId = level === 0 ? null : selectedPath[level - 1];
+        const parentId = level === 0 ? undefined : selectedPath[level - 1];
         return categories.filter(cat => cat.level === level && cat.parentId === parentId);
     };
 
@@ -54,7 +63,9 @@ const ModalCategorySelected = memo(({ opened, onClose, onSelect, categories, sel
     const handleSave = () => {
         if (selectedPath.length > 0) {
             const lastSelected = selectedPath[selectedPath.length - 1];
-            onSelect(lastSelected);
+            const selectedCategory = categories.find(cat => cat.id === lastSelected);
+            const path = selectedCategory ? selectedCategory.urlPath || selectedCategory.name : '';
+            onSelect(lastSelected, path);
         }
         handleClose();
     };
@@ -91,7 +102,7 @@ const ModalCategorySelected = memo(({ opened, onClose, onSelect, categories, sel
                             <Text size="sm" fw={600} mb="xs">Cấp {level + 1}</Text>
                             <Divider mb="xs" />
                             <ScrollArea style={{ height: 320 }}>
-                                <Stack gap={2}>
+                                <Stack gap={2} mr={10}>
                                     {levelCategories.map(category => {
                                         const isSelected = selectedPath[level] === category.id;
                                         const hasChildren = categories.some(cat => cat.parentId === category.id);

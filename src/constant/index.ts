@@ -47,7 +47,9 @@ export const API_ENDPOINTS = {
   },
   CATEGORIES: {
     BASE: '/categories',
+    GET_FOR_SHOP: '/categories/my-shop',
     GET_MY_SHOP_SUGGEST_CATEGORIES: '/categories/suggest',
+    GET_SUGGEST_BY_NAME_PRODUCT: '/categories/suggest-by-product-name',
   },
 
 };
