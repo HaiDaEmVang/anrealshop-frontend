@@ -6,156 +6,137 @@ import {
     Text,
     type AutocompleteProps
 } from '@mantine/core';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FiX } from 'react-icons/fi';
 import type { BaseCategoryDto } from '../../../../../types/CategoryType';
 
-interface CategoryOption {
-    value: string;
-    label: string;
-    category: BaseCategoryDto;
-    fullPath: string;
-}
+
 
 interface AutoComplateCustomeProps extends Omit<AutocompleteProps, 'value' | 'onChange' | 'onClear' | 'error' | 'data'> {
     categories: BaseCategoryDto[];
-    value?: string | null; 
+    value?: string | null;
     onChange: (value: string | null) => void;
     onClear?: () => void;
-    error?: React.ReactNode; 
+    onSearchChange?: (searchValue: string) => void;
+    error?: React.ReactNode;
 }
 
 const AutoComplateCustome = ({
     categories,
     value,
     onChange,
-    onClear, 
+    onClear,
+    onSearchChange,
     placeholder = "Nhập để tìm kiếm...",
     error,
-    ...rest 
+    ...rest
 }: AutoComplateCustomeProps) => {
-    const [searchValue, setSearchValue] = useState(value || ''); 
+    const [searchValue, setSearchValue] = useState(value || '');
 
-    const buildCategoryPath = useCallback((categoryId: string): string => {
-        const category = categories.find(cat => cat.id === categoryId);
-        if (!category) return '';
-
-        if (category.parentId) {
-            const parentPath = buildCategoryPath(category.parentId);
-            return parentPath ? `${parentPath} > ${category.name}` : category.name;
+    useEffect(() => {
+        if (value !== undefined && value !== null) {
+            setSearchValue(value);
         }
-        return category.name;
-    }, [categories]);
+    }, [value]);
 
-    const selectedCategoryDisplay = useMemo(() => {
-        if (!value) return '';
-        return buildCategoryPath(value);
-    }, [value, buildCategoryPath]);
-
-    const categoryOptions = useMemo((): CategoryOption[] => {
-        return categories
-            .filter(cat => !cat.hasChildren)
-            .map(category => ({
-                value: category.id,
-                label: category.name,
-                category,
-                fullPath: buildCategoryPath(category.id)
-            }));
-    }, [categories, buildCategoryPath]);
-
-    const filteredOptions = useMemo(() => {
-        if (!searchValue) return categoryOptions;
-        
-        const query = searchValue.toLowerCase();
-        return categoryOptions.filter(option => 
-            option.fullPath.toLowerCase().includes(query) ||
-            option.label.toLowerCase().includes(query)
-        );
-    }, [categoryOptions, searchValue]);
-
-    const handleCategorySelect = (selectedValue: string) => {
-        const selectedOption = categoryOptions.find(option => option.value === selectedValue);
+    const handleCategorySelect = useCallback((selectedValue: string) => {
+        const selectedOption = categories.find(option => option.id === selectedValue);
         if (selectedOption) {
-            onChange(selectedOption.value); 
-            setSearchValue(selectedOption.fullPath);
+            onChange(selectedOption.id);
+            setSearchValue(selectedOption.urlPath || selectedOption.name);
         }
-    };
+    }, [categories, onChange]);
 
-    const handleClearInternal = () => {
+    const handleClearInternal = useCallback(() => {
         onChange(null);
         setSearchValue('');
-        if (onClear) { 
+        if (onClear) {
             onClear();
         }
-    };
+    }, [onChange, onClear]);
 
-    const handleSearchChange = (newSearchValue: string) => {
+    const handleSearchChange = useCallback((newSearchValue: string) => {
+        console.log('Search value changed:', newSearchValue);
         setSearchValue(newSearchValue);
-        if (value && newSearchValue !== selectedCategoryDisplay) {
-            onChange(null); 
+        if (onSearchChange) {
+            onSearchChange(newSearchValue);
         }
-    };
+    }, [onSearchChange]);
+
+    const autocompleteData = useMemo(() => {
+        return categories.map(option => ({
+            value: option.id,
+            label: option.urlPath || option.name
+        }));
+    }, [categories]);
+
+    const renderOption = useCallback(({ option }: any) => {
+        const categoryOption = categories.find(opt => opt.id === option.value);
+        if (!categoryOption) return null;
+
+        return (
+            <Box>
+                <Text size="sm" className="text-contentText">
+                    {categoryOption.urlPath || categoryOption.name}
+                </Text>
+            </Box>
+        );
+    }, [categories]);
+
+    const rightSection = useMemo(() => {
+        return value ? (
+            <ActionIcon
+                size="sm"
+                variant="subtle"
+                color="gray"
+                onClick={handleClearInternal}
+            >
+                <FiX size={14} />
+            </ActionIcon>
+        ) : null;
+    }, [value, handleClearInternal]);
+
+    const filterFunction = useCallback(({ options }: any) => {
+        return options;
+    }, []);
+
+    const autocompleteStyles = useMemo(() => ({
+        input: {
+            fontSize: '14px',
+            minHeight: '36px'
+        },
+        dropdown: {
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px'
+        },
+        option: {
+            padding: '8px 12px',
+            borderRadius: '4px',
+            margin: '2px 4px'
+        }
+    }), []);
+
+    const comboboxProps = useMemo(() => ({
+        transitionProps: { transition: 'pop' as const, duration: 200 },
+        shadow: 'md' as const
+    }), []);
 
     return (
         <Autocomplete
-            value={value ? selectedCategoryDisplay : searchValue}
+            value={searchValue}
             onChange={handleSearchChange}
             onOptionSubmit={handleCategorySelect}
-            data={filteredOptions.map(option => ({
-                value: option.value,
-                label: option.fullPath
-            }))}
+            data={autocompleteData}
             placeholder={placeholder}
             limit={5}
             maxDropdownHeight={300}
             error={error}
-            rightSection={
-                value ? (
-                    <ActionIcon
-                        size="sm"
-                        variant="subtle"
-                        color="gray"
-                        onClick={handleClearInternal} 
-                    >
-                        <FiX size={14} />
-                    </ActionIcon>
-                ) : null
-            }
-            comboboxProps={{
-                transitionProps: { transition: 'pop', duration: 200 },
-                shadow: 'md'
-            }}
-            renderOption={({ option }) => {
-                const categoryOption = filteredOptions.find(opt => opt.value === option.value);
-                if (!categoryOption) return null;
-                
-                return (
-                    <Box>
-                        <Text size="sm" className="text-contentText">
-                            {categoryOption.fullPath}
-                        </Text>
-                    </Box>
-                );
-            }}
-            filter={({ options }) => {
-                return options;
-            }}
-            styles={{
-                input: {
-                    fontSize: '14px',
-                    minHeight: '36px'
-                },
-                dropdown: {
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px'
-                },
-                option: {
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    margin: '2px 4px'
-                }
-            }}
-            {...rest} 
+            rightSection={rightSection}
+            comboboxProps={comboboxProps}
+            renderOption={renderOption}
+            filter={filterFunction}
+            styles={autocompleteStyles}
+            {...rest}
         />
     );
 };

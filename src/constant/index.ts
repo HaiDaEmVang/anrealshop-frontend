@@ -27,17 +27,30 @@ export const API_ENDPOINTS = {
     CHANGE_PASSWORD: '/user/change-password',
     RESET_PASSWORD: '/user/reset-password',
   },
-  PRODUCTS: {
-    // BASE: '/products', 
-    CREATE: '/products/create',
-    // APPROVALS: '/products/approvals',
-    // SEARCH: '/products/search',
-    // CATEGORY: (slug: string) => `/products/category/${slug}`,
-    // SHOP: (slug: string) => `/products/shop/${slug}`,
+  PRODUCTS: {   
+    BASE: '/products', 
+    GET_BY_ID: (id: string) => `/products/${id}`,
+    CREATE: '/products',
+    CREATE_LIST: '/products/creates',
+    UPDATE: (id: string) => `/products/${id}`,
+    DELETE: (id: string) => `/products/${id}`,
+    DELETE_MULTIPLE: '/products',
+    GET_MY_SHOP_SUGGEST_PRODUCT_NAME: '/products/suggest-my-products-by-name',
+    GET_META_STATUS: '/products/filter-statuses',
+    GET_MY_SHOP_PRODUCTS: '/products/my-shop',
+    GET_MY_SHOP_PRODUCT_BY_ID: (id: string) => `/products/my-shop/${id}`,
+    UPDATE_VISIBILITY: (id: string) => `/products/${id}/update-visible`,
+    UPDATE_MULTIPLE_VISIBILITY: '/products/update-visible-multiple',
   },
   ATTRIBUTES: {
     ATTRIBUTE_FOR_SHOP: '/attributes/my-shop',
-  }
+  },
+  CATEGORIES: {
+    BASE: '/categories',
+    GET_FOR_SHOP: '/categories/my-shop',
+    GET_MY_SHOP_SUGGEST_CATEGORIES: '/categories/suggest',
+    GET_SUGGEST_BY_NAME_PRODUCT: '/categories/suggest-by-product-name',
+  },
 
 };
 

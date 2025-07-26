@@ -4,12 +4,12 @@ import { FiEye, FiSave } from 'react-icons/fi';
 import { useParams } from 'react-router-dom';
 import Infor from './Infor';
 import { useProductForm } from '../../../../hooks/useProductForm';
-
+  
 const ProductForm = () => {
   const { id } = useParams();
   const isEditMode = !!id;
 
-  const { form, handleSubmit, isLoading } = useProductForm({ isEditMode });
+  const { form, handleSubmit, isLoading } = useProductForm(isEditMode);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -26,13 +26,7 @@ const ProductForm = () => {
     setIsPreviewOpen(false);
   };
 
-  const handleFormSubmit = async () => {
-    try {
-      await handleSubmit();
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    }
-  };
+  
 
   return (
     <Container fluid px="lg" py="md" style={{ position: 'relative' }}>
@@ -146,7 +140,7 @@ const ProductForm = () => {
               </Button>
               <Button
                 className="bg-primary hover:bg-primary/90"
-                onClick={handleFormSubmit}
+                onClick={handleSubmit}
                 disabled={!isDirty || isLoading}
                 loading={isLoading}
                 radius="md"

@@ -7,23 +7,49 @@ import {
 } from '@mantine/core';
 import { memo, useState } from 'react';
 import { FiGrid } from 'react-icons/fi';
-import { categories } from '../../../../../data/CategoryPageData';
+import type { BaseCategoryDto } from '../../../../../types/CategoryType';
 import AutoComplateCustome from './AutoComplateCustome';
 import ModalCategorySelected from './ModalCategorySelected';
 
 interface CategoryInfoProps {
     categoryIdProps: AutocompleteProps;
+    categories: BaseCategoryDto[];
+    categoryPathProps: AutocompleteProps;
+    onSearchChange?: (searchValue: string) => void;
 }
 
-const CategoryInfo = memo(({ categoryIdProps }: CategoryInfoProps) => {
+const CategoryInfo = memo(({ categoryIdProps, categories, categoryPathProps, onSearchChange }: CategoryInfoProps) => {
     const [modalOpened, setModalOpened] = useState(false);
 
-    const handleModalSelect = (categoryIdValue: string) => {
+    const handleModalSelect = (categoryIdValue: string, path: string) => {
         const formOnChange = categoryIdProps.onChange as (value: string | null) => void;
         if (formOnChange) {
             formOnChange(categoryIdValue);
         }
-        setModalOpened(false); 
+
+        if (categoryPathProps.onChange && path) {
+            const pathOnChange = categoryPathProps.onChange as (value: string) => void;
+            pathOnChange(path);
+        }
+        setModalOpened(false);
+    };
+
+    const handleCateSelectedChange = (categoryIdValue: string | null) => {
+        const cateSelected = categories.find(c => c.id === categoryIdValue);
+        const formOnChange = categoryIdProps.onChange as (value: string | null) => void;
+
+        if (formOnChange) {
+            formOnChange(categoryIdValue);
+        }
+
+        if (categoryPathProps.onChange && cateSelected) {
+            const pathValue = cateSelected.urlPath || cateSelected.name;
+            const pathOnChange = categoryPathProps.onChange as (value: string) => void;
+            pathOnChange(pathValue);
+        } else if (categoryPathProps.onChange && !categoryIdValue) {
+            const pathOnChange = categoryPathProps.onChange as (value: string) => void;
+            pathOnChange('');
+        }
     };
 
     return (
@@ -44,12 +70,20 @@ const CategoryInfo = memo(({ categoryIdProps }: CategoryInfoProps) => {
 
             <AutoComplateCustome
                 categories={categories}
-                value={categoryIdProps.value}
-                onChange={categoryIdProps.onChange as (value: string | null) => void}
+                value={categoryPathProps.value as string || ''}
+                onChange={handleCateSelectedChange}
+                onSearchChange={onSearchChange}
                 error={categoryIdProps.error}
                 placeholder="Nhập để tìm kiếm danh mục..."
                 required={categoryIdProps.required}
-                onClear={() => categoryIdProps.onChange && (categoryIdProps.onChange as (value: string | null) => void)('')}
+                onClear={() => {
+                    const formOnChange = categoryIdProps.onChange as (value: string | null) => void;
+                    if (formOnChange) formOnChange('');
+                    if (categoryPathProps.onChange) {
+                        const pathOnChange = categoryPathProps.onChange as (value: string) => void;
+                        pathOnChange('');
+                    }
+                }}
                 description={categoryIdProps.error ? undefined : ''}
             />
 
@@ -57,8 +91,7 @@ const CategoryInfo = memo(({ categoryIdProps }: CategoryInfoProps) => {
                 opened={modalOpened}
                 onClose={() => setModalOpened(false)}
                 onSelect={handleModalSelect}
-                categories={categories}
-                selectedCategoryId={categoryIdProps.value as string} 
+                selectedCategoryId={categoryIdProps.value as string}
             />
         </Paper>
     );

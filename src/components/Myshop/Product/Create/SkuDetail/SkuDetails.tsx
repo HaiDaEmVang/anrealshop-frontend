@@ -16,6 +16,7 @@ import showErrorNotification from '../../../../Toast/NotificationError';
 import AttributeSelecter from './AttributeSelecter';
 import SkuBulkAction from './SkuBlukAction';
 import SkuTable from './SkuTable';
+import { formatSkuPart } from '../../../../../untils/Untils';
 
 
 interface SkuDetailsProps {
@@ -29,52 +30,89 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
     const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
     const [selectedClassificationType, setSelectedClassificationType] = useState<string | null>(null);
 
+    const [attributesReady, setAttributesReady] = useState(false);
+
+    useEffect(() => {
+        if (form.values.productSkus && form.values.productSkus.length > 0 && attributes.length === 0) {
+            const uniqueAttributes: ProductAttribute[] = [];
+            form.values.productSkus.forEach(sku => {
+                sku.attributes.forEach(attr => {
+                    const existingAttr = uniqueAttributes.find(ua => ua.attributeKeyName === attr.attributeKeyName);
+                    if (!existingAttr) {
+                        uniqueAttributes.push({
+                            attributeKeyName: attr.attributeKeyName,
+                            attributeKeyDisplay: attr.attributeKeyDisplay,
+                            values: [attr.values[0]]
+                        });
+                    } else {
+                        if (!existingAttr.values.includes(attr.values[0])) {
+                            existingAttr.values.push(attr.values[0]);
+                        }
+                    }
+                });
+            });
+            setAttributes(uniqueAttributes);
+            setAttributesReady(true);
+        }
+    }, [form.values.productSkus, attributes.length]);
+
     const formValues = useMemo(() => ({
         name: form.values.name,
+        categoryPath: form.values.categoryPath,
         price: form.values.price,
         quantity: form.values.quantity
-    }), [form.values.name, form.values.price, form.values.quantity]);
+    }), [form.values.name, form.values.categoryPath, form.values.price, form.values.quantity]);
 
     const generateSkuCombinations = useCallback(() => {
         const activeAttributes = attributes.filter(attr => attr.values.length > 0);
         if (activeAttributes.length === 0) return [];
+        
+        const keyNameToDisplayMap = new Map(
+            activeAttributes.map(attr => [attr.attributeKeyName, attr.attributeKeyDisplay])
+        );
 
+        
         const combinations = (index = 0, current: Record<string, string> = {}): Record<string, string>[] => {
             if (index >= activeAttributes.length) return [current];
             const attr = activeAttributes[index];
             return attr.values.flatMap(value =>
-                combinations(index + 1, { ...current, [attr.attributeKeyDisplay]: value })
+                combinations(index + 1, { ...current, [attr.attributeKeyName]: value })
             );
         };
 
-        const skuBase = formValues.name?.substring(0, 3).toUpperCase() || 'PRD';
+        const skuBase = "SKU";
+        const currentSkus = form.values.productSkus || [];
         return combinations().map(combo => {
             const skuSuffix = Object.values(combo)
-                .map(value => value.substring(0, 2).toUpperCase())
-                .join('-');
+                .map(value => formatSkuPart(value, value.split(' ')?.[0]?.length))
+                .join('_');
 
+                
+            const skuCode = `${skuBase}_${skuSuffix}`;
+            const existingSku = currentSkus.find(s => s.sku === skuCode);
             const attributesArray: ProductAttribute[] = Object.entries(combo).map(([key, value]) => ({
-                attributeKeyDisplay: key,
-                attributeKeyName: key.toLowerCase().replace(/\s+/g, '_'),
+                attributeKeyDisplay: keyNameToDisplayMap.get(key) || key,
+                attributeKeyName: key,
                 values: [value]
             }));
-
             return {
-                sku: `${skuBase}-${skuSuffix}`,
-                price: formValues.price || 0,
-                quantity: formValues.quantity || 0,
-                imageUrl: '',
+                sku: skuCode,
+                price: existingSku?.price ?? formValues.price ?? 0,
+                quantity: existingSku?.quantity ?? formValues.quantity ?? 0,
+                imageUrl: existingSku?.imageUrl ?? '',
                 attributes: attributesArray
             };
         });
-    }, [attributes, formValues]);
+    }, [attributes, formValues, form.values.productSkus]);
+
 
     useEffect(() => {
+        if (!attributesReady) return;
         const skus = generateSkuCombinations();
         const currentSkus = form.values.productSkus || [];
         const skusChanged = skus.length !== currentSkus.length ||
             skus.some((sku, index) => sku.sku !== currentSkus[index]?.sku);
-
+            
         if (skusChanged) {
             form.setFieldValue('productSkus', skus);
         }
@@ -118,12 +156,12 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
         form.setFieldValue('productSkus', updatedSkus);
     }, [form]);
 
-    const handleImageUpload = useCallback(async (skuId: string, file: File | null) => { // <-- Thêm async
+    const handleImageUpload = useCallback(async (skuId: string, file: File | null) => { 
         if (!file) return;
 
         try {
             const result = await uploadToCloudinary(file, 'image');
-            updateSku(skuId, 'imageUrl', result.secure_url); 
+            updateSku(skuId, 'imageUrl', result.secure_url);
         } catch (error) {
             showErrorNotification("Thông báo", "Không thể tải lên hình ảnh");
         }

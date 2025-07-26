@@ -1,15 +1,11 @@
-// useProductForm.ts
 import { useForm } from '@mantine/form';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import showErrorNotification from '../components/Toast/NotificationError';
 import showSuccessNotification from '../components/Toast/NotificationSuccess';
 import { defaultProductDescriptionHtml } from '../data/InitData';
 import ProductsService from '../service/ProductsService';
 import type { ProductCreateRequest } from '../types/ProductType';
-
-interface UseProductFormOptions {
-    isEditMode: boolean;
-}
+import { useParams } from 'react-router-dom';
 
 
 const defaultInitialValues: ProductCreateRequest = {
@@ -20,6 +16,7 @@ const defaultInitialValues: ProductCreateRequest = {
     discountPrice: 0,
     quantity: 0,
     categoryId: '',
+    categoryPath: '',
     weight: 0,
     height: 0,
     length: 0,
@@ -29,9 +26,10 @@ const defaultInitialValues: ProductCreateRequest = {
     media: []
 };
 
-export const useProductForm = (options: UseProductFormOptions) => {
+export const useProductForm = ( isEditMode = false ) => {
+
+    const { id } = useParams();
     const [isLoading, setIsLoading] = useState(false);
-    const { isEditMode } = options;
 
     const form = useForm<ProductCreateRequest>({
         initialValues: defaultInitialValues,
@@ -63,7 +61,7 @@ export const useProductForm = (options: UseProductFormOptions) => {
             },
             quantity: (value) => {
                 if (value === null || value === undefined) return 'Số lượng không được để trống';
-                if (value < 0) return 'Số lượng không hợp lệ';
+                if (value < 0) return 'Số lượng không hợp lệ';// Optional product ID for edit mode
                 return null;
             },
             categoryId: (value) => {
@@ -112,14 +110,37 @@ export const useProductForm = (options: UseProductFormOptions) => {
                 }
                 return null;
             }
-        }
+        },
+        validateInputOnChange: ['name'],
     });
+
+    
+
+    // Fetch product data if in edit mode
+    useEffect(() => {
+        const fetchProductData = async () => {
+            if (!isEditMode || !id) return;
+
+            try {
+                const product: ProductCreateRequest = await ProductsService.getMyShopProductById(id);
+                console.log('Fetched product data:', product);
+                form.setValues(product);
+            } catch (error: any) {
+                showErrorNotification(
+                    'Lỗi tải dữ liệu',
+                    error.message || 'Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.'
+                );
+            } 
+        }
+
+        fetchProductData();
+    }, [isEditMode, id]);
+
 
     const clearForm = () => {
         form.setValues(defaultInitialValues);
         form.reset();
     };
-
 
     const handleSubmit = async () => {
         form.validate();
@@ -127,34 +148,50 @@ export const useProductForm = (options: UseProductFormOptions) => {
             showErrorNotification('Thông báo', 'Vui lòng nhập đầy đủ thông tin sản phẩm và kiểm tra các lỗi.');
             return;
         }
-        form.values.categoryId = '026890fd-fd6d-4fd2-93e2-1b46727815ab'
-        if(form.values.productSkus.length > 0){
+
+        if (form.values.productSkus.length > 0) {
             const quantity = form.values.productSkus.reduce((total, sku) => total + (sku.quantity || 0), 0);
-            form.setFieldValue("quantity", quantity);
+            form.values.quantity = quantity;
         }
+
         setIsLoading(true);
-        // debugger;
+
         try {
-            const data = await ProductsService.create(form.values);
-            console.log('Product created successfully:', data);
-            showSuccessNotification('Thành công', 'Sản phẩm đã được tạo thành công.');
-            clearForm();
+            let data;
+            console.log('Submitting product data:', form.values);
+            if (isEditMode && id) {
+                data = await ProductsService.update(id, form.values);
+                showSuccessNotification('Thành công', 'Sản phẩm đã được cập nhật thành công.');
+            } else {
+                form.values.categoryId = '87ef8ac9-8064-4123-ba22-7e50f5930e3a';
+                data = await ProductsService.create(form.values);
+                showSuccessNotification('Thành công', 'Sản phẩm đã được tạo thành công.');
+                // clearForm();
+            }
+
+            console.log('Product operation successful:', data);
         } catch (err: any) {
-              let notificationMessage = err.message || 'Có trường chưa được nhập.';
-        
-              if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
+            let notificationMessage = err.message || 'Có trường chưa được nhập.';
+
+            if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
                 notificationMessage = err.message || 'Dữ liệu nhập vào không hợp lệ.';
-              } else {
+            } else {
                 notificationMessage = err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
-              }
-        
-              showErrorNotification('Tạo sản phẩm thất bại', notificationMessage);
-            
-        }finally {
+            }
+
+            showErrorNotification(
+                isEditMode ? 'Cập nhật sản phẩm thất bại' : 'Tạo sản phẩm thất bại',
+                notificationMessage
+            );
+        } finally {
             setIsLoading(false);
         }
-
     };
 
-    return { form, handleSubmit, isLoading };
+    return {
+        form,
+        handleSubmit,
+        isLoading,
+        isEditMode
+    };
 };

@@ -8,7 +8,8 @@ export interface ProductCreateRequest {
   price: number;
   discountPrice: number;
   quantity: number;
-  categoryId: string;
+  categoryId: string; 
+  categoryPath: string;
   weight: number;
   height: number;
   length: number;
@@ -43,11 +44,13 @@ export interface MyShopProductDto {
   discountPrice: number;
   quantity: number;
   sold: number;
-  status: string;
+  status: ProductStatus;
   visible: boolean;
   createdAt: string;
-  productSkus: MyShopProductSkuDto[];
+  productSkus?: MyShopProductSkuDto[];
 }
+
+export type ProductStatus = 'ALL' | 'ACTIVE' | 'VIOLATION' | 'PENDING' | 'HIDDEN';
 
 export interface ProductStatusDto {
   id: string;
