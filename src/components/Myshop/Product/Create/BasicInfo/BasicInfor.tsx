@@ -104,7 +104,7 @@ const BasicInfor = memo(({
                     <CategoryInfo
                         categoryIdProps={{
                             ...categoryIdProps,
-                            value: categoryIdProps.value ?? undefined // Ensure value is string | undefined
+                            value: categoryIdProps.value ?? undefined 
                         } as AutocompleteProps}
                     />
 

@@ -1,4 +1,4 @@
-import { Stack } from '@mantine/core';
+import { Stack, Skeleton } from '@mantine/core';
 import { type UseFormReturnType } from '@mantine/form';
 import '@mantine/tiptap/styles.css';
 import { memo, useEffect, useState } from 'react';
@@ -14,12 +14,50 @@ import MediaUpload from './uploadImage/MediaUpload';
 interface InforProps {
   form: UseFormReturnType<ProductCreateRequest>;
   isEditMode?: boolean;
+  isLoadingData?: boolean;
 }
 
-const Infor = memo(({ form, isEditMode = false }: InforProps) => {
+const ProductFormSkeleton = () => (
+  <Stack>
+    <Stack gap="xs">
+      <Skeleton height={24} width="30%" mb="xs" />
+      <Skeleton height={200} radius="md" />
+    </Stack>
+
+    <Stack gap="xs">
+      <Skeleton height={24} width="40%" mb="xs" />
+      <Skeleton height={50} mb="xs" />
+      <Skeleton height={100} mb="xs" />
+      <Skeleton height={50} mb="xs" />
+      <Skeleton height={50} mb="xs" />
+      <Skeleton height={50} mb="xs" />
+      <Skeleton height={50} mb="xs" />
+      <Skeleton height={200} mb="xs" />
+    </Stack>
+
+    <Stack gap="xs">
+      <Skeleton height={24} width="40%" mb="xs" />
+      <Skeleton height={100} mb="xs" />
+    </Stack>
+
+    <Stack gap="xs">
+      <Skeleton height={24} width="40%" mb="xs" />
+      <Skeleton height={150} mb="xs" />
+    </Stack>
+
+    <Stack gap="xs">
+      <Skeleton height={24} width="40%" mb="xs" />
+      <Skeleton height={120} mb="xs" />
+    </Stack>
+  </Stack>
+);
+
+const Infor = memo(({ form, isEditMode = false, isLoadingData = false }: InforProps) => {
   const [attributeData, setAttributeData] = useState<AttributeForShop>();
   const [isShowQuantity, setIsShowQuantity] = useState(true);
+  const [isLoading, setIsLoading] = useState(isEditMode);
   const isCategorySelected = form.values.categoryId && form.values.categoryId.trim() !== '';
+
 
   useEffect(() => {
     const fetchAttributes = async () => {
@@ -35,6 +73,45 @@ const Infor = memo(({ form, isEditMode = false }: InforProps) => {
       fetchAttributes();
     }
   }, [isCategorySelected]);
+
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    if (isEditMode) {
+
+      setIsLoading(true);
+
+
+      timer = setTimeout(() => {
+
+        if (!isLoadingData) {
+          setIsLoading(false);
+        }
+      }, 2000);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isEditMode, isLoadingData]);
+
+
+  useEffect(() => {
+    if (!isLoadingData && isEditMode) {
+
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingData, isEditMode]);
+
+
+  if (isLoading) {
+    return <ProductFormSkeleton />;
+  }
 
   return (
     <Stack>

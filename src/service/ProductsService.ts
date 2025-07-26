@@ -31,7 +31,7 @@ const getMyShopProducts = async (params?: {
 
 
 // Get my shop product by ID
-const getMyShopProductById = async (id: string): Promise<MyShopProductDto> => {
+const getMyShopProductById = async (id: string): Promise<ProductCreateRequest> => {
     const response = await axiosInstance.get(API_ENDPOINTS.PRODUCTS.GET_MY_SHOP_PRODUCT_BY_ID(id));
     return response.data;
 };

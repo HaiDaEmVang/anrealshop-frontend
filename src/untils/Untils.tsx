@@ -34,3 +34,17 @@ export const getStatusColor = (status: string) => {
     default: return 'gray';
   }
 };
+
+
+export function formatSkuPart(input: string, maxLen: number = 3): string {
+  if (!input) return '';
+
+  return input
+    .normalize('NFD')                    
+    .replace(/[\u0300-\u036f]/g, '')    
+    .replace(/đ/g, 'd')                 
+    .replace(/Đ/g, 'D')                 
+    .replace(/[^a-zA-Z0-9]/g, '')       
+    .substring(0, maxLen)               
+    .toUpperCase();                     
+}

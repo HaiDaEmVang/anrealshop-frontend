@@ -43,6 +43,7 @@ const AttributeSelecter = ({
     }, [attributes, attributeForSku]);
 
     const addClassification = useCallback(() => {
+        
         if (!selectedClassificationType) return;
 
         const selectedAttr = attributeForSku.find(
@@ -68,7 +69,7 @@ const AttributeSelecter = ({
         );
         onAttributesChange(updatedAttributes);
     }, [attributes, onAttributesChange]);
-
+attributes
     const removeAttribute = useCallback((attributeId: string) => {
         const updatedAttributes = attributes.filter(attr => attr.attributeKeyName !== attributeId);
         onAttributesChange(updatedAttributes);

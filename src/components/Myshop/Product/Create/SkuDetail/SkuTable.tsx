@@ -35,9 +35,8 @@ const SkuTable = ({ attributes, skus, onImageUpload, onSkuFieldUpdate }: SkuTabl
         onSkuFieldUpdate(skuId, field, value);
     }, [onSkuFieldUpdate]);
 
-    const getAttributeValueForDisplay = useCallback((sku: ProductSkuRequest, attributeName: string) => {
-        const attributeKey = attributeName.toLowerCase().replace(/\s+/g, '_');
-        const attribute = sku.attributes.find(attr => attr.attributeKeyName === attributeKey);
+    const getAttributeValueForDisplay = useCallback((sku: ProductSkuRequest, attributeKeyName: string) => {
+        const attribute = sku.attributes.find(attr => attr.attributeKeyName === attributeKeyName);
         return attribute?.values || '-';
     }, []);
 
@@ -60,7 +59,7 @@ const SkuTable = ({ attributes, skus, onImageUpload, onSkuFieldUpdate }: SkuTabl
                         <Table.Tr key={sku.sku}>
                             {attributes.map((attr) => (
                                 <Table.Td key={attr.attributeKeyName}>
-                                    {getAttributeValueForDisplay(sku, attr.attributeKeyDisplay)}
+                                    {getAttributeValueForDisplay(sku, attr.attributeKeyName)}
                                 </Table.Td>
                             ))}
                             <Table.Td>

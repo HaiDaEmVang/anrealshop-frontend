@@ -8,7 +8,8 @@ export interface ProductCreateRequest {
   price: number;
   discountPrice: number;
   quantity: number;
-  categoryId: string;
+  categoryId: string; 
+  categoryPath: string;
   weight: number;
   height: number;
   length: number;
