@@ -26,6 +26,7 @@ interface FilterProductProps {
   sortBy: string | null;
   onSortChange: (value: string | null) => void;
   onFetchWithParam: () => void;
+  onClearAll: () => void;
 }
 
 const FilterProduct = ({
@@ -35,8 +36,10 @@ const FilterProduct = ({
   onCategoryChange,
   sortBy,
   onSortChange,
-  onFetchWithParam
+  onFetchWithParam,
+  onClearAll
 }: FilterProductProps) => {
+
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const [localCategory, setLocalCategory] = useState<string | null>(category?.name || null);
   const [localSortBy, setLocalSortBy] = useState<string | null>(sortBy);
@@ -127,13 +130,10 @@ const FilterProduct = ({
     setProductNameSuggestions([]);
     setCategorySuggestions([]);
 
-    onSearchChange('');
-    onCategoryChange(null);
-    onSortChange(null);
-    onFetchWithParam();
-  }, [onSearchChange, onCategoryChange, onSortChange]);
+    onClearAll();
+  }, [onClearAll]);
 
-  
+
 
   return (
     <div className=" p-4 bg-white rounded-md">

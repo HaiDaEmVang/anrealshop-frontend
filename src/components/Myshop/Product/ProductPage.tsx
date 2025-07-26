@@ -1,7 +1,7 @@
-
 import { Anchor, Box, Breadcrumbs, Container, Group, Paper, Text, Title } from '@mantine/core';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiShoppingBag } from 'react-icons/fi';
+import { useSearchParams } from 'react-router-dom';
 import { useProduct } from '../../../hooks/useProduct';
 import type { BaseCategoryDto } from '../../../types/CategoryType';
 import type { ProductStatus } from '../../../types/ProductType';
@@ -25,18 +25,37 @@ const NonProductFound = lazy(() => import('./Managerment/ProductView/NonProductF
 const Pagination = lazy(() => import('./Managerment/ProductView/Pagination'));
 
 const ProductPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(
+    (searchParams.get('view') as 'grid' | 'list') || 'grid'
+  );
 
-  // State cho filters
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [category, setCategory] = useState<BaseCategoryDto | null>(null);
-  const [sortBy, setSortBy] = useState<string | null>(null);
-  const [status, setStatus] = useState<ProductStatus>('ALL');
+  const [sortBy, setSortBy] = useState<string | null>(searchParams.get('sortBy') || null);
+  const [status, setStatus] = useState<ProductStatus>(
+    (searchParams.get('status') as ProductStatus) || 'ALL'
+  );
 
-  // State cho selected products
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
-  const [activePage, setActivePage] = useState(1);
+  const [activePage, setActivePage] = useState(
+    parseInt(searchParams.get('page') || '1', 10)
+  );
+
+  const updateURLParams = useCallback((updates: Record<string, string | null>) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '' || value === 'ALL') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const {
     products,
@@ -58,8 +77,28 @@ const ProductPage = () => {
     }
   });
 
-  // Unified function to fetch products with current filters
   const loadProducts = useCallback(() => {
+    // Update URL trước khi fetch
+    updateURLParams({
+      search: searchQuery || null,
+      categoryId: category?.urlSlug || category?.id || null,
+      categoryName: category?.name || null,
+      categoryPath: category?.urlPath || null,
+      sortBy: sortBy || null,
+      page: activePage.toString(),
+      status: status !== 'ALL' ? status : null,
+      view: viewMode
+    });
+
+    console.log('Fetching products with params:', {
+      page: activePage - 1,
+      limit: viewMode === 'list' ? 10 : 12,
+      status: status !== 'ALL' ? status : undefined,
+      search: searchQuery || undefined,
+      categoryId: category?.urlSlug || category?.id || undefined,
+      sortBy: sortBy || undefined
+    });
+    // Sau đó fetch products
     fetchProducts({
       page: activePage - 1,
       limit: viewMode === 'list' ? 10 : 12,
@@ -69,25 +108,87 @@ const ProductPage = () => {
       sortBy: sortBy || undefined
     });
     setSelectedProductIds([]);
-  }, [activePage, viewMode, status, searchQuery, category, sortBy, fetchProducts]);
+  }, [activePage, viewMode, status, searchQuery, category?.id, category?.urlSlug, sortBy, fetchProducts, updateURLParams]);
+
+
+  useEffect(() => {
+    const categoryParam = searchParams.get('categoryId');
+    if (categoryParam && !category) {
+      setCategory({
+        id: categoryParam,
+        name: searchParams.get('categoryName') || '',
+        urlPath: searchParams.get('categoryPath') || '',
+        urlSlug: categoryParam,
+      } as BaseCategoryDto);
+    }
+  }, [searchParams, category]);
 
   useEffect(() => {
     loadProducts();
-  }, [status, activePage])
+  }, [status, activePage]);
 
   useEffect(() => {
     fetchStatusMetadata();
   }, [fetchStatusMetadata]);
 
+  
   const handleStatusChange = useCallback((newStatus: ProductStatus) => {
     setStatus(newStatus);
     setActivePage(1);
-  }, [loadProducts]);
+  }, [updateURLParams]);
+
+  const handleViewModeChange = useCallback((newViewMode: 'grid' | 'list') => {
+    setViewMode(newViewMode);
+    updateURLParams({
+      view: newViewMode
+    });
+  }, [updateURLParams]);
+
+  const handleSearchChange = useCallback((newSearchQuery: string) => {
+    setSearchQuery(newSearchQuery);
+  }, [updateURLParams]);
+
+  const handleCategoryChange = useCallback((newCategory: BaseCategoryDto | null) => {
+    setCategory(newCategory);
+  }, [updateURLParams]);
+
+  const handleSortChange = useCallback((newSortBy: string | null) => {
+    setSortBy(newSortBy);
+  }, [updateURLParams]);
+
+  const handlePageChange = useCallback((newPage: number) => {
+    setActivePage(newPage);
+  }, [updateURLParams]);
 
   const onFetchWithParam = useCallback(() => {
+    setActivePage(1);
     loadProducts();
-  }, [loadProducts]);
+  }, [searchQuery, category, sortBy, updateURLParams, loadProducts]);
 
+  const handleClearAll = useCallback(() => {
+    // Reset all filter states
+    setSearchQuery('');
+    setCategory(null);
+    setSortBy(null);
+
+    const newParams = new URLSearchParams();
+    const viewMode = searchParams.get('view') || 'grid';
+    const currentStatus = searchParams.get('status') || 'ALL';
+
+    newParams.set('view', viewMode);
+    if (currentStatus !== 'ALL') {
+      newParams.set('status', currentStatus);
+    }
+
+    setSearchParams(newParams, { replace: true });
+
+    fetchProducts({
+      page: 0,
+      limit: viewMode === 'list' ? 10 : 12,
+      status: status !== 'ALL' ? status : undefined
+    });
+    setSelectedProductIds([]);
+  }, [searchParams, setSearchParams, status, fetchProducts]);
 
   // Handler functions for product selection
   const handleSelectAll = (checked: boolean) => {
@@ -97,7 +198,6 @@ const ProductPage = () => {
       setSelectedProductIds([]);
     }
   };
-
 
   const handleSelectProduct = (productId: string, checked: boolean) => {
     if (checked) {
@@ -115,12 +215,10 @@ const ProductPage = () => {
       })
   }, [loadProducts, updateVisibility]);
 
-
   const handleRefresh = useCallback(() => {
     fetchStatusMetadata();
     loadProducts();
   }, [fetchStatusMetadata, loadProducts]);
-
 
   // Breadcrumb items
   const breadcrumbItems = [
@@ -131,7 +229,6 @@ const ProductPage = () => {
       {item.title}
     </Anchor>
   ));
-
 
   return (
     <Container fluid px="lg" py="md">
@@ -170,9 +267,9 @@ const ProductPage = () => {
       >
         <Suspense fallback={<OptionConfigSkeleton />}>
           <OptionConfig
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-        />
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+          />
         </Suspense>
       </Paper>
 
@@ -184,22 +281,23 @@ const ProductPage = () => {
         className="bg-white"
       >
         <Suspense fallback={<StatusFilterSkeleton />}>
-        <FilterByStatus
-          selectedStatus={status}
-          onStatusChange={handleStatusChange}
-          productStatusData={statusMetadata}
-        />
+          <FilterByStatus
+            selectedStatus={status}
+            onStatusChange={handleStatusChange}
+            productStatusData={statusMetadata}
+          />
         </Suspense>
         <Suspense fallback={<FilterControlsSkeleton />}>
-        <FilterProduct
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          category={category}
-          onCategoryChange={setCategory}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          onFetchWithParam={onFetchWithParam}
-        />
+          <FilterProduct
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            category={category}
+            onCategoryChange={handleCategoryChange}
+            sortBy={sortBy}
+            onSortChange={handleSortChange}
+            onFetchWithParam={onFetchWithParam}
+            onClearAll={handleClearAll}
+          />
         </Suspense>
 
         {isEmpty && !isLoading && (
@@ -209,16 +307,16 @@ const ProductPage = () => {
           />
         )}
 
-        {!isEmpty &&  (
+        {!isEmpty && (
           <div className={viewMode === 'list' ? 'pl-8 pr-4' : 'pl-6 pr-4'}>
             <Suspense fallback={<CheckboxSelectedSkeleton />}>
-            <CheckboxSelected
-              selectedProductIds={selectedProductIds}
-              products={products}
-              updateVisibilityMultible={updateVisibilityMultible}
-              onSelectAll={handleSelectAll}
-              onRefresh={handleRefresh}
-            />
+              <CheckboxSelected
+                selectedProductIds={selectedProductIds}
+                products={products}
+                updateVisibilityMultible={updateVisibilityMultible}
+                onSelectAll={handleSelectAll}
+                onRefresh={handleRefresh}
+              />
             </Suspense>
           </div>
         )}
@@ -237,31 +335,28 @@ const ProductPage = () => {
           </Suspense>
         ) : (
           <Suspense fallback={<ProductGridSkeleton />}>
-          <GridView
-            products={products}
-            isLoading={isLoading}
-            selectedProducts={selectedProductIds}
-            onSelectAll={handleSelectAll}
-            onSelectProduct={handleSelectProduct}
-            onToggleStatus={handleToggleStatus}
-            onRefresh={handleRefresh}
-          />
+            <GridView
+              products={products}
+              isLoading={isLoading}
+              selectedProducts={selectedProductIds}
+              onSelectAll={handleSelectAll}
+              onSelectProduct={handleSelectProduct}
+              onToggleStatus={handleToggleStatus}
+              onRefresh={handleRefresh}
+            />
           </Suspense>
         )}
-        
 
         <Suspense fallback={<PaginationSkeleton />}>
-        <Pagination
-          currentPage={activePage}
-          totalPages={totalPages}
-          totalItems={totalCount}
-          itemsPerPage={viewMode === 'list' ? 10 : 12}
-          onPageChange={setActivePage}
-        />
+          <Pagination
+            currentPage={activePage}
+            totalPages={totalPages}
+            totalItems={totalCount}
+            itemsPerPage={viewMode === 'list' ? 10 : 12}
+            onPageChange={handlePageChange}
+          />
         </Suspense>
       </Paper>
-
-
     </Container>
   );
 };

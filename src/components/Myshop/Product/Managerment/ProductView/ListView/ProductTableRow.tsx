@@ -58,8 +58,8 @@ const ProductTableRow = ({
         />
       </Table.Td>
       <Table.Td>
-        <Group>
-          <div style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '4px', overflow: 'hidden' }}>
+        <Group gap="xs" style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
             <Image
               src={product.thumbnailUrl}
               alt={product.name}
@@ -69,8 +69,24 @@ const ProductTableRow = ({
               fallbackSrc="https://placehold.co/40x40?text=No+Image"
             />
           </div>
-          <div>
-            <Text size="sm" fw={500}>{product.name}</Text>
+          <div style={{
+            flex: 1,
+            minWidth: 0,
+            maxWidth: '500px'
+          }}>
+            <Text
+              size="sm"
+              fw={500}
+              style={{
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%'
+              }}
+              title={product.name} 
+            >
+              {product.name}
+            </Text>
             <Text size="xs" c="dimmed">
               ID: {product.id}
             </Text>

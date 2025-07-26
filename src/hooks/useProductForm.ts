@@ -114,9 +114,7 @@ export const useProductForm = ( isEditMode = false ) => {
         validateInputOnChange: ['name'],
     });
 
-    useEffect(() => {
-        console.log('Form values changed:', form.values);
-    }, [form]);
+    
 
     // Fetch product data if in edit mode
     useEffect(() => {
