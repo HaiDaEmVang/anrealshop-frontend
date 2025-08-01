@@ -17,7 +17,7 @@ import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS, BASE_API_URL } from '../../constant';
 import { fetchCurrentUser, loginUser } from '../../feature/auth/authSlice';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
 import type { LoginRequest } from '../../types/AuthType';
 import type { UserDto } from '../../types/UserType';
 import { validateEmail, validatePassword } from '../../untils/ValidateInput';
@@ -42,8 +42,8 @@ export function SignIn() {
 
   const form = useForm<SignInFormValues>({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'haiemdavang@example.com',
+      password: 'Abc@123456',
       rememberMe: false,
     },
     validate: {

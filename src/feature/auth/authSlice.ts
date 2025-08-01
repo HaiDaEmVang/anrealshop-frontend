@@ -1,10 +1,9 @@
 // src/features/auth/authSlice.ts
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import type { LoginRequest, LoginResponse } from '../../types/AuthType';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import authService from '../../service/AuthService';
-import type { ProfileRequest, RegisterRequest, UserDto } from '../../types/UserType';
+import type { LoginRequest, LoginResponse } from '../../types/AuthType';
 import type { ErrorResponseDto } from '../../types/CommonType';
-import type { StringDecoder } from 'node:string_decoder';
+import type { RegisterRequest, UserDto } from '../../types/UserType';
 
 interface AuthError {
   message: string;
@@ -67,24 +66,24 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
-export const updateUserProfile = createAsyncThunk(
-  'auth/updateUserProfile',
-  async (profileData: ProfileRequest, { rejectWithValue }) => {
-    try {
-      const updatedUser: UserDto = await authService.updateProfile(profileData);
-      return updatedUser;
-    } catch (error: any) {
-      const authError: AuthError = {
-        message: error.message || 'Cập nhật thông tin thất bại.',
-        code: error.code,
-        statusCode: error.statusCode,
-        details: error.details,
-        traceId: error.traceId,
-      };
-      return rejectWithValue(authError);
-    }
-  }
-);
+// export const updateUserProfile = createAsyncThunk(
+//   'auth/updateUserProfile',
+//   async (profileData: ProfileRequest, { rejectWithValue }) => {
+//     try {
+//       const updatedUser: UserDto = await authService.updateProfile(profileData);
+//       return updatedUser;
+//     } catch (error: any) {
+//       const authError: AuthError = {
+//         message: error.message || 'Cập nhật thông tin thất bại.',
+//         code: error.code,
+//         statusCode: error.statusCode,
+//         details: error.details,
+//         traceId: error.traceId,
+//       };
+//       return rejectWithValue(authError);
+//     }
+//   }
+// );
 
 export const logoutUser = createAsyncThunk(
   'auth/logout',
@@ -124,10 +123,31 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({
+const authSlice = createSlice({ 
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    addToCart: (state) => {
+      if (state.user) {
+        state.user.cartCount = (state.user.cartCount || 0) + 1;
+      }
+    },
+    removeFromCart: (state) => {
+      if (state.user && state.user.cartCount && state.user.cartCount > 0) {
+        state.user.cartCount = state.user.cartCount - 1;
+      }
+    },
+    updateCartCount: (state, action: PayloadAction<number>) => {
+      if (state.user) {
+        state.user.cartCount = action.payload;
+      }
+    },
+    clearCart: (state) => {
+      if (state.user) {
+        state.user.cartCount = 0;
+      }
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
@@ -162,19 +182,19 @@ const authSlice = createSlice({
         state.user = null;
         state.error = (action.payload as AuthError) || { message: 'Không thể xác thực người dùng.' };
       })
-      .addCase(updateUserProfile.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<UserDto>) => {
-        state.status = 'succeeded';
-        state.user = action.payload;
-        state.error = null;
-      })
-      .addCase(updateUserProfile.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = (action.payload as AuthError) || { message: 'Cập nhật thông tin thất bại.' };
-      })
+      // .addCase(updateUserProfile.pending, (state) => {
+      //   state.status = 'loading';
+      //   state.error = null;
+      // })
+      // .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<UserDto>) => {
+      //   state.status = 'succeeded';
+      //   state.user = action.payload;
+      //   state.error = null;
+      // })
+      // .addCase(updateUserProfile.rejected, (state, action) => {
+      //   state.status = 'failed';
+      //   state.error = (action.payload as AuthError) || { message: 'Cập nhật thông tin thất bại.' };
+      // })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
