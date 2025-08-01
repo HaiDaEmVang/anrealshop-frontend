@@ -15,9 +15,10 @@ import { useEffect, useRef, useState } from 'react';
 import { BiUser } from 'react-icons/bi';
 import { FaSearch } from 'react-icons/fa';
 import { FiHome, FiLogIn, FiLogOut, FiMapPin, FiPackage, FiShoppingCart, FiUser } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ModalAddress, { type Address } from '../header/ModalAddress';
 import SuggestSearch from '../header/SuggestSearch';
+import { useAppSelector } from '../../hooks/useAppRedux';
 
 // Dữ liệu danh mục
 const POPULAR_CATEGORIES = [
@@ -57,6 +58,8 @@ const SAVED_ADDRESSES: Address[] = [
 
 
 const Header: React.FC = () => {
+    const { user, isAuthenticated, status, error } = useAppSelector((state) => state.auth);
+    const location = useLocation();
     const [searchValue, setSearchValue] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [addressModalOpened, setAddressModalOpened] = useState(false);
@@ -64,7 +67,7 @@ const Header: React.FC = () => {
     const [currentAddress, setCurrentAddress] = useState(SAVED_ADDRESSES[0]);
     
     const searchContainerRef = useRef<HTMLDivElement>(null);
-    const isLoggedIn = false;
+
 
     // Xử lý click outside để ẩn gợi ý tìm kiếm
     useEffect(() => {
@@ -210,14 +213,16 @@ const Header: React.FC = () => {
 
                         <Group gap="lg" className="flex mt-4">
                             {/* Home button */}
-                            <UnstyledButton
-                                className="flex gap-2 hover:text-primary transition-colors"
-                                component={Link}
-                                to="/"
-                            >
-                                <FiHome size={18} />
-                                <Text size="sm">Trang chủ</Text>
-                            </UnstyledButton>
+                            {location.pathname !== "/" && (
+                                <UnstyledButton
+                                    className="flex gap-2 hover:text-primary transition-colors"
+                                    component={Link}
+                                    to="/"
+                                >
+                                    <FiHome size={18} />
+                                    <Text size="sm">Trang chủ</Text>
+                                </UnstyledButton>
+                            )}
 
                             {/* Account button with dropdown */}
                             <Menu
@@ -235,7 +240,7 @@ const Header: React.FC = () => {
                                     </UnstyledButton>
                                 </Menu.Target>
                                 <Menu.Dropdown>
-                                    {isLoggedIn ? (
+                                    {isAuthenticated ? (
                                         <>
                                             <Menu.Item
                                                 leftSection={<BiUser size={16} />}
@@ -286,7 +291,7 @@ const Header: React.FC = () => {
                                 <div className="relative">
                                     <FiShoppingCart size={20} />
                                     <span className="absolute -top-2 -right-2 bg-primary text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                                        0
+                                        {user?.cartCount || 0}
                                     </span>
                                 </div>
                             </UnstyledButton>
@@ -310,7 +315,7 @@ const Header: React.FC = () => {
                 selectedAddressId={selectedAddressId}
                 onSelectAddress={handleSelectAddress}
                 onApplyAddress={handleApplyAddress}
-                isLoggedIn={isLoggedIn}
+                isLoggedIn={isAuthenticated}
             />
         </header>
     );

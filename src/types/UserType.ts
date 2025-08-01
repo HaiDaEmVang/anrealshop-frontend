@@ -12,6 +12,9 @@ export interface UserDto {
   role: string;
   createdAt: string; 
   updatedAt: string;
+
+  address?: string;
+  cartCount?: number;
 }
 
 export interface RegisterRequest {

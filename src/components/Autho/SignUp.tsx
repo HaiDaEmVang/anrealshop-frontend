@@ -13,7 +13,7 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
-import { useAppDispatch, useAppSelector } from '../../hooks';
+import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
 import type { RegisterRequest } from '../../types/UserType';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import { registerUser } from '../../feature/auth/authSlice';
