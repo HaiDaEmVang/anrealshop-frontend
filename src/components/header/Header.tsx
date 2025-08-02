@@ -135,7 +135,7 @@ const Header: React.FC = () => {
                             <span className="text-primary">Anreal</span>
                             <span className="text-contentText">Shop</span>
                         </div>
-                    </Link>
+                    </Link>  
 
                     {/* Search bar with search button */}
                     <Stack gap={4} className="flex-grow max-w-[50%]">
@@ -209,9 +209,9 @@ const Header: React.FC = () => {
                     </Stack>
 
                     {/* Navigation Buttons */}
-                    <Stack gap="xs" className="flex items-center">
+                    <Stack gap="xs" className="flex items-center ">
 
-                        <Group gap="lg" className="flex mt-4">
+                        <Group gap="lg" className="flex mt-4 !justify-end items-center">
                             {/* Home button */}
                             {location.pathname !== "/" && (
                                 <UnstyledButton
@@ -286,7 +286,7 @@ const Header: React.FC = () => {
                             <UnstyledButton
                                 className="flex items-center gap-2 mr-4 text-contentText hover:text-primary transition-colors"
                                 component={Link}
-                                to="/cart"
+                                to="/carts"
                             >
                                 <div className="relative">
                                     <FiShoppingCart size={20} />
