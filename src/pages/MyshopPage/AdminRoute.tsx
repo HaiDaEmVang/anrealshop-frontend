@@ -26,10 +26,10 @@ const SystemSettings = () => <div>Cài đặt hệ thống</div>;
 const AdminPage: React.FC = () => {
   const location = useLocation();
   const [opened, { toggle, close }] = useDisclosure(false);
-  
+
   const generateBreadcrumbs = () => {
     const pathSegments = location.pathname.split('/').filter(segment => segment);
-    
+
     const routeNames: Record<string, string> = {
       'admin': 'Quản trị',
       'dashboard': 'Tổng quan',
@@ -41,7 +41,7 @@ const AdminPage: React.FC = () => {
       'reports': 'Báo cáo & Thống kê',
       'settings': 'Cài đặt hệ thống'
     };
-    
+
     const items = [
       <Anchor component={Link} to="/" key="home">
         <Group gap={4}>
@@ -50,13 +50,13 @@ const AdminPage: React.FC = () => {
         </Group>
       </Anchor>
     ];
-    
+
     let currentPath = '';
-    
+
     pathSegments.forEach((segment, index) => {
       currentPath += `/${segment}`;
       const isLast = index === pathSegments.length - 1;
-      
+
       items.push(
         isLast ? (
           <Text key={segment} fw={500}>
@@ -69,47 +69,44 @@ const AdminPage: React.FC = () => {
         )
       );
     });
-    
+
     return items;
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Suspense fallback={<div></div>}>
-         <AdminHeader toggleSidebar={toggle} sidebarOpened={opened} />
+        <AdminHeader toggleSidebar={toggle} sidebarOpened={opened} />
       </Suspense>
-      
+
       <Flex className="flex-1">
-        <Suspense fallback={<div></div>}>
-           <AdminSidebar opened={opened} onClose={close} />
-        </Suspense>
-        
-        <Box className="flex-1 bg-gray-50 p-4">
+        <AdminSidebar opened={opened} onClose={close} />
+
+
+        <Box className="flex-1 bg-gray-50 p-4 "  >
           <Paper p="md" mb="md" radius="md" shadow="xs">
             <Breadcrumbs separator={<FiChevronRight size={14} />}>
               {generateBreadcrumbs()}
             </Breadcrumbs>
           </Paper>
-          
+
           <Paper p="md" radius="md" shadow="xs">
-            <Suspense fallback={<div>Loading...</div>}>
-              <Routes>
-                <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="categories" element={<CategoryManagement />} />
-                <Route path="users" element={<UserManagement />} />
-                <Route path="shop-registrations" element={<ShopApprovalPage />} />
-                <Route path="product-approvals" element={<ProductApprovalPage />} />
-                <Route path="orders" element={<OrderManagement />} />
-                <Route path="reports" element={<ReportManagement />} />
-                <Route path="settings" element={<SystemSettings />} />
-                <Route path="*" element={<div>Page not found</div>} />
-              </Routes>
-            </Suspense>
+            <Routes>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="categories" element={<CategoryManagement />} />
+              <Route path="users" element={<UserManagement />} />
+              <Route path="shop-registrations" element={<ShopApprovalPage />} />
+              <Route path="product-approvals" element={<ProductApprovalPage />} />
+              <Route path="orders" element={<OrderManagement />} />
+              <Route path="reports" element={<ReportManagement />} />
+              <Route path="settings" element={<SystemSettings />} />
+              <Route path="*" element={<div>Page not found</div>} />
+            </Routes>
           </Paper>
         </Box>
       </Flex>
-    </div>
+     </div>
   );
 };
 

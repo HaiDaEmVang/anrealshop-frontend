@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { FiCheckCircle, FiAlertTriangle, FiClock, FiEyeOff, FiGrid } from 'react-icons/fi';
+import { FiCheckCircle, FiAlertTriangle, FiClock, FiEyeOff, FiGrid, FiX } from 'react-icons/fi';
 
 export const useProductStatusIcon = () => {
   return useMemo(() => ({
@@ -15,6 +15,10 @@ export const useProductStatusIcon = () => {
           return FiClock;
         case 'hidden':
           return FiEyeOff;
+        case 'approved':
+          return FiCheckCircle;
+        case 'rejected':
+          return FiX;
         default:
           return FiGrid;
       }
@@ -36,6 +40,10 @@ export const useProductStatusColor = () => {
           return 'yellow';
         case 'hidden':
           return 'gray';
+        case 'approved':
+          return 'green';
+        case 'rejected':
+          return 'red';
         default:
           return 'gray';
       }
@@ -52,6 +60,10 @@ export const useProductStatusColor = () => {
           return '#eab308';
         case 'hidden':
           return '#6b7280';
+        case 'approved':
+          return '#22c55e';
+        case 'rejected':
+          return '#ef4444';
         default:
           return '#6b7280';
       }
@@ -73,9 +85,14 @@ export const useProductStatusLabel = () => {
           return 'Chờ duyệt';
         case 'hidden':
           return 'Đang ẩn';
+        case 'approved':
+          return 'Đã duyệt';
+        case 'rejected':
+          return 'Bị từ chối';
         default:
           return 'Không xác định';
       }
     }
   }), []);
 };
+

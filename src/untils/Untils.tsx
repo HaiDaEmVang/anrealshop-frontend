@@ -8,22 +8,28 @@ export const formatMessageTime = (date: Date) => {
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   
-  if (date >= today) {
-    // Today: show time
+  if (date >= today) { 
     return format(date, 'HH:mm', { locale: vi });
-  } else if (date >= yesterday) {
-    // Yesterday: show 'Hôm qua'
+  } else if (date >= yesterday) {   
     return 'Hôm qua';
-  } else if (now.getFullYear() === date.getFullYear()) {
-    // Same year: show day and month
+  } else if (now.getFullYear() === date.getFullYear()) { 
     return format(date, 'dd/MM', { locale: vi });
-  } else {
-    // Different year: show day, month, year
+  } else { 
     return format(date, 'dd/MM/yyyy', { locale: vi });
   }
 };
 
-// Get status color
+export const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+  }).format(price);
+};
+ 
+export const formatDate = (dateString: string): string => {
+  return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi });
+};
+ 
 export const getStatusColor = (status: string) => {
   switch(status) {
     case 'pending': return 'yellow';
