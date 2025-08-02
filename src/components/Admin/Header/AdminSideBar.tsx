@@ -42,6 +42,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active, onClick, chi
         childrenOffset={28}
         my={4}
         onClick={onClick}
+        className='rounded-md hover:bg-gray-100 transition-colors duration-200' 
       >
         {children}
       </NavLink>
@@ -80,15 +81,20 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
   const desktopSidebar = (
     <Box
       w={250}
-      h="100%"
+      h="calc(100vh - 65px)"
       bg="white"
       style={{ 
         borderRight: '1px solid #eaeaea',
+        position: 'sticky',
+        top: '65px',
+        left: 0,
+        zIndex: 2,
+        overflow: 'hidden'
       }}
-      p="xs"
+      p="xs" 
       className="hidden md:block"
     >
-      <ScrollArea h="calc(100vh - 60px)" scrollbarSize={6} offsetScrollbars>
+      <ScrollArea h="100vh" scrollbarSize={6} offsetScrollbars>
         <Box py="md">
           <Text fw={700} size="sm" c="dimmed" mb="xs" px="md">
             QUẢN TRỊ HỆ THỐNG
@@ -100,7 +106,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
               icon={item.icon}
               label={item.label}
               to={item.path}
-              active={location.pathname === item.path}
+              active={location.pathname === item.path} 
             />
           ))}
         </Box>
@@ -147,14 +153,16 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
           </ThemeIcon>
           Quay lại cửa hàng
         </Link>
-        <UnstyledButton
-          className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50"
+        <div 
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
+          onClick={onClose}
         >
           <ThemeIcon variant="light" color="red" size="sm">
             <FiLogOut size={16} />
           </ThemeIcon>
-          Đăng xuất
-        </UnstyledButton>
+           Đăng xuất
+        </div>
+         
       </div>
     </Drawer>
   );

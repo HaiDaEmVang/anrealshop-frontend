@@ -31,3 +31,11 @@ body {
   color: #334155;
   background-color: #f9fafb;
 }
+
+/* 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    outline: none;
+} */

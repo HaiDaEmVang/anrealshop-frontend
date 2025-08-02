@@ -41,6 +41,7 @@ const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean 
           {/* Logo và nút menu cho mobile */}
           <div className="flex items-center">
             <Burger 
+              size="sm"
               opened={sidebarOpened} 
               onClick={toggleSidebar} 
               className="mr-2 md:hidden" 
