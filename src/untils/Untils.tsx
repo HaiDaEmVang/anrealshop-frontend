@@ -29,7 +29,28 @@ export const formatPrice = (price: number): string => {
 export const formatDate = (dateString: string): string => {
   return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi });
 };
- 
+
+export const formatDateForBe = (date: Date | null): string => {
+  if (!date) return '';
+  return format(date, 'dd-MM-yyyy', { locale: vi });
+};
+
+export const getDefaultDateRange_Now_Yesterday = (): [Date, Date] => {
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0);
+        today.setHours(23, 59, 59, 999);
+        return [yesterday, today];
+    };
+
+export const equalDates = (date1: Date | null, date2: Date | null): boolean => {
+  if (!date1 || !date2) return false;
+  return date1.getDate() === date2.getDate() &&
+         date1.getMonth() === date2.getMonth() &&
+         date1.getFullYear() === date2.getFullYear();
+}
+
 export const getStatusColor = (status: string) => {
   switch(status) {
     case 'pending': return 'yellow';

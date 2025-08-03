@@ -1,5 +1,6 @@
 import type { ProductAttribute } from "./AttributeType";
 import type { MediaDto } from "./CommonType";
+import type { ShopDto } from "./ShopType";
 
 export interface ProductCreateRequest {
   name: string;
@@ -8,7 +9,7 @@ export interface ProductCreateRequest {
   price: number;
   discountPrice: number;
   quantity: number;
-  categoryId: string; 
+  categoryId: string;
   categoryPath: string;
   weight: number;
   height: number;
@@ -18,7 +19,7 @@ export interface ProductCreateRequest {
   productSkus: ProductSkuRequest[];
   media: MediaDto[];
 }
- 
+
 export interface ProductSkuRequest {
   sku: string;
   price: number;
@@ -41,13 +42,19 @@ export interface MyShopProductDto {
   thumbnailUrl: string;
   urlSlug: string;
   categoryId: string;
+  categoryPath? : string;
   discountPrice: number;
   quantity: number;
   sold: number;
   status: ProductStatus;
   visible: boolean;
   createdAt: string;
+
+  restrictedReason?: string;
+  restricted?: boolean; 
+
   productSkus?: MyShopProductSkuDto[];
+  baseShopDto?: ShopDto;
 }
 
 export type ProductStatus = 'ALL' | 'ACTIVE' | 'VIOLATION' | 'PENDING' | 'HIDDEN';

@@ -1,4 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import showErrorNotification from '../components/Toast/NotificationError';
+import showSuccessNotification from '../components/Toast/NotificationSuccess';
+import { productStatusDefaultData, productStatusDefaultDataAdmin } from '../data/ProductData';
 import ProductsService from '../service/ProductsService';
 import type {
     MyShopProductDto,
@@ -7,20 +10,23 @@ import type {
     ProductStatus,
     ProductStatusDto,
 } from '../types/ProductType';
-import showErrorNotification from '../components/Toast/NotificationError';
-import showSuccessNotification from '../components/Toast/NotificationSuccess';
-import { productStatusDefaultData } from '../data/ProductData';
+import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../untils/Untils';
 
+type ProductMode = 'myshop' | 'admin' | 'user';
+
+interface UseProductParams {
+    page?: number;
+    limit?: number;
+    status?: ProductStatus;
+    search?: string;
+    categoryId?: string;
+    sortBy?: string;
+    dateRange?: [Date | null, Date | null];
+}
 interface UseProductOptions {
+    mode?: ProductMode;
     autoFetch?: boolean;
-    initialParams?: {
-        page?: number;
-        limit?: number;
-        status?: ProductStatus;
-        search?: string;
-        categoryId?: string;
-        sortBy?: string;
-    };
+    initialParams?: UseProductParams;
 }
 
 interface UseProductState {
@@ -46,34 +52,28 @@ export const useProduct = (options: UseProductOptions = {}) => {
         isEmpty: true
     });
 
-    const [statusMetadata, setStatusMetadata] = useState<ProductStatusDto[]>(productStatusDefaultData);
+    const [statusMetadata, setStatusMetadata] = useState<ProductStatusDto[]>(options.mode === 'admin' ? productStatusDefaultDataAdmin : productStatusDefaultData);
 
-    // Fetch products with error handling
-    const fetchProducts = useCallback(async (params?: {
-        page?: number;
-        limit?: number;
-        status?: ProductStatus;
-        search?: string;
-        categoryId?: string;
-        sortBy?: string;
-    }) => {
-        console.log('Fetching products with params:', {
-            page: params?.page || 0,
-            limit: params?.limit || 12,
-            status: params?.status || undefined,
-            search: params?.search || undefined,
-            categoryId: params?.categoryId || undefined,
-            sortBy: params?.sortBy || undefined
-        });
+    const fetchProducts = useCallback(async (params?: UseProductParams) => {
         setState(prev => ({
             ...prev,
             isLoading: true,
             error: null
         }));
-
         try {
-            const response: MyShopProductListResponse = await ProductsService.getMyShopProducts(params);
-
+            var response: MyShopProductListResponse = {
+                totalCount: 0,
+                totalPages: 0,
+                currentPage: 0,
+                products: []
+            };
+            if (options.mode === 'admin') {
+                console.log(params);
+                response = await ProductsService.getMyShopProductsAdmin(params);
+                console.log(response)
+            } else if (options.mode === 'myshop') {
+                response = await ProductsService.getMyShopProducts(params);
+            }
             setState(prev => ({
                 ...prev,
                 products: response.products || [],
@@ -178,19 +178,24 @@ export const useProduct = (options: UseProductOptions = {}) => {
         });
     }, []);
 
-    const fetchStatusMetadata = useCallback(async () => {
-        console.log('Fetching product status metadata');
+    const fetchStatusMetadata = useCallback(async (date?: [Date | null, Date | null]) => {
         try {
-            const metadata = await ProductsService.getProductStatusMetadata();
-            setStatusMetadata(metadata);
-            return metadata;
+            if (options.mode === 'admin') {
+                const [startDate, endDate] = date || getDefaultDateRange_Now_Yesterday();
+                const metadata = await ProductsService.getProductStatusMetadata_admin(formatDateForBe(startDate), formatDateForBe(endDate));
+                setStatusMetadata(metadata);
+                return metadata;
+            } else if (options.mode === 'myshop') {
+                const metadata = await ProductsService.getProductStatusMetadata();
+                setStatusMetadata(metadata);
+                return metadata;
+            }
         } catch (err: any) {
             setStatusMetadata(productStatusDefaultData);
             return productStatusDefaultData;
         }
     }, []);
 
-    // Auto fetch on mount if enabled
     useEffect(() => {
         if (autoFetch) {
             fetchProducts(initialParams);
@@ -210,7 +215,7 @@ export const useProduct = (options: UseProductOptions = {}) => {
         refresh,
         reset,
 
-        // Computed values
+        // Computed values 
         hasProducts: state.products.length > 0,
         hasError: !!state.error,
         hasNextPage: state.currentPage < state.totalPages,
@@ -254,6 +259,45 @@ export const useProductDelete = () => {
         deleteProducts,
         isLoading
     };
+}
+
+export const useProductApproval = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const approvalProduct = useCallback(async (id: string) => {
+        try {
+            setIsLoading(true);
+            await ProductsService.approveProduct(id);
+            showSuccessNotification('Thành công', 'Sản phẩm đã được phê duyệt thành công.');
+            return true;
+        } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
+            showErrorNotification('Lỗi phê duyệt sản phẩm', errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const rejectProduct = useCallback(async (id: string, reason: string) => {
+        try {
+            setIsLoading(true);
+            await ProductsService.rejectProduct(id, reason);
+            showSuccessNotification('Thành công', 'Sản phẩm đã được từ chối thành công.');
+            return true;
+        } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
+            showErrorNotification('Lỗi từ chối sản phẩm', errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, [])
+
+    return {
+        isLoading,
+        approvalProduct,
+        rejectProduct
+    }
 }
 
 // Utility function to extract error messages from backend

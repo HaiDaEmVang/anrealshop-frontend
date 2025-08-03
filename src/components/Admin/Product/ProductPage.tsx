@@ -1,134 +1,159 @@
-import { Box, LoadingOverlay, Paper } from '@mantine/core';
+import { Box, Group, LoadingOverlay, Pagination, Paper } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
-import ProductReviewModal from './ProductReviewModal';
-import RejectModal from './RejectModal';
-import SuccessModal from './SuccessModal';
+import { useCallback, useEffect, useState } from 'react';
+import { useProduct } from '../../../hooks/useProduct';
+import { useProductApproval } from '../../../hooks/useProduct'
+import type { MyShopProductDto, ProductStatus } from '../../../types/ProductType';
+import { getDefaultDateRange_Now_Yesterday } from '../../../untils/Untils';
 import Filter from './Filter';
 import ProductList from './ProductList';
-import { mockProducts, type Product } from '../../../types/AdminProductType';
+import RejectModal from './RejectModal'; 
+
+
 
 const ProductApprovalPage = () => {
-    const [products, setProducts] = useState<Product[]>(mockProducts);
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [statusFilter, setStatusFilter] = useState<string | null>('pending');
-    const [activeTab, setActiveTab] = useState('pending');
+    const [selectedProduct, setSelectedProduct] = useState<MyShopProductDto | null>(null);
     const [rejectionReason, setRejectionReason] = useState('');
-    const [date, setDate] = useState<[Date | null, Date | null]>([null, null]);
+    const [activeTab, setActiveTab] = useState('ALL');
     const [searchTerm, setSearchTerm] = useState('');
+    const [page, setPage] = useState(1);
+    const { approvalProduct, rejectProduct } = useProductApproval();
 
-    const handleDateRangeChange = (range: [Date | null, Date | null]) => {
-        setDate(range);
-        if (range) {
-            setIsLoading(true);
-            setTimeout(() => {
-                setIsLoading(false);
-            }, 500);
+    const [date, setDate] = useState<[Date | null, Date | null]>(getDefaultDateRange_Now_Yesterday());
+
+    const {
+        products,
+        totalPages,
+        currentPage,
+        isLoading,
+        fetchProducts,
+        fetchStatusMetadata,
+        statusMetadata
+    } = useProduct({
+        mode: 'admin',
+        autoFetch: false,
+        initialParams: {
+            page: 0,
+            status: 'ALL' as ProductStatus,
+            limit: 40,
+            dateRange: getDefaultDateRange_Now_Yesterday()
         }
+    });
+
+    const fetchProductData = useCallback(() => {
+        fetchStatusMetadata(date)
+        return fetchProducts({
+            page: page - 1,
+            status: (activeTab === 'ALL' ? undefined : activeTab) as ProductStatus,
+            search: searchTerm,
+            limit: 10,
+            dateRange: date
+        });
+    }, [fetchProducts, activeTab, searchTerm, date]);
+
+
+    useEffect(() => {
+        fetchProductData();
+    }, [page]);
+
+    useEffect(() => {
+        setPage(1);
+        fetchProductData();
+    }, [activeTab])
+
+    const handleApplyFilters = () => {
+        fetchProductData();
     };
 
     const resetFilters = () => {
-        setDate([null, null]);
-        setStatusFilter('pending');
-        setActiveTab('pending');
+        const defaultRange = getDefaultDateRange_Now_Yesterday();
+        setDate(defaultRange);
+        setActiveTab('ALL');
         setSearchTerm('');
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-        }, 500);
-    };
-
-    // Modals
-    const [reviewModalOpened, { open: openReviewModal, close: closeReviewModal }] = useDisclosure(false);
-    const [rejectModalOpened, { open: openRejectModal, close: closeRejectModal }] = useDisclosure(false);
-    const [successModalOpened, { open: openSuccessModal, close: closeSuccessModal }] = useDisclosure(false);
-
-    useEffect(() => {
-        // Simulate API call with mock data
-        setTimeout(() => {
-            const mockProducts: Product[] = [
-                // ...existing mock data...
-            ];
-            setProducts(mockProducts);
-            setIsLoading(false);
-        }, 1000);
-    }, []);
-
-    const handleApprove = (product: Product) => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setProducts(prev =>
-                prev.map(p =>
-                    p.id === product.id ? { ...p, status: 'approved', reviewNote: 'Sản phẩm đạt chuẩn' } : p
-                )
-            );
-            setSelectedProduct(null);
-            setIsLoading(false);
-            openSuccessModal();
-        }, 800);
-    };
-
-    const handleReject = () => {
-        if (!selectedProduct) return;
-        setIsLoading(true);
-        setTimeout(() => {
-            setProducts(prev =>
-                prev.map(p =>
-                    p.id === selectedProduct.id ? { ...p, status: 'rejected', reviewNote: rejectionReason } : p
-                )
-            );
-            setSelectedProduct(null);
-            setRejectionReason('');
-            closeRejectModal();
-            setIsLoading(false);
-            openSuccessModal();
-        }, 800);
-    };
-
-    const openProductReview = (product: Product) => {
-        setSelectedProduct(product);
-        openReviewModal();
+        setPage(1);
+        fetchProductData();
     };
 
     const handleTabChange = (tab: string | null) => {
         if (tab === null) return;
         setActiveTab(tab);
-        setStatusFilter(tab === 'all' ? null : tab);
+    }; 
+
+    // Modals
+    const [reviewModalOpened, { open: openReviewModal, close: closeReviewModal }] = useDisclosure(false);
+    const [rejectModalOpened, { open: openRejectModal, close: closeRejectModal }] = useDisclosure(false); 
+
+    // Handle approve product
+    const handleApprove = async (product: MyShopProductDto | null) => {
+        if (!product) return; 
+        await approvalProduct(product.id)
+            .then(() => {
+                fetchProductData();
+            })
     };
 
-    const filteredProducts = statusFilter
-        ? products.filter(product => product.status === statusFilter)
-        : products;
+    // Handle reject product
+    const handleReject = async () => {
+        if (!selectedProduct) return;
+
+        await rejectProduct(selectedProduct.id, rejectionReason)
+            .then(() => { 
+                fetchProductData();
+            })
+            .finally(() => { 
+                closeRejectModal();
+                setSelectedProduct(null);
+                setRejectionReason('');
+            })
+    };
+
+    const openProductReview = (product: MyShopProductDto) => {
+        
+        openReviewModal();
+    };
+
+    const handleViewRejectionReason = (product: MyShopProductDto) => {
+        if (product.restrictedReason) {
+            setSelectedProduct(product);
+            setRejectionReason(product.restrictedReason)
+            openRejectModal();
+        }
+    };
 
     return (
         <Box>
-            <LoadingOverlay visible={isLoading} overlayProps={{ blur: 2 }} />
-
             <Paper p="md" radius="md" withBorder mb="md">
                 <Filter
                     date={date}
                     searchTerm={searchTerm}
                     activeTab={activeTab}
-                    products={products}
-                    onDateChange={handleDateRangeChange}
+                    productStatusData={statusMetadata}
+                    onDateChange={setDate}
                     onSearchChange={setSearchTerm}
                     onTabChange={handleTabChange}
                     onResetFilters={resetFilters}
+                    onApplyFilters={handleApplyFilters}
                 />
 
                 <ProductList
-                    products={mockProducts}
-                    page={page}
-                    onPageChange={setPage}
+                    products={products}
                     onViewProduct={openProductReview}
                     onApproveProduct={handleApprove}
                     onRejectProduct={(product) => {
                         setSelectedProduct(product);
                         openRejectModal();
                     }}
+                    onViewRejectionReason={handleViewRejectionReason}
                 />
+
+                <Group justify="flex-end" mt="md">
+                    <Pagination
+                        total={totalPages}
+                        value={currentPage}
+                        onChange={setPage}
+                        size="sm"
+                    />
+                </Group>
             </Paper>
 
             <ProductReviewModal
@@ -148,12 +173,10 @@ const ProductApprovalPage = () => {
                 onReject={handleReject}
                 rejectionReason={rejectionReason}
                 onReasonChange={setRejectionReason}
+                existsProductReason={selectedProduct?.restrictedReason ? true : false}
+                onApprove={() => handleApprove(selectedProduct )}
             />
 
-            <SuccessModal
-                opened={successModalOpened}
-                onClose={closeSuccessModal}
-            />
         </Box>
     );
 };

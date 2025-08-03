@@ -77,8 +77,7 @@ const ProductPage = () => {
     }
   });
 
-  const loadProducts = useCallback(() => {
-    // Update URL trước khi fetch
+  const loadProducts = useCallback(() => { 
     updateURLParams({
       search: searchQuery || null,
       categoryId: category?.urlSlug || category?.id || null,
@@ -89,16 +88,7 @@ const ProductPage = () => {
       status: status !== 'ALL' ? status : null,
       view: viewMode
     });
-
-    console.log('Fetching products with params:', {
-      page: activePage - 1,
-      limit: viewMode === 'list' ? 10 : 12,
-      status: status !== 'ALL' ? status : undefined,
-      search: searchQuery || undefined,
-      categoryId: category?.urlSlug || category?.id || undefined,
-      sortBy: sortBy || undefined
-    });
-    // Sau đó fetch products
+  
     fetchProducts({
       page: activePage - 1,
       limit: viewMode === 'list' ? 10 : 12,

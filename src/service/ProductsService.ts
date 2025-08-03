@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "../constant";
 import type { MyShopProductDto, MyShopProductListResponse, ProductCreateRequest, ProductStatus, ProductStatusDto } from "../types/ProductType";
+import { formatDateForBe } from "../untils/Untils";
 import { axiosInstance } from "./AxiosInstant";
 
 const create = async (data: ProductCreateRequest) => {
@@ -8,25 +9,51 @@ const create = async (data: ProductCreateRequest) => {
 }
 
 const getMyShopProducts = async (params?: {
-  page?: number;
-  limit?: number;
-  status?: ProductStatus;
-  search?: string;
-  categoryId?: string;
-  sortBy?: string;
+    page?: number;
+    limit?: number;
+    status?: ProductStatus;
+    search?: string;
+    categoryId?: string;
+    sortBy?: string;
 }): Promise<MyShopProductListResponse> => {
-  const queryParams = new URLSearchParams();
+    const queryParams = new URLSearchParams();
 
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value != null) {
-      queryParams.append(key, String(value));
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value != null) {
+            queryParams.append(key, String(value));
+        }
+    });
+
+    const response = await axiosInstance.get(
+        `${API_ENDPOINTS.PRODUCTS.GET_MY_SHOP_PRODUCTS}?${queryParams}`
+    );
+    return response.data;
+};
+const getMyShopProductsAdmin = async (params?: {
+    page?: number;
+    limit?: number;
+    status?: ProductStatus;
+    search?: string;
+    dateRange?: [Date | null, Date | null];
+}): Promise<MyShopProductListResponse> => {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(params || {}).forEach(([key, value]) => {
+        if (value != null && key !== 'dateRange') {
+            queryParams.append(key, String(value));
+        }
+    });
+
+    if (params?.dateRange) {
+        const [startDate, endDate] = params.dateRange;
+        if (startDate) queryParams.append('startDate', formatDateForBe(startDate));
+        if (endDate) queryParams.append('endDate', formatDateForBe(endDate));
     }
-  });
 
-  const response = await axiosInstance.get(
-    `${API_ENDPOINTS.PRODUCTS.GET_MY_SHOP_PRODUCTS}?${queryParams}`
-  );
-  return response.data;
+    const response = await axiosInstance.get(
+        `${API_ENDPOINTS.PRODUCTS.GET_PRODUCTS_ADMIN}?${queryParams}`
+    );
+    return response.data;
 };
 
 
@@ -66,36 +93,58 @@ const getProductNameSuggestions = async (keyword: string): Promise<string[]> => 
     return response.data;
 };
 
+
+
 // Get product status metadata (counts for each status)
 const getProductStatusMetadata = async (): Promise<ProductStatusDto[]> => {
     const response = await axiosInstance.get(API_ENDPOINTS.PRODUCTS.GET_META_STATUS);
+    return response.data;
+};
+const getProductStatusMetadata_admin = async (startDate: string, endDate: string): Promise<ProductStatusDto[]> => { 
+    const response = await axiosInstance.get(API_ENDPOINTS.PRODUCTS.GET_META_STATUS_ADMIN, {
+        params: { startDate, endDate }
+    });
     return response.data;
 };
 
 
 const deleteProducts = async (ids: string[]): Promise<void> => {
     await axiosInstance.delete(API_ENDPOINTS.PRODUCTS.DELETE_MULTIPLE, {
-        data: ids  
+        data: ids
     });
 };
 
 const updateProductsVisibility = async (ids: string[], visible = true): Promise<void> => {
-    await axiosInstance.put(API_ENDPOINTS.PRODUCTS.UPDATE_MULTIPLE_VISIBILITY, 
-        ids, { params: { visible }});
+    await axiosInstance.put(API_ENDPOINTS.PRODUCTS.UPDATE_MULTIPLE_VISIBILITY,
+        ids, { params: { visible } });
 };
+
+const rejectProduct = async (id: string, reason: string): Promise<void> => {
+    await axiosInstance.put(API_ENDPOINTS.PRODUCTS.REJECT(id),
+        { reason });
+};
+
+const approveProduct = async (id: string): Promise<void> => {
+    await axiosInstance.put(API_ENDPOINTS.PRODUCTS.APPROVE(id));
+};
+
 
 
 const ProductsService = {
     create,
     getMyShopProducts,
+    getMyShopProductsAdmin,
     getMyShopProductById,
     update,
     deleteProduct,
     updateVisibility,
     getProductNameSuggestions,
+    getProductStatusMetadata_admin,
     getProductStatusMetadata,
     deleteProducts,
     updateProductsVisibility,
+    rejectProduct,
+    approveProduct
 };
 
 export default ProductsService;
