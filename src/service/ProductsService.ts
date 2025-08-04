@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "../constant";
-import type { MyShopProductDto, MyShopProductListResponse, ProductCreateRequest, ProductStatus, ProductStatusDto } from "../types/ProductType";
+import type { MyShopProductDto, MyShopProductListResponse, ProductCreateRequest, ProductDetailDto, ProductStatus, ProductStatusDto } from "../types/ProductType";
 import { formatDateForBe } from "../untils/Untils";
 import { axiosInstance } from "./AxiosInstant";
 
@@ -7,6 +7,11 @@ const create = async (data: ProductCreateRequest) => {
     const response = await axiosInstance.post(API_ENDPOINTS.PRODUCTS.CREATE, data);
     return response.data;
 }
+
+const getProductById = async (id: string): Promise<ProductDetailDto> => {
+    const response = await axiosInstance.get(API_ENDPOINTS.PRODUCTS.GET_BY_ID(id));
+    return response.data;
+};
 
 const getMyShopProducts = async (params?: {
     page?: number;
@@ -55,6 +60,7 @@ const getMyShopProductsAdmin = async (params?: {
     );
     return response.data;
 };
+
 
 
 // Get my shop product by ID
@@ -132,6 +138,7 @@ const approveProduct = async (id: string): Promise<void> => {
 
 const ProductsService = {
     create,
+    getProductById,
     getMyShopProducts,
     getMyShopProductsAdmin,
     getMyShopProductById,

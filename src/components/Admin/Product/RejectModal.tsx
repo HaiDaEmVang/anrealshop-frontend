@@ -8,6 +8,7 @@ interface RejectModalProps {
   rejectionReason: string;
   onReasonChange: (reason: string) => void;
   existsProductReason: boolean;
+  isViolation?: boolean;
   onApprove: () => void;
 }
 
@@ -18,6 +19,7 @@ const RejectModal: React.FC<RejectModalProps> = ({
   rejectionReason,
   onReasonChange,
   existsProductReason,
+  isViolation = false,
   onApprove
 }) => {
   const isEdit = existsProductReason && rejectionReason;
@@ -56,13 +58,13 @@ const RejectModal: React.FC<RejectModalProps> = ({
                       onClose();
                     }}
                   >
-                    Phê duyệt
+                    {isViolation ? 'Phê duyệt' : 'Duyệt lại'}
                   </Button>
                 <Button
                   color="blue"
                   leftSection={<FiEdit size={16} />}
                   onClick={onReject}
-                  disabled={!rejectionReason.trim()}
+                  disabled={rejectionReason.trim() ? false : true}
                 >
                   Cập nhật
                 </Button>

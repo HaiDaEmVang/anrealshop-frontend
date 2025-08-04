@@ -1,4 +1,4 @@
-import type { ProductAttribute } from "./AttributeType";
+import type { ProductAttribute, ProductAttributeSingleValue } from "./AttributeType";
 import type { MediaDto } from "./CommonType";
 import type { ShopDto } from "./ShopType";
 
@@ -73,4 +73,46 @@ export interface MyShopProductSkuDto {
   quantity: number;
   sold: number;
   createdAt: string;
+
+  keyAttributes?: string[];
+  attributeForSku?: ProductAttributeSingleValue[];
+}
+
+
+
+export interface ProductDetailDto {
+  id: string;
+  name: string;
+  thumbnailUrl: string;
+  urlSlug: string;
+  categoryId?: string;
+  categoryPath?: string;
+  description?: string;
+  sortDescription?: string;
+  price?: number;
+  discountPrice: number;
+  quantity: number;
+  sold: number;
+  status: ProductStatus;
+  visible: boolean;
+  
+  createdAt: string;
+  updatedAt?: string;
+  
+  restrictedReason?: string;
+  isRestricted?: boolean;
+  restrictStatus?: string;
+  
+  averageRating?: number;
+  totalReviews?: number;
+
+  width?: number;
+  height?: number;
+  length?: number;
+  weight?: number;
+  
+  baseShopDto?: ShopDto;
+  medias?: MediaDto[];
+  attributes?: ProductAttribute[];
+  productSkus?: MyShopProductSkuDto[];
 }

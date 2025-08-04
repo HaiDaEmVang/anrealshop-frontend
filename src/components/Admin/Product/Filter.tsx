@@ -2,7 +2,7 @@ import { ActionIcon, Badge, Button, Group, Stack, Tabs, Text, TextInput, Title, 
 import { DatePickerInput } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { FiCalendar, FiCheck, FiRefreshCcw, FiSearch, FiX } from 'react-icons/fi';
-import { useProductForAdStatusColor, useProductForAdStatusIcon, useProductForAdStatusLabel } from '../../../hooks/useProductStatus';
+import { useProductForAd } from '../../../hooks/useProductStatus';
 import type { ProductStatusDto } from '../../../types/ProductType';
 import { equalDates, getDefaultDateRange_Now_Yesterday } from '../../../untils/Untils';
 
@@ -29,9 +29,7 @@ const Filter: React.FC<FilterProps> = ({
   onResetFilters,
   onApplyFilters
 }) => {
-  const { getStatusIcon } = useProductForAdStatusIcon();
-  const { getStatusLabel2 } = useProductForAdStatusLabel();
-  const {  getStatusIconColor } = useProductForAdStatusColor();
+  const { getStatusIcon, getStatusIconColor, getStatusLabel } = useProductForAd();
   const equalDateWithDefault = () => {
     const defaultRange = getDefaultDateRange_Now_Yesterday();
     return equalDates(date[0], defaultRange[0]) && equalDates(date[1], defaultRange[1]);
@@ -117,7 +115,7 @@ const Filter: React.FC<FilterProps> = ({
               const iconColor = getStatusIconColor(status.id);
               const badgeColor = getStatusIconColor(status.id);
               const isActive = activeTab === status.id;
-              const label = getStatusLabel2(status.id);
+              const label = getStatusLabel(status.id);
 
               return (
                 <Tabs.Tab

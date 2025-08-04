@@ -68,9 +68,7 @@ export const useProduct = (options: UseProductOptions = {}) => {
                 products: []
             };
             if (options.mode === 'admin') {
-                console.log(params);
                 response = await ProductsService.getMyShopProductsAdmin(params);
-                console.log(response)
             } else if (options.mode === 'myshop') {
                 response = await ProductsService.getMyShopProducts(params);
             }
@@ -298,6 +296,29 @@ export const useProductApproval = () => {
         approvalProduct,
         rejectProduct
     }
+}
+
+export const useGetProduct = () => {
+    const [isLoading, setIsLoading] = useState(false); 
+
+    const getProductById = useCallback(async (id: string) => {
+        setIsLoading(true);
+        try {
+            const result = await ProductsService.getProductById(id);  
+            return result;
+        } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
+            showErrorNotification('Lỗi tải sản phẩm', errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    return {
+        isLoading, 
+        getProductById
+    };
 }
 
 // Utility function to extract error messages from backend

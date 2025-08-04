@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FiCheckCircle, FiAlertTriangle, FiClock, FiEyeOff, FiGrid, FiX } from 'react-icons/fi';
 
 export const useProductStatusIcon = () => {
@@ -22,24 +22,7 @@ export const useProductStatusIcon = () => {
   }), []);
 };
 
-export const useProductForAdStatusIcon = () => { 
-  return useMemo(() => ({
-    getStatusIcon: (statusId: string) => {
-      switch (statusId.toLowerCase()) {
-        case 'all':
-          return FiGrid;
-        case 'active':
-          return FiCheckCircle;
-        case 'violation':
-          return FiX;
-        case 'pending':
-          return FiClock; 
-        default:
-          return FiGrid;
-      }
-    }
-  }), []);
-};
+
 export const useProductStatusColor = () => {
   return useMemo(() => ({
     getStatusColor: (statusId: string) => {
@@ -77,36 +60,6 @@ export const useProductStatusColor = () => {
   }), []);
 };
 
-export const useProductForAdStatusColor = () => {
-  return useMemo(() => ({
-    getStatusColor: (statusId: string, reason?: string) => {
-      statusId = statusId.toLowerCase();
-      if (statusId === 'all')
-        return "gray"
-      if (statusId !== 'violation' && reason)
-        return 'green';
-      if (!reason)
-        return 'yellow';
-      if (statusId === 'violation')
-        return 'red'  
-      
-    },
-    getStatusIconColor: (statusId: string) => {
-      switch (statusId.toLowerCase()) {
-        case 'all':
-          return '#6b7280';
-        case 'active':
-          return '#22c55e';
-        case 'violation':
-          return '#ef4444';
-        case 'pending':
-          return '#eab308'; 
-        default:
-          return '#6b7280';
-      }
-    }
-  }), []);
-};
 
 export const useProductStatusLabel = () => {
   return useMemo(() => ({
@@ -129,26 +82,30 @@ export const useProductStatusLabel = () => {
   }), []);
 };
 
-export const useProductForAdStatusLabel = () => {
-  return useMemo(() => ({
-    getStatusLabel: (statusId: string, reason?: string) => {
-      statusId = statusId.toLowerCase();
-      if (statusId === 'all')
-        return "Tất cả"
-      if (statusId !== 'violation' && reason)
-        return 'Đã duyệt';
-      if (!reason)
-        return 'Chưa duyệt';
-      if (statusId === 'violation')
-        return 'Từ chối' 
-    },
 
-    getStatusLabel2: (statusId: string) => { 
-      switch (statusId.toLowerCase()) {
+
+
+export const useProductForAd = () => {
+  const convertStatus = useCallback((status: string, reason?: string) => {
+    status = status.toLowerCase();
+    if (status === 'all')
+      return "ALL";
+    if (status !== 'violation' && reason)
+      return 'ACTIVE';
+    if (!reason)
+      return 'PENDING';
+    if (status === 'violation')
+      return 'VIOLATION';
+    else 
+      return 'ALL'
+  }, []);
+
+  const getStatusLabel = useCallback((statusId: string) => {
+    switch (statusId.toLowerCase()) {
         case 'all':
           return "Tất cả";
         case 'active':
-          return "Đã duyệt";
+          return "Đã duyệt"; 
         case 'violation':
           return "Từ chối";
         case 'pending':
@@ -156,7 +113,58 @@ export const useProductForAdStatusLabel = () => {
         default:
           return "Không xác định";
       }
-    }
-  }), []);
-};
+  }, []);
 
+  const getStatusColor = useCallback((statusId: string) => {
+    switch (statusId.toLowerCase()) {
+      case 'all':
+        return 'gray';
+      case 'active':
+        return 'green';
+      case 'violation':
+        return 'red';
+      case 'pending':
+        return 'yellow';
+      default:
+        return 'gray';
+    }
+  }, []);
+
+  const getStatusIconColor = useCallback((statusId: string) => {
+    switch (statusId.toLowerCase()) {
+      case 'all':
+        return '#6b7280';
+      case 'active':
+        return '#22c55e';
+      case 'violation':
+        return '#ef4444';
+      case 'pending':
+        return '#eab308';
+      default:
+        return '#6b7280';
+    }
+  }, []);
+
+  const getStatusIcon = useCallback((statusId: string) => {
+    switch (statusId.toLowerCase()) {
+      case 'all':
+        return FiGrid;
+      case 'active':
+        return FiCheckCircle;
+      case 'violation':
+        return FiX;
+      case 'pending':
+        return FiClock;
+      default:
+        return FiGrid;
+    }
+  }, []);
+
+  return {
+    convertStatus,
+    getStatusLabel,
+    getStatusIconColor,
+    getStatusColor,
+    getStatusIcon
+  }
+}

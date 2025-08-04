@@ -1,15 +1,17 @@
 import { ActionIcon, Badge, Group, Image, Menu, Table, Text, Tooltip } from '@mantine/core';
 import { FiCheck, FiEye, FiFileText, FiMoreVertical, FiX } from 'react-icons/fi';
-import { useProductForAdStatusColor, useProductForAdStatusLabel } from '../../../hooks/useProductStatus';
 import type { MyShopProductDto } from '../../../types/ProductType';
 import { formatDate, formatPrice } from '../../../untils/Untils';
+import { useProductForAd } from '../../../hooks/useProductStatus';
+import { ProductListSkeleton } from './skeleton';
 
 interface ProductListProps {
     products: MyShopProductDto[];
-    onViewProduct: (product: MyShopProductDto) => void;
-    onApproveProduct: (product: MyShopProductDto) => void;
-    onRejectProduct: (product: MyShopProductDto) => void;
-    onViewRejectionReason: (product: MyShopProductDto) => void;
+    onViewProduct: (productId: string) => void;
+    onApproveProduct: (productId: string) => void;
+    onRejectProduct: (productId: string) => void;
+    onViewRejectionReason: (productId: string) => void;
+    loading: boolean;
 }
 
 const ProductList: React.FC<ProductListProps> = ({
@@ -18,10 +20,12 @@ const ProductList: React.FC<ProductListProps> = ({
     onApproveProduct,
     onRejectProduct,
     onViewRejectionReason,
+    loading
 }) => {
-    const { getStatusColor } = useProductForAdStatusColor();
-    const { getStatusLabel } = useProductForAdStatusLabel();
-
+    const { getStatusColor, getStatusLabel, convertStatus } = useProductForAd();
+    if (loading) {
+        return <ProductListSkeleton />;
+    }
     return (
         <>
             <Table striped highlightOnHover withColumnBorders>
@@ -70,8 +74,8 @@ const ProductList: React.FC<ProductListProps> = ({
                                 <Table.Td style={{ textAlign: 'center' }}>{formatPrice(product.discountPrice)}</Table.Td>
                                 <Table.Td style={{ textAlign: 'center' }}>{formatDate(product.createdAt)}</Table.Td>
                                 <Table.Td style={{ textAlign: 'center' }}>
-                                    <Badge color={getStatusColor(product.status, product.restrictedReason)}>
-                                        {getStatusLabel(product.status, product.restrictedReason)}
+                                    <Badge color={getStatusColor(convertStatus(product.status, product.restrictedReason))}>
+                                        {getStatusLabel(convertStatus(product.status, product.restrictedReason))}
                                     </Badge>
                                 </Table.Td>
                                 <Table.Td>
@@ -79,13 +83,13 @@ const ProductList: React.FC<ProductListProps> = ({
                                         <Tooltip label="Xem chi tiết">
                                             <ActionIcon
                                                 variant="subtle"
-                                                onClick={() => onViewProduct(product)}
+                                                onClick={() => onViewProduct(product.id)}
                                             >
                                                 <FiEye size={16} />
                                             </ActionIcon>
                                         </Tooltip>
 
-                                        {product.status === 'PENDING' && (
+                                        {product.status !== 'VIOLATION' && (
                                             <Menu position="bottom-end" withinPortal>
                                                 <Menu.Target>
                                                     <ActionIcon variant="subtle">
@@ -94,14 +98,16 @@ const ProductList: React.FC<ProductListProps> = ({
                                                 </Menu.Target>
                                                 <Menu.Dropdown>
                                                     <Menu.Item
+                                                        disabled={convertStatus(product.status, product.restrictedReason) === 'ACTIVE'}
                                                         leftSection={<FiCheck size={14} color="green" />}
-                                                        onClick={() => onApproveProduct(product)}
+                                                        onClick={() => onApproveProduct(product.id)}
                                                     >
                                                         Phê duyệt
                                                     </Menu.Item>
                                                     <Menu.Item
+                                                        disabled={convertStatus(product.status, product.restrictedReason) === 'VIOLATION'}
                                                         leftSection={<FiX size={14} color="red" />}
-                                                        onClick={() => onRejectProduct(product)}
+                                                        onClick={() => onRejectProduct(product.id)}
                                                     >
                                                         Từ chối
                                                     </Menu.Item>
@@ -113,7 +119,7 @@ const ProductList: React.FC<ProductListProps> = ({
                                                 <ActionIcon
                                                     variant="subtle"
                                                     color="red"
-                                                    onClick={() => onViewRejectionReason(product)}
+                                                    onClick={() => onViewRejectionReason(product.id)}
                                                 >
                                                     <FiFileText size={16} />
                                                 </ActionIcon>
