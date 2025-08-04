@@ -14,6 +14,11 @@ export interface ProductAttribute {
   values: string[];
 }
 
+export interface ProductAttributeSingleValue {
+  attributeKeyName: string;
+  attributeKeyDisplay: string;
+  values: string;
+}
 
 export interface AttributeForShop {
   attribute: BaseAttribute[];

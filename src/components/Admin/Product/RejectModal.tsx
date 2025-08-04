@@ -1,5 +1,5 @@
 import { Button, Group, Modal, Stack, Text, Textarea } from '@mantine/core';
-import { FiX } from 'react-icons/fi';
+import { FiCheck, FiEdit, FiX } from 'react-icons/fi';
 
 interface RejectModalProps {
   opened: boolean;
@@ -7,6 +7,9 @@ interface RejectModalProps {
   onReject: () => void;
   rejectionReason: string;
   onReasonChange: (reason: string) => void;
+  existsProductReason: boolean;
+  isViolation?: boolean;
+  onApprove: () => void;
 }
 
 const RejectModal: React.FC<RejectModalProps> = ({
@@ -14,8 +17,12 @@ const RejectModal: React.FC<RejectModalProps> = ({
   onClose,
   onReject,
   rejectionReason,
-  onReasonChange
+  onReasonChange,
+  existsProductReason,
+  isViolation = false,
+  onApprove
 }) => {
+  const isEdit = existsProductReason && rejectionReason;
   return (
     <Modal
       opened={opened}
@@ -35,17 +42,49 @@ const RejectModal: React.FC<RejectModalProps> = ({
         />
 
         <Group justify="space-between" mt="md">
-          <Button variant="outline" onClick={onClose}>
-            Hủy
-          </Button>
-          <Button
-            color="red"
-            leftSection={<FiX size={16} />}
-            onClick={onReject}
-            disabled={!rejectionReason.trim()}
-          >
-            Từ chối sản phẩm
-          </Button>
+          {isEdit ? (
+            // Edit mode buttons
+            <>
+              <Button variant="outline" onClick={onClose}>
+                Đóng
+              </Button>
+              
+              <Group>
+                <Button
+                    color="green"
+                    leftSection={<FiCheck size={16} />}
+                    onClick={()=> {
+                      onApprove();
+                      onClose();
+                    }}
+                  >
+                    {isViolation ? 'Phê duyệt' : 'Duyệt lại'}
+                  </Button>
+                <Button
+                  color="blue"
+                  leftSection={<FiEdit size={16} />}
+                  onClick={onReject}
+                  disabled={rejectionReason.trim() ? false : true}
+                >
+                  Cập nhật
+                </Button>
+              </Group>
+            </>
+          ) : ( 
+            <>
+              <Button variant="outline" onClick={onClose}>
+                Hủy
+              </Button>
+              <Button
+                color="red"
+                leftSection={<FiX size={16} />}
+                onClick={onReject}
+                disabled={!rejectionReason.trim()}
+              >
+                Từ chối sản phẩm
+              </Button>
+            </>
+          )}
         </Group>
       </Stack>
     </Modal>
