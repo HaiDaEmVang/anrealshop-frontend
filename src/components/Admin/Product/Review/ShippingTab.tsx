@@ -19,7 +19,6 @@ const ShippingTab: React.FC<ShippingTabProps> = ({ product }) => {
     <Box p="xs">
       {hasPhysicalSpecs ? (
         <>
-          <Divider my="md" />
           <Group mb="xs" align="center">
             <FiPackage size={18} />
             <Title order={5}>Kích thước và trọng lượng</Title>
