@@ -1,16 +1,16 @@
 import { ActionIcon, Badge, Button, Card, Group, Image, Rating, Text } from '@mantine/core';
 import { FiHeart, FiShoppingCart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import type { Product } from '../../../data/UserData';
+import type { UserProductDto } from '../../../types/ProductType';
+import { formatPrice } from '../../../untils/Untils';
 
 interface ProductCardProps {
-  product: Product;
+  product: UserProductDto;
   compact?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) => {
-  const { id, name, price, discountPrice, images, rating, reviewCount, isNew, shop } = product;
-  const discountPercentage = discountPrice ? Math.round(((price - discountPrice) / price) * 100) : 0;
+  const discountPercentage = product.discountPrice ? Math.round(((product.price - product.discountPrice) / product.price) * 100) : 0;
 
   return (
     <Card
@@ -28,11 +28,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
       <div className="flex flex-col h-full">
         {/* Image Section */}
         <div className="relative overflow-hidden">
-          <Link to={`/products/${id}`} className="block no-underline">
-            <div className="overflow-hidden bg-gray-50" style={{ aspectRatio: '4/5' }}>
+          <Link to={`/products/${product.urlSlug}`} className="block no-underline">
+            <div className="overflow-hidden bg-gray-50 " style={{ aspectRatio: '4/5' }}>
               <Image
-                src={images[0]}
-                alt={name}
+                src={product.thumbnailUrl}
+                alt={product.name}
                 className="transition-transform duration-500 group-hover:scale-110"
                 style={{
                   width: '100%',
@@ -45,7 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
 
           {/* Badges positioned on the image */}
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-            {isNew && (
+            {/* {product.isNew && (
               <Badge
                 color="green"
                 variant="filled"
@@ -54,15 +54,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
               >
                 Mới
               </Badge>
-            )}
-            {discountPrice && (
+            )} */}
+            {product.discountPrice && discountPercentage !== 0 && (
               <Badge
                 color="red"
                 variant="filled"
                 className="font-medium text-xs shadow-sm"
                 radius="md"
               >
-                -{discountPercentage}%
+                {discountPercentage}%
               </Badge>
             )}
           </div>
@@ -98,18 +98,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
         <div className="p-4 flex flex-col flex-grow">
           {/* Shop name */}
           <Text size="xs" c="dimmed" className="mb-1 font-medium">
-            {shop.name}
+            {product.shopName}
           </Text>
 
           {/* Product Name */}
-          <Link to={`/products/${id}`} className="no-underline">
+          <Link to={`/products/${product.id}`} className="no-underline">
             <Text
               fw={500}
               lineClamp={2}
               className="text-slate-900 text-sm !mb-2 hover:text-primary transition-colors duration-200"
               style={{ minHeight: '2.5rem' }}
             >
-              {name}
+              {product.name}
             </Text>
           </Link>
 
@@ -117,24 +117,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
           <div className="mb-3">
             <Group gap={6} wrap="nowrap">
               <Rating
-                value={rating}
+                value={product.averageRating}
                 fractions={2}
                 readOnly
                 size="xs"
                 color="orange"
               />
               <Text size="xs" c="dimmed" className="font-medium">
-                {rating} ({reviewCount})
+                {product.averageRating} ({product.totalReviews})
               </Text>
             </Group>
           </div>
 
           {/* Price Section */}
           <div className="mt-auto">
-            {discountPrice ? (
+            {product.discountPrice ? (
               <Group gap={8} align="center" wrap="nowrap">
                 <Text fw={700} className="text-red-500 text-lg">
-                  {discountPrice.toLocaleString()}₫
+                  {formatPrice(product.discountPrice)}
                 </Text>
                 <Text
                   td="line-through"
@@ -142,12 +142,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
                   size="sm"
                   className="font-medium"
                 >
-                  {price.toLocaleString()}₫
+                  {formatPrice(product.price)}
                 </Text>
               </Group>
             ) : (
               <Text fw={700} className="text-slate-900 text-lg">
-                {price.toLocaleString()}₫
+                {formatPrice(product.price)}
               </Text>
             )}
           </div>

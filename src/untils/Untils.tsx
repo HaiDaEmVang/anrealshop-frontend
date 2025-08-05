@@ -1,5 +1,6 @@
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import type { UseProductParams } from '../hooks/useProduct';
 
 // Function to format date/time for conversations
 export const formatMessageTime = (date: Date) => {
@@ -7,14 +8,14 @@ export const formatMessageTime = (date: Date) => {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  
-  if (date >= today) { 
+
+  if (date >= today) {
     return format(date, 'HH:mm', { locale: vi });
-  } else if (date >= yesterday) {   
+  } else if (date >= yesterday) {
     return 'Hôm qua';
-  } else if (now.getFullYear() === date.getFullYear()) { 
+  } else if (now.getFullYear() === date.getFullYear()) {
     return format(date, 'dd/MM', { locale: vi });
-  } else { 
+  } else {
     return format(date, 'dd/MM/yyyy', { locale: vi });
   }
 };
@@ -25,7 +26,7 @@ export const formatPrice = (price: number): string => {
     currency: 'VND',
   }).format(price);
 };
- 
+
 export const formatDate = (dateString: string): string => {
   return format(new Date(dateString), 'dd/MM/yyyy HH:mm', { locale: vi });
 };
@@ -36,23 +37,23 @@ export const formatDateForBe = (date: Date | null): string => {
 };
 
 export const getDefaultDateRange_Now_Yesterday = (): [Date, Date] => {
-        const today = new Date();
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
-        yesterday.setHours(0, 0, 0, 0);
-        today.setHours(23, 59, 59, 999);
-        return [yesterday, today];
-    };
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  yesterday.setHours(0, 0, 0, 0);
+  today.setHours(23, 59, 59, 999);
+  return [yesterday, today];
+};
 
 export const equalDates = (date1: Date | null, date2: Date | null): boolean => {
   if (!date1 || !date2) return false;
   return date1.getDate() === date2.getDate() &&
-         date1.getMonth() === date2.getMonth() &&
-         date1.getFullYear() === date2.getFullYear();
+    date1.getMonth() === date2.getMonth() &&
+    date1.getFullYear() === date2.getFullYear();
 }
 
 export const getStatusColor = (status: string) => {
-  switch(status) {
+  switch (status) {
     case 'pending': return 'yellow';
     case 'processing': return 'blue';
     case 'shipping': return 'indigo';
@@ -67,11 +68,28 @@ export function formatSkuPart(input: string, maxLen: number = 3): string {
   if (!input) return '';
 
   return input
-    .normalize('NFD')                    
-    .replace(/[\u0300-\u036f]/g, '')    
-    .replace(/đ/g, 'd')                 
-    .replace(/Đ/g, 'D')                 
-    .replace(/[^a-zA-Z0-9]/g, '')       
-    .substring(0, maxLen)               
-    .toUpperCase();                     
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .substring(0, maxLen)
+    .toUpperCase();
+}
+
+
+export function getParams(params: UseProductParams): string {
+  const queryParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (key && value != null && value !== '' && key !== 'dateRange') {
+      queryParams.append(key, String(value));
+    }
+  });
+  if (params?.dateRange) {
+    const [startDate, endDate] = params.dateRange;
+    if (startDate) queryParams.append('startDate', formatDateForBe(startDate));
+    if (endDate) queryParams.append('endDate', formatDateForBe(endDate));
+  }
+  return queryParams.toString();
 }

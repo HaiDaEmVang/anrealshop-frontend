@@ -1,7 +1,8 @@
 import { API_ENDPOINTS } from "../constant";
-import type { MyShopProductDto, MyShopProductListResponse, ProductCreateRequest, ProductDetailDto, ProductStatus, ProductStatusDto } from "../types/ProductType";
-import { formatDateForBe } from "../untils/Untils";
-import { axiosInstance } from "./AxiosInstant";
+import type { UseProductParams } from "../hooks/useProduct";
+import type { MyShopProductDto, MyShopProductListResponse, ProductCreateRequest, ProductDetailDto, ProductStatusDto } from "../types/ProductType";
+import { getParams } from "../untils/Untils";
+import { axiosInstance, axiosNoWithCredInstance } from "./AxiosInstant";
 
 const create = async (data: ProductCreateRequest) => {
     const response = await axiosInstance.post(API_ENDPOINTS.PRODUCTS.CREATE, data);
@@ -9,59 +10,42 @@ const create = async (data: ProductCreateRequest) => {
 }
 
 const getProductById = async (id: string): Promise<ProductDetailDto> => {
-    const response = await axiosInstance.get(API_ENDPOINTS.PRODUCTS.GET_BY_ID(id));
+    const response = await axiosNoWithCredInstance.get(API_ENDPOINTS.PRODUCTS.GET_BY_ID(id));
     return response.data;
 };
 
-const getMyShopProducts = async (params?: {
-    page?: number;
-    limit?: number;
-    status?: ProductStatus;
-    search?: string;
-    categoryId?: string;
-    sortBy?: string;
-}): Promise<MyShopProductListResponse> => {
-    const queryParams = new URLSearchParams();
-
-    Object.entries(params || {}).forEach(([key, value]) => {
-        if (value != null) {
-            queryParams.append(key, String(value));
-        }
-    });
-
-    const response = await axiosInstance.get(
-        `${API_ENDPOINTS.PRODUCTS.GET_MY_SHOP_PRODUCTS}?${queryParams}`
-    );
-    return response.data;
+const getListFeatured = async () => {
+    console.log('getListFeatured is not implemented yet');
+    return [];
 };
-const getMyShopProductsAdmin = async (params?: {
-    page?: number;
-    limit?: number;
-    status?: ProductStatus;
-    search?: string;
-    dateRange?: [Date | null, Date | null];
-}): Promise<MyShopProductListResponse> => {
-    const queryParams = new URLSearchParams();
+const getListNewApproval = async () => {
+    console.log('getListNewApproval is not implemented yet');
+    return [];
+};
 
-    Object.entries(params || {}).forEach(([key, value]) => {
-        if (value != null && key !== 'dateRange') {
-            queryParams.append(key, String(value));
-        }
-    });
+const getListTrending = async () => {
+    console.log('getListTrending is not implemented yet');
+    return [];
+};
 
-    if (params?.dateRange) {
-        const [startDate, endDate] = params.dateRange;
-        if (startDate) queryParams.append('startDate', formatDateForBe(startDate));
-        if (endDate) queryParams.append('endDate', formatDateForBe(endDate));
-    }
-
-    const response = await axiosInstance.get(
-        `${API_ENDPOINTS.PRODUCTS.GET_PRODUCTS_ADMIN}?${queryParams}`
-    );
+const getListRecommended = async (params?: UseProductParams) => {
+    const queryParams = getParams(params || {});
+    const response = await axiosInstance.get(`${API_ENDPOINTS.PRODUCTS.GET_RECOMMENDED_PRODUCTS}?${queryParams}`); 
     return response.data;
 };
 
 
+const getMyShopProducts = async (params?: UseProductParams): Promise<MyShopProductListResponse> => {
+    const queryParams = getParams(params || {});
+    const response = await axiosInstance.get(`${API_ENDPOINTS.PRODUCTS.GET_MY_SHOP_PRODUCTS}?${queryParams}`);
+    return response.data;
+};
+
+const getMyShopProductsAdmin = async (params?: UseProductParams): Promise<MyShopProductListResponse> => {
+    const queryParams = getParams(params || {});
+    const response = await axiosInstance.get(`${API_ENDPOINTS.PRODUCTS.GET_PRODUCTS_ADMIN}?${queryParams}`);
+    return response.data;
+};
 
 // Get my shop product by ID
 const getMyShopProductById = async (id: string): Promise<ProductCreateRequest> => {
@@ -139,6 +123,10 @@ const approveProduct = async (id: string): Promise<void> => {
 const ProductsService = {
     create,
     getProductById,
+    getListFeatured,
+    getListNewApproval,
+    getListTrending,
+    getListRecommended,
     getMyShopProducts,
     getMyShopProductsAdmin,
     getMyShopProductById,

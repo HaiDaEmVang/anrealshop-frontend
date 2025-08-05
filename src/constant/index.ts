@@ -30,6 +30,8 @@ export const API_ENDPOINTS = {
   PRODUCTS: {   
     BASE: '/products', 
     GET_BY_ID: (id: string) => `/products/${id}`,
+    GET_RECOMMENDED_PRODUCTS: '/public/products/', ///xoa endpoint '/' ca be lan fe nghe pro
+    GET_TRENDING_PRODUCTS: 'chua phat trien',
     CREATE: '/products',
     CREATE_LIST: '/products/creates',
     UPDATE: (id: string) => `/products/${id}`,

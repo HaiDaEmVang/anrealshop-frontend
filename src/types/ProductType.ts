@@ -116,3 +116,24 @@ export interface ProductDetailDto {
   attributes?: ProductAttribute[];
   productSkus?: MyShopProductSkuDto[];
 }
+
+export interface UserProductDto {
+  id: string;
+  name: string;
+  thumbnailUrl: string;
+  sortDescription: string;
+  urlSlug: string;
+  discountPrice: number;
+  price: number;
+  quantity: number;
+  sold: number;
+  averageRating: number;
+  totalReviews: number;
+
+  categoryId: string;
+  categoryName: string;
+
+  shopId: string;
+  shopName: string;
+  shopThumbnailUrl: string;
+}

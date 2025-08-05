@@ -9,12 +9,13 @@ import type {
     ProductCreateRequest,
     ProductStatus,
     ProductStatusDto,
+    UserProductDto,
 } from '../types/ProductType';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../untils/Untils';
 
 type ProductMode = 'myshop' | 'admin' | 'user';
 
-interface UseProductParams {
+export interface UseProductParams {
     page?: number;
     limit?: number;
     status?: ProductStatus;
@@ -315,9 +316,26 @@ export const useGetProduct = () => {
         }
     }, []);
 
+    const getListRecommended = useCallback(async (params?: UseProductParams) => {
+        setIsLoading(true); 
+        try {
+            console.log('getListRecommended called with params:', params);
+            const result: UserProductDto[] = await ProductsService.getListRecommended(params);
+            console.log('getListRecommended result:', result);
+            return result;
+        } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
+            showErrorNotification('Lỗi tải sản phẩm', errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
     return {
         isLoading, 
-        getProductById
+        getProductById,
+        getListRecommended
     };
 }
 

@@ -1,9 +1,13 @@
 import { Box, Group, SimpleGrid, Title } from '@mantine/core';
 import { FiTrendingUp } from 'react-icons/fi';
-import { mockTrendingProducts } from '../../../../data/UserData';
 import ProductCard from '../../Common/ProductCard';
+import type { UserProductDto } from '../../../../types/ProductType';
 
-const ListProduct = () => {
+interface ListProductProps {
+    products: UserProductDto[];
+}
+
+const ListProduct = ( {products}: ListProductProps ) => {
     return (
         <Box>
             <Group justify="start" className="mb-4">
@@ -13,11 +17,11 @@ const ListProduct = () => {
                 </Title>
             </Group>
 
-            <SimpleGrid
-                cols={{ base: 1, sm: 2, md: 3, lg: 5, xl: 6 }}
+            <SimpleGrid 
+                cols={{ base: 1, sm: 3, md: 4, lg: 5, xl: 6 }}
                 spacing="md"
             >
-                {mockTrendingProducts.map((product) => (
+                {products.map((product) => (
                     <ProductCard key={product.id} product={product} />
                 ))}
             </SimpleGrid>

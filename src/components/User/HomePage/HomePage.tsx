@@ -1,6 +1,8 @@
 import { Button, Container, Paper } from '@mantine/core';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { CategorySkeleton, HeroBannerSkeleton, NewsletterSkeleton, ProductGridSkeleton, PromotionBannerSkeleton, SearchTopSkeleton } from './Skeleton';
+import { useGetProduct, useProduct } from '../../../hooks/useProduct';
+import type { UserProductDto } from '../../../types/ProductType';
 
 const HeroBanner = lazy(() => import('./Banner/HeroBanner'));
 const PromotionBanner = lazy(() => import('./Banner/PromationBanner'));
@@ -13,6 +15,18 @@ const SearchTop = lazy(() => import('./SearchTop'));
 const TrendingProducts = lazy(() => import('./Products/TrendingProduct'));
 
 const HomePage = () => {
+  const [recommendedProducts, setRecommendedProducts] = useState<UserProductDto[]>([]);
+  const { getListRecommended } = useGetProduct();
+  useEffect(() => {
+    getListRecommended()
+      .then((data) => {
+        setRecommendedProducts(data);
+      });
+  }, [])
+
+
+
+
   return (
     <div className="bg-gray-50 py-6">
       <Container size="xl" className="px-4">
@@ -83,7 +97,9 @@ const HomePage = () => {
         <Paper radius="md" className="mb-8 bg-white shadow-sm">
           <div className="p-4">
             <Suspense fallback={<ProductGridSkeleton />}>
-              <ListProduct />
+              <ListProduct 
+                products={recommendedProducts}
+              />
             </Suspense>
           </div>
         </Paper>
