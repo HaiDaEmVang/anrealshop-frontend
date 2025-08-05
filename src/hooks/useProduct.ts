@@ -42,7 +42,7 @@ interface UseProductState {
 }
 
 export const useProduct = (options: UseProductOptions = {}) => {
-    const { autoFetch = false, initialParams } = options;
+    const { autoFetch = false, initialParams, mode = 'myshop' } = options;
 
     const [state, setState] = useState<UseProductState>({
         products: [],
@@ -54,7 +54,7 @@ export const useProduct = (options: UseProductOptions = {}) => {
         isEmpty: true
     });
 
-    const [statusMetadata, setStatusMetadata] = useState<ProductStatusDto[]>(options.mode === 'admin' ? productStatusDefaultDataAdmin : productStatusDefaultData);
+    const [statusMetadata, setStatusMetadata] = useState<ProductStatusDto[]>(mode === 'admin' ? productStatusDefaultDataAdmin : productStatusDefaultData);
 
     const fetchProducts = useCallback(async (params?: UseProductParams) => {
         setState(prev => ({
@@ -69,9 +69,9 @@ export const useProduct = (options: UseProductOptions = {}) => {
                 currentPage: 0,
                 products: []
             };
-            if (options.mode === 'admin') {
+            if (mode === 'admin') {
                 response = await ProductsService.getMyShopProductsAdmin(params);
-            } else if (options.mode === 'myshop') {
+            } else if (mode === 'myshop') {
                 response = await ProductsService.getMyShopProducts(params);
             }
             setState(prev => ({
@@ -180,12 +180,12 @@ export const useProduct = (options: UseProductOptions = {}) => {
 
     const fetchStatusMetadata = useCallback(async (date?: [Date | null, Date | null]) => {
         try {
-            if (options.mode === 'admin') {
+            if (mode === 'admin') {
                 const [startDate, endDate] = date || getDefaultDateRange_Now_Yesterday();
                 const metadata = await ProductsService.getProductStatusMetadata_admin(formatDateForBe(startDate), formatDateForBe(endDate));
                 setStatusMetadata(metadata);
                 return metadata;
-            } else if (options.mode === 'myshop') {
+            } else if (mode === 'myshop') {
                 const metadata = await ProductsService.getProductStatusMetadata();
                 setStatusMetadata(metadata);
                 return metadata;

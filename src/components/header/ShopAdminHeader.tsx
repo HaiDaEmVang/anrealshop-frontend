@@ -66,7 +66,7 @@ export function ShopAdminHeader() {
           <div className="hidden lg:flex flex-1 items-center justify-center">
             <nav className="flex items-center space-x-1">
               {navLinks.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive = location.pathname.includes(item.path);
                 return (
                   <Link
                     key={item.path}
