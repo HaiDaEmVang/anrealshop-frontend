@@ -2,15 +2,11 @@ import { ActionIcon, Box, Group, Image, LoadingOverlay, ScrollArea, Stack } from
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi';
+import type { MediaDto } from '../../../types/CommonType';
 
-interface ProductMedia {
-  id: string;
-  url: string;
-  type: 'IMAGE' | 'VIDEO';
-}
 
 interface ImageProductProps {
-  media: ProductMedia[];
+  media: MediaDto[];
   thumbnailUrl: string;
   productName: string;
 }
@@ -23,10 +19,8 @@ const ImageProduct = ({ media, thumbnailUrl, productName }: ImageProductProps) =
   
   // Preload images to improve user experience
   useEffect(() => {
-    // Start loading spinner
     setLoading(true);
     
-    // Immediately load and display the first image
     const img = new window.Image();
     img.src = media[0]?.url || thumbnailUrl;
     img.onload = () => {
@@ -79,9 +73,9 @@ const ImageProduct = ({ media, thumbnailUrl, productName }: ImageProductProps) =
 
   return (
     <>
-      <Box className="relative flex flex-col md:flex-row" style={{ minHeight: '500px' }}>
+      <Box className="relative flex flex-col md:flex-row" style={{ minHeight: '440px' }}>
         {/* Thumbnails - Vertical List on left side */}
-        <Stack className="flex-shrink-0 mr-4 hidden md:flex" gap="xs" style={{ width: '80px' }}>
+        <Stack className="flex-shrink-1 mr-4 hidden md:flex  overflow-y-auto" gap="xs" style={{ width: '80px' }}>
           {media.map((img, idx) => (
             <Box
               key={idx}
@@ -110,7 +104,7 @@ const ImageProduct = ({ media, thumbnailUrl, productName }: ImageProductProps) =
 
         {/* Main Hero Image */}
         <Box 
-          className="relative flex-1 overflow-hidden rounded-md bg-white"
+          className="relative flex-1 overflow-hidden rounded-md bg-white "
           style={{ minHeight: '400px' }}
         >
           <Box 

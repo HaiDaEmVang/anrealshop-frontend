@@ -6,6 +6,7 @@ import ProductsService from '../service/ProductsService';
 import type {
     MyShopProductDto,
     MyShopProductListResponse,
+    MyShopProductSkuDto,
     ProductCreateRequest,
     ProductStatus,
     ProductStatusDto,
@@ -338,6 +339,7 @@ export const useGetProduct = () => {
         getListRecommended
     };
 }
+
 
 // Utility function to extract error messages from backend
 const getErrorMessage = (error: any): string => {

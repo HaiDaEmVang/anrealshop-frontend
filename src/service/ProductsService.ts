@@ -30,7 +30,7 @@ const getListTrending = async () => {
 
 const getListRecommended = async (params?: UseProductParams) => {
     const queryParams = getParams(params || {});
-    const response = await axiosInstance.get(`${API_ENDPOINTS.PRODUCTS.GET_RECOMMENDED_PRODUCTS}?${queryParams}`); 
+    const response = await axiosNoWithCredInstance.get(`${API_ENDPOINTS.PRODUCTS.GET_RECOMMENDED_PRODUCTS}?${queryParams}`); 
     return response.data;
 };
 

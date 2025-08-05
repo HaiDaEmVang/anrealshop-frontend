@@ -9,7 +9,7 @@ export interface ErrorResponseDto {
   timestamp: string;
   traceId?: string;
   details?: Array<ItemError>;
-}
+} 
 
 export interface MediaDto {
   isUploading?: boolean;
