@@ -70,6 +70,7 @@ const ProductPage = () => {
     updateVisibilityMultible,
   } = useProduct({
     autoFetch: false,
+    mode: 'myshop',
     initialParams: {
       page: 0,
       limit: viewMode === 'list' ? 10 : 12,
@@ -155,8 +156,7 @@ const ProductPage = () => {
     loadProducts();
   }, [searchQuery, category, sortBy, updateURLParams, loadProducts]);
 
-  const handleClearAll = useCallback(() => {
-    // Reset all filter states
+  const handleClearAll = useCallback(() => { 
     setSearchQuery('');
     setCategory(null);
     setSortBy(null);

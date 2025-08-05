@@ -76,34 +76,10 @@ const Infor = memo(({ form, isEditMode = false, isLoadingData = false }: InforPr
 
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-
-    if (isEditMode) {
-
-      setIsLoading(true);
-
-
-      timer = setTimeout(() => {
-
-        if (!isLoadingData) {
-          setIsLoading(false);
-        }
-      }, 2000);
-    } 
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isEditMode, isLoadingData]);
-
-
-  useEffect(() => {
-    if (!isLoadingData && isEditMode) {
-
+    if (!isLoadingData && isEditMode) { 
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 300);
-
+      }, 300); 
       return () => clearTimeout(timer);
     }
   }, [isLoadingData, isEditMode]);

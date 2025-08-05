@@ -54,6 +54,9 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
             setAttributes(uniqueAttributes);
             setAttributesReady(true);
         }
+        if (form.values.productSkus.length === 0 && attributes.length > 0) {
+            setAttributesReady(true);
+        }
     }, [form.values.productSkus, attributes.length]);
 
     const formValues = useMemo(() => ({
@@ -64,9 +67,10 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
     }), [form.values.name, form.values.categoryPath, form.values.price, form.values.quantity]);
 
     const generateSkuCombinations = useCallback(() => {
+        console.log("Generating SKU combinations with attributes:", attributes);
         const activeAttributes = attributes.filter(attr => attr.values.length > 0);
         if (activeAttributes.length === 0) return [];
-        
+
         const keyNameToDisplayMap = new Map(
             activeAttributes.map(attr => [attr.attributeKeyName, attr.attributeKeyDisplay])
         );
@@ -105,18 +109,29 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
         });
     }, [attributes, formValues, form.values.productSkus]);
 
+    useEffect(() => {
+        // generateSkuCombinations();
+        console.log("Attributes changed:", attributes);
+    }, [attributes])
 
     useEffect(() => {
+        console.log("Selected classification type changed:", selectedClassificationType);
+    }, [selectedClassificationType]);
+
+    useEffect(() => {
+        console.log("Form values changed:", form.values);
         if (!attributesReady) return;
         const skus = generateSkuCombinations();
         const currentSkus = form.values.productSkus || [];
         const skusChanged = skus.length !== currentSkus.length ||
             skus.some((sku, index) => sku.sku !== currentSkus[index]?.sku);
+         
             
+            console.log("Generated SKUs:", skus);
         if (skusChanged) {
             form.setFieldValue('productSkus', skus);
         }
-    }, [generateSkuCombinations]);
+    }, [generateSkuCombinations, attributes]);
 
     const updateSku = useCallback((skuId: string, field: string, value: any) => {
         const updatedSkus = form.values.productSkus.map(sku =>
@@ -191,7 +206,7 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
                         selectedClassificationType={selectedClassificationType}
                         onAttributesChange={setAttributes}
                         onClassificationTypeChange={setSelectedClassificationType}
-                    />
+                    /> 
 
                     {form.values.productSkus?.length > 0 && (
                         <>
