@@ -8,7 +8,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { Link, useParams } from 'react-router-dom';
 
@@ -18,71 +18,69 @@ import type { MyShopProductSkuDto, ProductDetailDto } from '../../../types/Produ
 import Breadcrumbs from './Breadcrumbs';
 import ImageProduct from './ImageProduct';
 import InforProduct from './productInfo/InforProduct';
+import type { ProductAttribute } from '../../../types/AttributeType';
 
 const ProductDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [product, setProduct] = useState<ProductDetailDto | null>(null);
+  const [media, setMedia] = useState<string[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
   const [selectedSku, setSelectedSku] = useState<MyShopProductSkuDto | null>(null);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
 
   const { isLoading, getProductById } = useGetProduct();
+
+  const getOrderImageActive = useCallback((url: string) => {
+      if (!url) return 0;
+      const index = media.indexOf(url);
+      return index !== -1 ? index : 0;
+    }, [media]);
+
 
   const groupedAttributes = useMemo(() => {
     if (!product?.productSkus?.length) return [];
 
-    const attributeMap = new Map();
-    
+    const attributeMap = new Map<string, ProductAttribute>();
+
     product.productSkus.forEach(sku => {
       if (!sku.attributeForSku) return;
-      
+
       sku.attributeForSku.forEach(attr => {
         if (!attributeMap.has(attr.attributeKeyName)) {
           attributeMap.set(attr.attributeKeyName, {
-            id: attr.attributeKeyName,
-            displayName: attr.attributeKeyDisplay,
+            attributeKeyName: attr.attributeKeyName,
+            attributeKeyDisplay: attr.attributeKeyDisplay,
             values: new Set<string>(),
           });
         }
-        
-        attributeMap.get(attr.attributeKeyName).values.add(attr.values);
+
+        attributeMap.get(attr.attributeKeyName)?.values.add(attr.values);
       });
     });
-    
-    console.log("Grouped Attributes:", Array.from(attributeMap.values()));
 
-    return Array.from(attributeMap.values()).map(group => ({
-      key: {
-        id: group.id,
-        displayName: group.displayName,
-      },
-      values: Array.from(group.values).map(value => ({
-        value,
-        imageUrl: null // We don't have image URLs for attribute values
-      }))
-    }));
+    return Array.from(attributeMap.values());
   }, [product]);
 
   // Handle attribute selection
   const handleAttributeSelect = (attributeId: string, value: string) => {
-    console.log("Selected Attribute:", attributeId, value);
     const newSelectedAttributes = {
       ...selectedAttributes,
       [attributeId]: value
     };
     setSelectedAttributes(newSelectedAttributes);
-    
+
     // Find matching SKU
     if (product?.productSkus) {
       const matchingSku = product.productSkus.find(sku => {
         if (!sku.attributeForSku) return false;
+        if (sku.attributeForSku.length !== Object.keys(newSelectedAttributes).length) return false;
         return sku.attributeForSku.every(attr => {
           const attrKey = attr.attributeKeyName;
           return !newSelectedAttributes[attrKey] || newSelectedAttributes[attrKey] === attr.values;
         });
       });
-      
-      console.log("Selected SKU:", matchingSku);
       setSelectedSku(matchingSku || null);
+      setSelectedImage(getOrderImageActive(matchingSku?.imageUrl || product.thumbnailUrl));
     }
   };
 
@@ -101,20 +99,21 @@ const ProductDetailPage = () => {
       getProductById(slug)
         .then(productData => {
           setProduct(productData);
-          
-          // Initialize with first SKU attributes if available
-          if (productData.productSkus?.length && productData.productSkus[0].attributeForSku) {
-            const initialAttributes: Record<string, string> = {};
-            productData.productSkus[0].attributeForSku.forEach(attr => {
-              initialAttributes[attr.attributeKeyName] = attr.values;
-            });
-            setSelectedAttributes(initialAttributes);
-            setSelectedSku(productData.productSkus[0]);
-          }
+          const medias = new Set<string>();
+          productData.medias?.forEach(media => {
+            if (media.url) {
+              medias.add(media.url);
+            }
+          });
+          productData.productSkus?.forEach(sku => {
+            if (sku.imageUrl) {
+              medias.add(sku.imageUrl);
+            }
+          });
+          setMedia(Array.from(medias));
         })
     }
   }, [slug, getProductById]);
-
   // Loading skeleton
   if (isLoading) {
     return (
@@ -181,9 +180,11 @@ const ProductDetailPage = () => {
           <Paper radius="md" className="!mb-8 bg-white shadow-sm sticky top-4">
             <div className="p-4">
               <ImageProduct
-                media={product.medias ? product.medias : []}
+                media={media}
                 thumbnailUrl={product.thumbnailUrl}
                 productName={product.name}
+                selectedImage={selectedImage}
+                setSelectedImage={setSelectedImage}
               />
             </div>
           </Paper>

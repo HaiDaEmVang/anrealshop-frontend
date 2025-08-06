@@ -11,7 +11,7 @@ export interface BaseAttribute {
 export interface ProductAttribute {
   attributeKeyName: string;
   attributeKeyDisplay: string;
-  values: string[];
+  values:  Set<string>;
 } 
 
 export interface ProductAttributeSingleValue {

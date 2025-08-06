@@ -1,6 +1,6 @@
-import { Box, Button, Group, Paper, Text, TypographyStylesProvider } from '@mantine/core';
+import { Box, Button, Group, Paper, Text, Tooltip, TypographyStylesProvider } from '@mantine/core';
 import { useState } from 'react';
-import { FiFileText } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiFileText } from 'react-icons/fi';
 
 interface ProductDescriptionProps {
   description: string;
@@ -18,9 +18,9 @@ const ProductDescription = ({ description, sortDescription }: ProductDescription
         <Group justify="apart" className="mb-2">
           <Group>
             <FiFileText size={16} className="text-primary" />
-            <Text fw={600} size="sm">Mô tả sản phẩm</Text>
+            <Text fw={500} size="md">Mô tả sản phẩm</Text>
           </Group>
-          {description.length > 150 && (
+          {description.length > 150 && showFullDescription && (
             <Button
               variant="subtle"
               size="xs"
@@ -44,16 +44,20 @@ const ProductDescription = ({ description, sortDescription }: ProductDescription
         ) : (
           <Box className="text-gray-700">
             <Text>{sortDescription || description.substring(0, 150) + '...'}</Text>
+          </Box>
+        )}
+        <div className="w-full text-center mt-2">
+          <Tooltip label={showFullDescription ? 'Thu gọn' : `Xem thêm `}>
             <Button
               variant="subtle"
               size="xs"
-              onClick={() => setShowFullDescription(true)}
-              className="mt-2"
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="text-primary "
             >
-              Xem thêm
+              {showFullDescription ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
             </Button>
-          </Box>
-        )}
+          </Tooltip>
+        </div>
       </Paper>
     </Box>
   );
