@@ -56,7 +56,6 @@ const AutoComplateCustome = ({
     }, [onChange, onClear]);
 
     const handleSearchChange = useCallback((newSearchValue: string) => {
-        console.log('Search value changed:', newSearchValue);
         setSearchValue(newSearchValue);
         if (onSearchChange) {
             onSearchChange(newSearchValue);

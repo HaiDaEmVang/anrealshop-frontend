@@ -67,7 +67,6 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
     }), [form.values.name, form.values.categoryPath, form.values.price, form.values.quantity]);
 
     const generateSkuCombinations = useCallback(() => {
-        console.log("Generating SKU combinations with attributes:", attributes);
         const activeAttributes = attributes.filter(attr => attr.values.length > 0);
         if (activeAttributes.length === 0) return [];
 
@@ -110,24 +109,11 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
     }, [attributes, formValues, form.values.productSkus]);
 
     useEffect(() => {
-        // generateSkuCombinations();
-        console.log("Attributes changed:", attributes);
-    }, [attributes])
-
-    useEffect(() => {
-        console.log("Selected classification type changed:", selectedClassificationType);
-    }, [selectedClassificationType]);
-
-    useEffect(() => {
-        console.log("Form values changed:", form.values);
         if (!attributesReady) return;
         const skus = generateSkuCombinations();
         const currentSkus = form.values.productSkus || [];
         const skusChanged = skus.length !== currentSkus.length ||
             skus.some((sku, index) => sku.sku !== currentSkus[index]?.sku);
-         
-            
-            console.log("Generated SKUs:", skus);
         if (skusChanged) {
             form.setFieldValue('productSkus', skus);
         }
@@ -153,8 +139,8 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
     const handleGroupApply = useCallback((attributeName: string, attributeValue: string, price: number | null, quantity: number | null, imageUrl?: string | null) => {
         const updatedSkus = form.values.productSkus.map(sku => {
             const hasMatchingAttribute = sku.attributes.some(attr =>
-                attr.attributeKeyName === attributeName.toLowerCase().replace(/\s+/g, '_') &&
-                attr.values[0] === attributeValue[0]
+                attr.attributeKeyName === attributes.find(a => a.attributeKeyDisplay === attributeName)?.attributeKeyName &&
+                attr.values[0] === attributeValue
             );
 
             if (hasMatchingAttribute) {
