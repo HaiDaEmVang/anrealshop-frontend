@@ -45,13 +45,14 @@ const SkuBulkAction = ({ attributes, skus, onApplyBulk, onApplyToGroup }: SkuBul
     const getGroupCount = useCallback(() => {
         if (!selectedAttribute || !selectedAttributeValue) return 0;
         
-        const attributeKey = selectedAttribute.toLowerCase().replace(/\s+/g, '_');
-        return skus.filter(sku => 
+        const attributeKey = attributes.find(attr => attr.attributeKeyDisplay === selectedAttribute)?.attributeKeyName;
+        const count = skus.filter(sku => 
             sku.attributes.some(attr => 
                 attr.attributeKeyName === attributeKey && 
-                attr.values[0] === selectedAttributeValue[0]
+                attr.values[0] === selectedAttributeValue
             )
         ).length;
+        return count;
     }, [selectedAttribute, selectedAttributeValue, skus]);
 
     const getInputValues = () => {
