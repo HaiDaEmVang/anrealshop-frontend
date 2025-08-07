@@ -65,6 +65,7 @@ export const API_ENDPOINTS = {
     ADD_ITEM: '/user/cart/add',
     REMOVE_ITEM: (cartItemId: string) => `/user/cart/remove/${cartItemId}`,
     REMOVE_ITEMS: '/user/cart/clear',
+    UPDATE_QUANTITY: `/user/cart/update-quantity`,
   }
 };
 
