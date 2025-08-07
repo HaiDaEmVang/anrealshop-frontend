@@ -19,6 +19,13 @@ import Breadcrumbs from './Breadcrumbs';
 import ImageProduct from './ImageProduct';
 import InforProduct from './productInfo/InforProduct';
 import type { ProductAttribute } from '../../../types/AttributeType';
+import showErrorNotification from '../../Toast/NotificationError';
+import { CartService } from '../../../service/CartService';
+import type { CartItemDto } from '../../../types/CartType';
+import showSuccessNotification from '../../Toast/NotificationSuccess';
+import { getErrorMessage } from '../../../untils/ErrorUntils';
+import { useAppDispatch } from '../../../hooks/useAppRedux';
+import { addToCart } from '../../../feature/auth/authSlice';
 
 const ProductDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -30,11 +37,13 @@ const ProductDetailPage = () => {
 
   const { isLoading, getProductById } = useGetProduct();
 
+  const dispatch = useAppDispatch();
+
   const getOrderImageActive = useCallback((url: string) => {
-      if (!url) return 0;
-      const index = media.indexOf(url);
-      return index !== -1 ? index : 0;
-    }, [media]);
+    if (!url) return 0;
+    const index = media.indexOf(url);
+    return index !== -1 ? index : 0;
+  }, [media]);
 
 
   const groupedAttributes = useMemo(() => {
@@ -84,13 +93,32 @@ const ProductDetailPage = () => {
     }
   };
 
-  const handleAddToCart = () => {
-    // Implement add to cart functionality
-    console.log("Adding to cart:", { product, selectedSku, selectedAttributes });
+  const handleAddToCart = (quantity: number) => {
+    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
+      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
+      return;
+    }
+    if (quantity < 1 || quantity > selectedSku.quantity) {
+      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
+      return;
+    }
+
+    const cartItemDto: CartItemDto = {
+      productSkuId: selectedSku.id,
+      quantity: quantity,
+    }
+    CartService.addItemToCart(cartItemDto)
+      .then((data) => {
+        showSuccessNotification("Thông báo", "Sản phẩm đã được thêm vào giỏ hàng thành công.");
+        if (data.isNew) 
+          dispatch(addToCart());
+      })
+      .catch((error) => {
+        showErrorNotification("Lỗi", getErrorMessage(error));
+      });
   }
 
   const handleBuyNow = () => {
-    // Implement buy now functionality
     console.log("Buying now:", { product, selectedSku, selectedAttributes });
   }
 

@@ -6,12 +6,12 @@ import ProductsService from '../service/ProductsService';
 import type {
     MyShopProductDto,
     MyShopProductListResponse,
-    MyShopProductSkuDto,
     ProductCreateRequest,
     ProductStatus,
     ProductStatusDto,
-    UserProductDto,
+    UserProductDto
 } from '../types/ProductType';
+import { getErrorMessage } from '../untils/ErrorUntils';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../untils/Untils';
 
 type ProductMode = 'myshop' | 'admin' | 'user';
@@ -341,27 +341,7 @@ export const useGetProduct = () => {
 }
 
 
-// Utility function to extract error messages from backend
-const getErrorMessage = (error: any): string => {
-    // Sử dụng message từ backend response trước
-    if (error.response?.data?.message) {
-        return error.response.data.message;
-    }
 
-    // Fallback cho các lỗi network hoặc không có response
-    if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
-        return 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet.';
-    }
-
-    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-        return 'Yêu cầu quá thời gian chờ. Vui lòng thử lại.';
-    }
-
-    // Fallback cuối cùng
-    return error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
-};
-
-// Hook for product operations (update)
 export const useProductOperations = () => {
     const [isLoading, setIsLoading] = useState(false);
 

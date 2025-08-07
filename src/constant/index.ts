@@ -59,6 +59,13 @@ export const API_ENDPOINTS = {
     GET_SUGGEST_BY_NAME_PRODUCT: '/categories/suggest-by-product-name',
   },
 
+  CART: {
+    BASE: '/cart',
+    GET: '/user/cart',
+    ADD_ITEM: '/user/cart/add',
+    REMOVE_ITEM: (cartItemId: string) => `/user/cart/remove/${cartItemId}`,
+    REMOVE_ITEMS: '/user/cart/clear',
+  }
 };
 
 

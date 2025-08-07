@@ -4,7 +4,7 @@ import { FiMinus, FiPlus, FiShoppingCart } from 'react-icons/fi';
 
 interface ProductActionsProps {
   availableQuantity: number;
-  onAddToCart: () => void;
+  onAddToCart: (quantity: number) => void;
   onBuyNow: () => void;
 }
 
@@ -41,7 +41,7 @@ const ProductActions = ({ availableQuantity, onAddToCart, onBuyNow }: ProductAct
           color="blue"
           size="md"
           className="flex-1 border-primary text-primary"
-          onClick={onAddToCart}
+          onClick={() => onAddToCart(itemQuantity)}
         >
           Thêm vào giỏ
         </Button>

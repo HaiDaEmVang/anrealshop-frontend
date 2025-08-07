@@ -28,6 +28,7 @@ import ProductDescription from './ProductDescription';
 import ProductPriceAndAttributes from './ProductPriceAndAttributes';
 import ProductShippingInfo from './ProductShippingInfo';
 import { ShopInfo } from './ShopInfo';
+import { useState } from 'react';
 
 
 
@@ -36,7 +37,7 @@ interface InforProductProps {
   selectedAttributes: Record<string, string>;
   selectedSku: MyShopProductSkuDto | null;
   onAttributeSelect: (keyId: string, value: string) => void;
-  onAddToCart: () => void;
+  onAddToCart: (quantity: number) => void;
   onBuyNow: () => void;
   groupedAttributes: ProductAttribute[];
 }
@@ -51,6 +52,7 @@ const InforProduct = ({
   groupedAttributes,
 }: InforProductProps) => {
   const availableQuantity = selectedSku?.quantity || product.quantity;
+  const [quantity, setQuantity] = useState<number>(1);
 
   return (
     <div>
