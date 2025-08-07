@@ -1,4 +1,4 @@
-import { Anchor, Container, Grid, Group, Text, Title, UnstyledButton } from '@mantine/core';
+import { ActionIcon, Anchor, Container, Grid, Group, Text, TextInput, Title, UnstyledButton } from '@mantine/core';
 import { FaCcMastercard, FaCcVisa, FaCreditCard, FaFacebook, FaInstagram, FaPaypal, FaTwitter } from 'react-icons/fa';
 import { FiMail, FiMapPin, FiPhone, FiSend } from 'react-icons/fi';
 
@@ -101,14 +101,28 @@ const Footer: React.FC = () => {
               Đăng ký nhận bản tin của chúng tôi để cập nhật những ưu đãi mới nhất!
             </Text>
             <div className="flex mb-6">
-              <input
-                type="email"
+              <TextInput
                 placeholder="Nhập email của bạn"
-                className="flex-1 border border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                size="sm"
+                rightSection={
+                  <ActionIcon 
+                    variant="filled" 
+                    color="primary" 
+                    size="md" 
+                    radius="sm" 
+                    className="!bg-primary hover:!bg-primary/80"
+                  >
+                    <FiSend size={16} />
+                  </ActionIcon>
+                }
+                // styles={{
+                //   input: {
+                //     '&:focus-within': {
+                //       borderColor: 'var(--mantine-color-primary-6)',
+                //     },
+                //   }
+                // }}
               />
-              <button className="bg-primary text-white px-4 py-2 rounded-r-md text-sm font-medium hover:bg-primary/45 transition-colors">
-                <FiSend size={16} />
-              </button>
             </div>
             
             {/* Payment methods */}

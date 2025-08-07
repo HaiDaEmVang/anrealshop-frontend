@@ -221,3 +221,4 @@ const authSlice = createSlice({
 });
 
 export default authSlice.reducer;
+export const { addToCart, removeFromCart, updateCartCount, clearCart } = authSlice.actions;

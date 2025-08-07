@@ -62,7 +62,7 @@ export type ProductStatus = 'ALL' | 'ACTIVE' | 'VIOLATION' | 'PENDING' | 'HIDDEN
 export interface ProductStatusDto {
   id: string;
   name: string;
-  count: number;
+  count: number; 
 }
 
 export interface MyShopProductSkuDto {
@@ -89,7 +89,7 @@ export interface ProductDetailDto {
   categoryPath?: string;
   description?: string;
   sortDescription?: string;
-  price?: number;
+  price: number;
   discountPrice: number;
   quantity: number;
   sold: number;
