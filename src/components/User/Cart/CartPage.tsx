@@ -1,229 +1,260 @@
 import {
   Box,
-  Button,
   Container,
   Divider,
   Grid,
   Group,
   Paper,
   Text,
-  Title
 } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
-import React, { useState } from 'react';
-import {
-  FiChevronLeft,
-  FiShoppingCart,
-  FiTruck
-} from 'react-icons/fi';
-import { Link } from 'react-router-dom';
-
-// Import component ListProduct
+import React, { useCallback, useEffect, useState } from 'react';
+import { FiTruck } from 'react-icons/fi';
+import { removeFromCart, updateCartCount } from '../../../feature/auth/authSlice';
+import { useAppDispatch } from '../../../hooks/useAppRedux';
+import { CartService } from '../../../service/CartService';
+import { ShipmentService } from '../../../service/ShipmentService';
+import type { CartDto } from '../../../types/CartType';
+import type { CartShippingFee } from '../../../types/ShipmentType';
+import { getErrorMessage } from '../../../untils/ErrorUntils';
+import showErrorNotification from '../../Toast/NotificationError';
+import showSuccessNotification from '../../Toast/NotificationSuccess';
 import CartBreadcrumbs from './Breadcrumbs';
-import ListProduct, { type CartItem } from './ListProduct';
+import ListProduct from './ListProduct';
+import ListProductSkeleton, { SummerSkeleton } from './Skeleton';
 import Summer from './Summer';
 
 const CartPage: React.FC = () => {
-  // Dữ liệu mẫu cho giỏ hàng
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: '1',
-      productId: 'p1',
-      skuId: 'sku1',
-      name: 'Áo thun nam cotton cổ tròn basic',
-      price: 199000,
-      originalPrice: 250000,
-      quantity: 2,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1611078489935-0cb964de46d6?q=80&w=1074',
-      attributes: {
-        color: 'Trắng',
-        size: 'L',
-      },
-      inStock: true,
-      maxQuantity: 10,
-    },
-    {
-      id: '2',
-      productId: 'p2',
-      skuId: 'sku2',
-      name: 'Quần jean nam slim fit',
-      price: 350000,
-      originalPrice: 350000,
-      quantity: 1,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1611078489935-0cb964de46d6?q=80&w=1074',
-      attributes: {
-        color: 'Xanh đậm',
-        size: '32',
-      },
-      inStock: true,
-      maxQuantity: 5,
-    },
-    {
-      id: '3',
-      productId: 'p3',
-      skuId: 'sku3',
-      name: 'Giày thể thao chạy bộ nam',
-      price: 750000,
-      originalPrice: 950000,
-      quantity: 1,
-      thumbnailUrl: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=1074',
-      attributes: {
-        color: 'Đen',
-        size: '42',
-      },
-      inStock: false,
-      maxQuantity: 0,
-    }
-  ]);
+  const [cartItems, setCartItems] = useState<CartDto[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // State để quản lý lựa chọn sản phẩm
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
-  // Xử lý chọn tất cả/bỏ chọn tất cả
+  const [shippingFees, setShippingFees] = useState<CartShippingFee[]>([]);
+  const [loadingShopIds, setLoadingShopIds] = useState<string[]>([]);
+
+  const dispatch = useAppDispatch();
+
+  const getAllItemIds = useCallback(() => {
+    return cartItems.flatMap(shop => shop.items.map(item => item.id));
+  }, [cartItems]);
+
+  const getAllSelectedItemIds = useCallback(() => {
+    return cartItems.flatMap(shop => shop.items.filter(i => i.isSelected).map(i => i.id));
+  }, [cartItems]);
+
+  const getAllItemsIdsForShop = useCallback((itemId: string) => {
+    const shop = cartItems.find(shop => shop.items.some(item => item.id === itemId));
+    return shop ? { shopId: shop.shop.id, itemIds: shop.items.filter(i => i.isSelected).map(i => i.id) } : { shopId: '', itemIds: [] };
+  }, [cartItems]);
+
+  useEffect(() => {
+    setLoading(true);
+    CartService.getCart()
+      .then(data => {
+        const normalized: CartDto[] = (data as CartDto[]).map((shop: CartDto) => ({
+          ...shop,
+          items: shop.items.map((item) => ({
+            ...item,
+            isSelected: typeof item.isSelected === 'boolean'
+              ? item.isSelected
+              : (item as any).selected === true
+          }))
+        }));
+        setCartItems(normalized);
+        setLoading(false);
+      })
+      .catch(error => {
+        setLoading(false);
+        showErrorNotification('Lấy giỏ hàng thất bại', getErrorMessage(error));
+      });
+  }, []);
+
+  const fetchFee = useCallback((ids: string[]) => {
+    if (ids.length === 0) {
+      return;
+    }
+    ShipmentService.getFeeForCart(ids)
+      .then(data => {
+        setShippingFees(pre => {
+          const dataCs = new Set(data.map(item => item.shopId));
+          const filteredPre = pre.filter(item => !dataCs.has(item.shopId));
+          return [...filteredPre, ...data];
+        });
+        setLoadingShopIds([]);
+      })
+      .catch(error => {
+        setLoadingShopIds([]);
+        showErrorNotification('Lấy phí vận chuyển thất bại', getErrorMessage(error));
+      });
+  }, [])
+
+
+  useEffect(() => {
+    const allItemIds = getAllItemIds();
+    const selected = getAllSelectedItemIds();
+    setSelectAll(allItemIds.length > 0 && selected.length === allItemIds.length);
+  }, [cartItems, getAllItemIds, getAllSelectedItemIds]);
+
+  // After cart data loaded, fetch shipping fee for already selected items
+  useEffect(() => {
+    if (loading) return;
+    const initiallySelected = getAllSelectedItemIds();
+    if (initiallySelected.length === 0) return;
+    const shopIds = cartItems.filter(s => s.items.some(i => i.isSelected)).map(s => s.shop.id);
+    setLoadingShopIds(shopIds);
+    fetchFee(initiallySelected);
+  }, [loading, cartItems, getAllSelectedItemIds, fetchFee]);
+
   const handleSelectAll = (checked: boolean) => {
+    const allIds = getAllItemIds();
     setSelectAll(checked);
-    if (checked) {
-      // Chọn tất cả các sản phẩm còn hàng
-      setSelectedItems(cartItems.filter(item => item.inStock).map(item => item.id));
-    } else {
-      setSelectedItems([]);
-    }
+    if (allIds.length === 0) return;
+    CartService.updateSelectedItems(allIds, checked)
+      .then(() => {
+        setCartItems(prev => prev.map(shop => ({
+          ...shop,
+          items: shop.items.map(item => ({ ...item, isSelected: checked }))
+        })));
+        if (checked) {
+          setLoadingShopIds(cartItems.map(shop => shop.shop.id));
+          fetchFee(allIds);
+        } else {
+          setLoadingShopIds([]);
+          setShippingFees([]);
+        }
+      })
+      .catch(error => {
+        showErrorNotification('Cập nhật chọn tất cả thất bại', getErrorMessage(error));
+      });
   };
 
-  // Xử lý chọn từng sản phẩm
   const handleSelectItem = (itemId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedItems(prev => [...prev, itemId]);
-    } else {
-      setSelectedItems(prev => prev.filter(id => id !== itemId));
-    }
+    CartService.updateSelectedItems([itemId], checked)
+      .then(() => {
+        setCartItems(prev => prev.map(shop => ({
+          ...shop,
+          items: shop.items.map(item => item.id === itemId ? { ...item, isSelected: checked } : item)
+        })));
+        const { shopId, itemIds } = getAllItemsIdsForShop(itemId);
+        if (checked) {
+          const idsToFetch = [...itemIds, itemId];
+          setLoadingShopIds(prev => prev.includes(shopId) ? prev : [...prev, shopId]);
+          fetchFee(idsToFetch);
+        } else {
+            if (itemIds.filter(id => id !== itemId).length === 0) {
+              setShippingFees(prev => prev.filter(f => f.shopId !== shopId));
+            } else {
+              const remainingIds = itemIds.filter(id => id !== itemId);
+              setLoadingShopIds(prev => prev.includes(shopId) ? prev : [...prev, shopId]);
+              fetchFee(remainingIds);
+            }
+        }
+      })
+      .catch(error => {
+        showErrorNotification('Cập nhật chọn sản phẩm thất bại', getErrorMessage(error));
+      });
   };
 
-  // Xử lý cập nhật số lượng
-  const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === itemId
-          ? { ...item, quantity: Math.min(newQuantity, item.maxQuantity) }
-          : item
-      )
+  const handleResetCartItems = useCallback((ids: string[]) => {
+    setCartItems(prevCartItems =>
+      prevCartItems.map(shopGroup => ({
+        ...shopGroup,
+        items: shopGroup.items.filter(item => !ids.includes(item.id))
+      })).filter(shopGroup => shopGroup.items.length > 0)
     );
+  }, []);
 
-    notifications.show({
-      title: 'Giỏ hàng đã được cập nhật',
-      message: 'Số lượng sản phẩm đã được cập nhật thành công',
-      color: 'blue',
-    });
+  const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
+    CartService.updateQuantity(itemId, newQuantity)
+      .then(() => {
+        setCartItems(prevCartItems =>
+          prevCartItems.map(shopGroup => ({
+            ...shopGroup,
+            items: shopGroup.items.map(item =>
+              item.id === itemId
+                ? { ...item, quantity: newQuantity }
+                : item
+            )
+          }))
+        );
+      })
+      .catch(error => {
+        showErrorNotification('Cập nhật số lượng thất bại', getErrorMessage(error));
+      });
   };
 
-  // Xử lý xóa sản phẩm
+
   const handleRemoveItem = (itemId: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
-    setSelectedItems(prev => prev.filter(id => id !== itemId));
-
-    notifications.show({
-      title: 'Đã xóa sản phẩm',
-      message: 'Sản phẩm đã được xóa khỏi giỏ hàng',
-      color: 'red',
-    });
+    console.log(`Removing item ${itemId} from cart`);
+    CartService.removeItemFromCart(itemId)
+      .then(() => {
+        handleResetCartItems([itemId]);
+        dispatch(removeFromCart());
+        showSuccessNotification('Xóa sản phẩm thành công', 'Sản phẩm đã được xóa khỏi giỏ hàng');
+      })
+      .catch(error => {
+        showErrorNotification('Xóa sản phẩm thất bại', getErrorMessage(error));
+      });
   };
 
-  // Xử lý xóa nhiều sản phẩm
   const handleRemoveSelected = () => {
-    if (selectedItems.length === 0) return;
-
-    setCartItems(prev => prev.filter(item => !selectedItems.includes(item.id)));
-    setSelectedItems([]);
-    setSelectAll(false);
-
-    notifications.show({
-      title: 'Đã xóa sản phẩm',
-      message: `${selectedItems.length} sản phẩm đã được xóa khỏi giỏ hàng`,
-      color: 'red',
-    });
+    const selectedIds = getAllSelectedItemIds();
+    if (selectedIds.length === 0) {
+      showErrorNotification('Không có sản phẩm nào được chọn', 'Vui lòng chọn ít nhất một sản phẩm để xóa');
+      return;
+    }
+    const currentCountItem = getAllItemIds().length;
+    CartService.clearCart(selectedIds)
+      .then((data) => {
+        handleResetCartItems(selectedIds);
+        dispatch(updateCartCount(currentCountItem - data.countDelete))
+        showSuccessNotification('Xóa sản phẩm thành công', `${selectedIds.length} sản phẩm đã được xóa khỏi giỏ hàng`);
+      })
+      .catch(error => {
+        showErrorNotification('Xóa sản phẩm thất bại', getErrorMessage(error));
+      });
   };
 
-  
-  // Tính toán tổng thanh toán
-  const subtotal = cartItems
-    .filter(item => selectedItems.includes(item.id))
-    .reduce((total, item) => total + (item.price * item.quantity), 0);
-
-  const discount = cartItems
-    .filter(item => selectedItems.includes(item.id))
-    .reduce((total, item) => total + ((item.originalPrice - item.price) * item.quantity), 0);
-
-  const shippingCost = subtotal > 0 ? 30000 : 0; // Miễn phí vận chuyển cho đơn từ 500,000đ
-  const freeShippingThreshold = 500000;
-  const freeShippingAmount = Math.max(0, freeShippingThreshold - subtotal);
-  const total = subtotal + shippingCost;
-
-  // Kiểm tra xem có sản phẩm nào trong giỏ không
-  const isCartEmpty = cartItems.length === 0;
-
-  // Kiểm tra xem có sản phẩm được chọn không
-  const hasSelectedItems = selectedItems.length > 0;
 
   return (
     <Container size="xl" className="py-6">
       <CartBreadcrumbs />
 
-      {isCartEmpty ? (
-        // Giỏ hàng trống
-        <Paper radius="md" shadow="sm" p="xl" className="bg-white">
-          <Box className="text-center py-10">
-            <FiShoppingCart size={64} className="text-gray-300 mx-auto mb-4" />
-            <Title order={3} className="text-slate-800 mb-3">Giỏ hàng của bạn đang trống</Title>
-            <Text color="dimmed" className="mb-6">
-              Bạn chưa thêm sản phẩm nào vào giỏ hàng.
-            </Text>
-            <Button
-              component={Link}
-              to="/"
-              size="md"
-              className="bg-primary hover:bg-picton-blue-600"
-              leftSection={<FiChevronLeft size={18} />}
-            >
-              Tiếp tục mua sắm
-            </Button>
-          </Box>
-        </Paper>
-      ) : (
-        // Giỏ hàng có sản phẩm
-        <Grid gutter="xl">
-          {/* Cột trái - danh sách sản phẩm */}
-          <Grid.Col span={{ base: 12, md: 8 }}>
-            <Paper radius="md" shadow="sm" p="md" className="bg-white">
-              {/* Sử dụng component ListProduct */}
+      <Grid gutter="xl">
+        <Grid.Col span={{ base: 12, md: 8 }}>
+          <Paper radius="md" shadow="sm" p="md" className="bg-white">
+            {loading ? (
+              <ListProductSkeleton />
+            ) : (
               <ListProduct
                 cartItems={cartItems}
-                selectedItems={selectedItems}
                 selectAll={selectAll}
                 onSelectAll={handleSelectAll}
                 onSelectItem={handleSelectItem}
                 onUpdateQuantity={handleUpdateQuantity}
                 onRemoveItem={handleRemoveItem}
                 onRemoveSelected={handleRemoveSelected}
+                shippingFees={shippingFees}
+                loadingShopIds={loadingShopIds}
               />
-            </Paper>
-          </Grid.Col>
+            )}
+          </Paper>
+        </Grid.Col>
 
-          {/* Cột phải - tổng quan đơn hàng */}
-          <Grid.Col span={{ base: 12, md: 4 }}>
-            <Box className="sticky top-4">
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Box className="sticky top-4">
+            {loading ? (
+              <SummerSkeleton />
+            ) : (
               <Summer
-                selectedItemsCount={selectedItems.length}
-                subtotal={subtotal}
-                discount={discount}
-                shippingCost={shippingCost}
-                total={total}
-                hasSelectedItems={hasSelectedItems}
-                freeShippingThreshold={freeShippingThreshold}
-                freeShippingAmount={freeShippingAmount}
+                cartItems={cartItems}
+                shippingFees={shippingFees}
+                freeShippingThreshold={500000}
+                loadingShop={loadingShopIds.length > 0}
               />
+            )}
 
-              {/* Các chính sách */}
+            {!loading && cartItems.length > 0 && (
               <Paper radius="md" shadow="sm" p="md" className="bg-white">
                 <Box className="space-y-4">
                   <Group gap="xs">
@@ -236,10 +267,10 @@ const CartPage: React.FC = () => {
                   </Text>
                 </Box>
               </Paper>
-            </Box>
-          </Grid.Col>
-        </Grid>
-      )}
+            )}
+          </Box>
+        </Grid.Col>
+      </Grid>
     </Container>
   );
 };

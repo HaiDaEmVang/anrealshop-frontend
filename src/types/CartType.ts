@@ -6,11 +6,30 @@ export interface CartDto {
 }
 
 export interface CartItemDto {
-    id?: string;
+    id: string;
+    productId: string;
+    urlSlug: string;
     productSkuId: string;
-    productName?: string;
-    thumbnailUrl?: string;
+    name: string;
+    thumbnailUrl: string;
     quantity: number;
-    price?: number;
-    attributeString?: string;
+    maxQuantity: number;
+    price: number;
+    attributeString: string;
+    isSelected: boolean;
+}
+
+export interface CartItemUpdateDto {
+    id: string;
+    quantity: number;
+}
+
+export interface CartAddItemDto {
+    productSkuId: string; 
+    quantity: number;
+}
+
+export interface CartUpdateSeleted {
+    itemIds: string[];
+    selected: boolean;
 }

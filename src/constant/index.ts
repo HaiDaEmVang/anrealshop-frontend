@@ -65,7 +65,15 @@ export const API_ENDPOINTS = {
     ADD_ITEM: '/user/cart/add',
     REMOVE_ITEM: (cartItemId: string) => `/user/cart/remove/${cartItemId}`,
     REMOVE_ITEMS: '/user/cart/clear',
-  }
+    UPDATE_QUANTITY: `/user/cart/update-quantity`,
+    UPDATE_SELECTED: '/user/cart/update-selected',
+  },
+
+  SHIPMENT: {
+    BASE: '/shipping',
+    GET_SHIPPING_FEE_FORCART: '/shipping/fee-for-cart',
+  },
+  
 };
 
 
