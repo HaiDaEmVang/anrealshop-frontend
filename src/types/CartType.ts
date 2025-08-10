@@ -16,7 +16,7 @@ export interface CartItemDto {
     maxQuantity: number;
     price: number;
     attributeString: string;
-    // isSelected: boolean;
+    isSelected: boolean;
 }
 
 export interface CartItemUpdateDto {

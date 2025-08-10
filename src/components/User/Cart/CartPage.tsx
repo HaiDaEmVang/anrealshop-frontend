@@ -9,36 +9,58 @@ import {
 } from '@mantine/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiTruck } from 'react-icons/fi';
+import { removeFromCart, updateCartCount } from '../../../feature/auth/authSlice';
+import { useAppDispatch } from '../../../hooks/useAppRedux';
 import { CartService } from '../../../service/CartService';
+import { ShipmentService } from '../../../service/ShipmentService';
 import type { CartDto } from '../../../types/CartType';
+import type { CartShippingFee } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
 import showErrorNotification from '../../Toast/NotificationError';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
 import CartBreadcrumbs from './Breadcrumbs';
 import ListProduct from './ListProduct';
-import Summer from './Summer';
 import ListProductSkeleton, { SummerSkeleton } from './Skeleton';
-import { useAppDispatch } from '../../../hooks/useAppRedux';
-import { removeFromCart, updateCartCount } from '../../../feature/auth/authSlice';
+import Summer from './Summer';
 
 const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartDto[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
 
-  const useDispatch = useAppDispatch();
+  const [shippingFees, setShippingFees] = useState<CartShippingFee[]>([]);
+  const [loadingShopIds, setLoadingShopIds] = useState<string[]>([]);
+
+  const dispatch = useAppDispatch();
 
   const getAllItemIds = useCallback(() => {
     return cartItems.flatMap(shop => shop.items.map(item => item.id));
+  }, [cartItems]);
+
+  const getAllSelectedItemIds = useCallback(() => {
+    return cartItems.flatMap(shop => shop.items.filter(i => i.isSelected).map(i => i.id));
+  }, [cartItems]);
+
+  const getAllItemsIdsForShop = useCallback((itemId: string) => {
+    const shop = cartItems.find(shop => shop.items.some(item => item.id === itemId));
+    return shop ? { shopId: shop.shop.id, itemIds: shop.items.filter(i => i.isSelected).map(i => i.id) } : { shopId: '', itemIds: [] };
   }, [cartItems]);
 
   useEffect(() => {
     setLoading(true);
     CartService.getCart()
       .then(data => {
-        setCartItems(data);
+        const normalized: CartDto[] = (data as CartDto[]).map((shop: CartDto) => ({
+          ...shop,
+          items: shop.items.map((item) => ({
+            ...item,
+            isSelected: typeof item.isSelected === 'boolean'
+              ? item.isSelected
+              : (item as any).selected === true
+          }))
+        }));
+        setCartItems(normalized);
         setLoading(false);
       })
       .catch(error => {
@@ -47,26 +69,90 @@ const CartPage: React.FC = () => {
       });
   }, []);
 
+  const fetchFee = useCallback((ids: string[]) => {
+    if (ids.length === 0) {
+      return;
+    }
+    ShipmentService.getFeeForCart(ids)
+      .then(data => {
+        setShippingFees(pre => {
+          const dataCs = new Set(data.map(item => item.shopId));
+          const filteredPre = pre.filter(item => !dataCs.has(item.shopId));
+          return [...filteredPre, ...data];
+        });
+        setLoadingShopIds([]);
+      })
+      .catch(error => {
+        setLoadingShopIds([]);
+        showErrorNotification('Lấy phí vận chuyển thất bại', getErrorMessage(error));
+      });
+  }, [])
+
+
   useEffect(() => {
     const allItemIds = getAllItemIds();
-    setSelectAll(allItemIds.length > 0 && selectedItems.length === allItemIds.length);
-  }, [selectedItems, cartItems, getAllItemIds]);
+    const selected = getAllSelectedItemIds();
+    setSelectAll(allItemIds.length > 0 && selected.length === allItemIds.length);
+  }, [cartItems, getAllItemIds, getAllSelectedItemIds]);
+
+  // After cart data loaded, fetch shipping fee for already selected items
+  useEffect(() => {
+    if (loading) return;
+    const initiallySelected = getAllSelectedItemIds();
+    if (initiallySelected.length === 0) return;
+    const shopIds = cartItems.filter(s => s.items.some(i => i.isSelected)).map(s => s.shop.id);
+    setLoadingShopIds(shopIds);
+    fetchFee(initiallySelected);
+  }, [loading, cartItems, getAllSelectedItemIds, fetchFee]);
 
   const handleSelectAll = (checked: boolean) => {
+    const allIds = getAllItemIds();
     setSelectAll(checked);
-    if (checked) {
-      setSelectedItems(getAllItemIds());
-    } else {
-      setSelectedItems([]);
-    }
+    if (allIds.length === 0) return;
+    CartService.updateSelectedItems(allIds, checked)
+      .then(() => {
+        setCartItems(prev => prev.map(shop => ({
+          ...shop,
+          items: shop.items.map(item => ({ ...item, isSelected: checked }))
+        })));
+        if (checked) {
+          setLoadingShopIds(cartItems.map(shop => shop.shop.id));
+          fetchFee(allIds);
+        } else {
+          setLoadingShopIds([]);
+          setShippingFees([]);
+        }
+      })
+      .catch(error => {
+        showErrorNotification('Cập nhật chọn tất cả thất bại', getErrorMessage(error));
+      });
   };
 
   const handleSelectItem = (itemId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedItems(prev => [...prev, itemId]);
-    } else {
-      setSelectedItems(prev => prev.filter(id => id !== itemId));
-    }
+    CartService.updateSelectedItems([itemId], checked)
+      .then(() => {
+        setCartItems(prev => prev.map(shop => ({
+          ...shop,
+          items: shop.items.map(item => item.id === itemId ? { ...item, isSelected: checked } : item)
+        })));
+        const { shopId, itemIds } = getAllItemsIdsForShop(itemId);
+        if (checked) {
+          const idsToFetch = [...itemIds, itemId];
+          setLoadingShopIds(prev => prev.includes(shopId) ? prev : [...prev, shopId]);
+          fetchFee(idsToFetch);
+        } else {
+            if (itemIds.filter(id => id !== itemId).length === 0) {
+              setShippingFees(prev => prev.filter(f => f.shopId !== shopId));
+            } else {
+              const remainingIds = itemIds.filter(id => id !== itemId);
+              setLoadingShopIds(prev => prev.includes(shopId) ? prev : [...prev, shopId]);
+              fetchFee(remainingIds);
+            }
+        }
+      })
+      .catch(error => {
+        showErrorNotification('Cập nhật chọn sản phẩm thất bại', getErrorMessage(error));
+      });
   };
 
   const handleResetCartItems = useCallback((ids: string[]) => {
@@ -76,7 +162,6 @@ const CartPage: React.FC = () => {
         items: shopGroup.items.filter(item => !ids.includes(item.id))
       })).filter(shopGroup => shopGroup.items.length > 0)
     );
-    setSelectedItems(prev => prev.filter(id => !ids.includes(id)));
   }, []);
 
   const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
@@ -104,7 +189,7 @@ const CartPage: React.FC = () => {
     CartService.removeItemFromCart(itemId)
       .then(() => {
         handleResetCartItems([itemId]);
-        useDispatch(removeFromCart());
+        dispatch(removeFromCart());
         showSuccessNotification('Xóa sản phẩm thành công', 'Sản phẩm đã được xóa khỏi giỏ hàng');
       })
       .catch(error => {
@@ -113,46 +198,23 @@ const CartPage: React.FC = () => {
   };
 
   const handleRemoveSelected = () => {
-    if (selectedItems.length === 0) {
+    const selectedIds = getAllSelectedItemIds();
+    if (selectedIds.length === 0) {
       showErrorNotification('Không có sản phẩm nào được chọn', 'Vui lòng chọn ít nhất một sản phẩm để xóa');
       return;
     }
-
     const currentCountItem = getAllItemIds().length;
-    CartService.clearCart(selectedItems)
+    CartService.clearCart(selectedIds)
       .then((data) => {
-        handleResetCartItems(selectedItems);
-        useDispatch(updateCartCount(currentCountItem - data.countDelete))
-        showSuccessNotification('Xóa sản phẩm thành công', `${selectedItems.length} sản phẩm đã được xóa khỏi giỏ hàng`);
+        handleResetCartItems(selectedIds);
+        dispatch(updateCartCount(currentCountItem - data.countDelete))
+        showSuccessNotification('Xóa sản phẩm thành công', `${selectedIds.length} sản phẩm đã được xóa khỏi giỏ hàng`);
       })
       .catch(error => {
         showErrorNotification('Xóa sản phẩm thất bại', getErrorMessage(error));
       });
   };
 
-  const findSelectedItems = () => {
-    const items = [];
-    for (const shop of cartItems) {
-      for (const item of shop.items) {
-        if (selectedItems.includes(item.id)) {
-          items.push(item);
-        }
-      }
-    }
-    return items;
-  };
-
-  const selectedItemsData = findSelectedItems();
-
-  const subtotal = selectedItemsData.reduce((total, item) => total + (item.price * item.quantity), 0);
-
-  const discount = 0;
-  const shippingCost = subtotal > 0 ? 30000 : 0;
-  const freeShippingThreshold = 500000;
-  const freeShippingAmount = Math.max(0, freeShippingThreshold - subtotal);
-  const total = subtotal + shippingCost;
-
-  const hasSelectedItems = selectedItems.length > 0;
 
   return (
     <Container size="xl" className="py-6">
@@ -166,13 +228,14 @@ const CartPage: React.FC = () => {
             ) : (
               <ListProduct
                 cartItems={cartItems}
-                selectedItems={selectedItems}
                 selectAll={selectAll}
                 onSelectAll={handleSelectAll}
                 onSelectItem={handleSelectItem}
                 onUpdateQuantity={handleUpdateQuantity}
                 onRemoveItem={handleRemoveItem}
                 onRemoveSelected={handleRemoveSelected}
+                shippingFees={shippingFees}
+                loadingShopIds={loadingShopIds}
               />
             )}
           </Paper>
@@ -184,16 +247,12 @@ const CartPage: React.FC = () => {
               <SummerSkeleton />
             ) : (
               <Summer
-                selectedItemsCount={selectedItems.length}
-                subtotal={subtotal}
-                discount={discount}
-                shippingCost={shippingCost}
-                total={total}
-                hasSelectedItems={hasSelectedItems}
-                freeShippingThreshold={freeShippingThreshold}
-                freeShippingAmount={freeShippingAmount}
+                cartItems={cartItems}
+                shippingFees={shippingFees}
+                freeShippingThreshold={500000}
+                loadingShop={loadingShopIds.length > 0}
               />
-            ) }
+            )}
 
             {!loading && cartItems.length > 0 && (
               <Paper radius="md" shadow="sm" p="md" className="bg-white">

@@ -33,10 +33,20 @@ const updateQuantity = async (cartItemId: string, quantity: number) => {
     return response.data;
 }
 
+const updateSelectedItems = async (itemIds: string[], selected: boolean) => {
+    const payload = {
+        itemIds,
+        selected
+    };
+    const response = await axiosInstance.put(API_ENDPOINTS.CART.UPDATE_SELECTED, payload);
+    return response.data;
+}
+
 export const CartService = {
     getCart,
     addItemToCart,
     removeItemFromCart,
     clearCart,
     updateQuantity,
+    updateSelectedItems,
 };
