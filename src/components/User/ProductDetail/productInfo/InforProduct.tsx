@@ -38,7 +38,7 @@ interface InforProductProps {
   selectedSku: MyShopProductSkuDto | null;
   onAttributeSelect: (keyId: string, value: string) => void;
   onAddToCart: (quantity: number) => void;
-  onBuyNow: () => void;
+  onBuyNow: (quantity: number) => void;
   groupedAttributes: ProductAttribute[];
 }
 
@@ -52,7 +52,6 @@ const InforProduct = ({
   groupedAttributes,
 }: InforProductProps) => {
   const availableQuantity = selectedSku?.quantity || product.quantity;
-  const [quantity, setQuantity] = useState<number>(1);
 
   return (
     <div>

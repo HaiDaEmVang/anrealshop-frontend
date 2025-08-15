@@ -11,10 +11,11 @@ import {
 } from '@mantine/core';
 import React, { useMemo } from 'react';
 import { FiAlertCircle, FiArrowRight, FiTruck } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import type { ItemsCheckoutRequest } from '../../../service/CheckoutService';
 import type { CartDto } from '../../../types/CartType';
 import type { CartShippingFee } from '../../../types/ShipmentType';
 import { formatPrice } from '../../../untils/Untils';
+import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 
 interface SummerProps {
   cartItems: CartDto[];
@@ -33,7 +34,7 @@ const Summer: React.FC<SummerProps> = ({
     const selectedItems = cartItems.flatMap(shop => shop.items.filter(i => i.isSelected));
     const selectedItemsCount = selectedItems.length;
     const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const discount = 0; 
+    const discount = 0;
     const selectedShopIds = new Set(cartItems.filter(s => s.items.some(i => i.isSelected)).map(s => s.shop.id));
     const shippingCost = Array.from(selectedShopIds).reduce((sum, shopId) => {
       const feeObj = shippingFees.find(f => f.shopId === shopId);
@@ -44,6 +45,23 @@ const Summer: React.FC<SummerProps> = ({
     const freeShippingAmount = Math.max(0, freeShippingThreshold - subtotal);
     return { selectedItemsCount, subtotal, discount, shippingCost, total, hasSelectedItems, freeShippingAmount };
   }, [cartItems, shippingFees, freeShippingThreshold]);
+
+  const handlePayment = () => {
+    if (!hasSelectedItems) {
+      return;
+    }
+    const idItemsSelected: ItemsCheckoutRequest = cartItems
+      .flatMap(cart => cart.items) 
+      .filter(item => item.isSelected) 
+      .reduce((acc, item) => {
+        acc[item.productSkuId] = item.quantity; 
+        return acc;
+      }, {} as ItemsCheckoutRequest);
+
+    localStorage.setItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS, JSON.stringify(idItemsSelected));
+
+    window.location.href = APP_ROUTES.CHECKOUT; 
+  }
 
   return (
     <Paper radius="md" shadow="sm" p="md" className="bg-white mb-6">
@@ -122,8 +140,8 @@ const Summer: React.FC<SummerProps> = ({
 
       {/* Nút thanh toán - vô hiệu hóa khi chưa chọn sản phẩm */}
       <Button
-        component={Link}
-        to={hasSelectedItems ? "/checkout" : "#"}
+        // component={Link}
+        // to={hasSelectedItems ? "/checkout" : "#"}
         size="md"
         color="blue"
         radius="md"
@@ -131,11 +149,7 @@ const Summer: React.FC<SummerProps> = ({
         className={`${hasSelectedItems ? "bg-primary hover:bg-picton-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
         rightSection={<FiArrowRight size={16} />}
         disabled={!hasSelectedItems}
-        onClick={(e) => {
-          if (!hasSelectedItems) {
-            e.preventDefault();
-          }
-        }}
+        onClick={handlePayment}
       >
         Tiến hành thanh toán
       </Button>

@@ -31,6 +31,7 @@ import {
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { FaStore } from 'react-icons/fa';
+import { formatDate, formatPrice } from '../../../../untils/Untils';
 
 // Kiểu dữ liệu cho đơn hàng thời trang (1 đơn = 1 sản phẩm)
 interface FashionOrder {
@@ -177,16 +178,6 @@ const OrderHistory = () => {
     const [loading, setLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<string | null>('all');
 
-    // Format price
-    const formatPrice = (price: number) => {
-        return price.toLocaleString('vi-VN') + '₫';
-    };
-
-    // Format date
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN');
-    };
 
     // Get status badge
     const getStatusBadge = (status: string) => {
@@ -216,7 +207,7 @@ const OrderHistory = () => {
 
     return (
         <>
-            <Title order={4} className="mb-4 text-slate-800">Đơn hàng thời trang của tôi</Title>
+            <Title order={4} className="mb-4 text-slate-800">Đơn hàng của tôi</Title>
 
             <Tabs value={activeTab} onChange={setActiveTab} mb="md">
                 <Tabs.List>

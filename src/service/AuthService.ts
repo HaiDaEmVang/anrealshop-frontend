@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { API_ENDPOINTS, BASE_API_URL } from '../constant';
 import type { LoginRequest, LoginResponse } from '../types/AuthType';
-import type { ProfileRequest, RegisterRequest, UserDto } from '../types/UserType';
-import { axiosInstance, axiosNoAuthInstance } from './AxiosInstant'; 
+import type { RegisterRequest, UserDto } from '../types/UserType';
+import { axiosInstance, axiosNoAuthInstance } from './AxiosInstant';
 
 const login = async (loginRequest: LoginRequest): Promise<LoginResponse> => {
   const response = await axiosNoAuthInstance.post<LoginResponse>(
@@ -21,15 +21,12 @@ const register = async (registerRequest: RegisterRequest): Promise<string> => {
 };
 
 const refreshToken = async (): Promise<void> => {
-  await axios.post(
-    `${BASE_API_URL}${API_ENDPOINTS.AUTH.REFRESH}`,
-    {},
-    { withCredentials: true }
-  );
+  const response = await axiosNoAuthInstance.post(API_ENDPOINTS.AUTH.REFRESH);
+  return response.data;
 };
 
 const getProfile = async (): Promise<UserDto> => {
-  const response = await axiosInstance.get<UserDto>(API_ENDPOINTS.USERS.ME);
+  const response = await axiosNoAuthInstance.get<UserDto>(API_ENDPOINTS.USERS.ME);
   return response.data;
 };
 

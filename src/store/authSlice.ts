@@ -1,9 +1,10 @@
 // src/features/auth/authSlice.ts
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import authService from '../../service/AuthService';
-import type { LoginRequest, LoginResponse } from '../../types/AuthType';
-import type { ErrorResponseDto } from '../../types/CommonType';
-import type { RegisterRequest, UserDto } from '../../types/UserType';
+import authService from '../service/AuthService';
+import type { LoginRequest, LoginResponse } from '../types/AuthType';
+import type { ErrorResponseDto } from '../types/CommonType';
+import type { RegisterRequest, UserDto } from '../types/UserType';
+import type { AddressDto } from '../types/AddressType';
 
 interface AuthError {
   message: string;
@@ -123,7 +124,7 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({ 
+const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
@@ -146,7 +147,18 @@ const authSlice = createSlice({
       if (state.user) {
         state.user.cartCount = 0;
       }
-    }
+    },
+
+    updateAddress: (state, action: PayloadAction<AddressDto>) => {
+      if (state.user) {
+        state.user.address = action.payload;
+      }
+    },
+
+    logout: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -176,11 +188,11 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.error = null;
       })
-      .addCase(fetchCurrentUser.rejected, (state, action) => {
-        state.status = 'failed';
+      .addCase(fetchCurrentUser.rejected, (state) => {
+        state.status = 'idle';
         state.isAuthenticated = false;
         state.user = null;
-        state.error = (action.payload as AuthError) || { message: 'Không thể xác thực người dùng.' };
+        state.error = null;
       })
       // .addCase(updateUserProfile.pending, (state) => {
       //   state.status = 'loading';
@@ -221,4 +233,4 @@ const authSlice = createSlice({
 });
 
 export default authSlice.reducer;
-export const { addToCart, removeFromCart, updateCartCount, clearCart } = authSlice.actions;
+export const { addToCart, removeFromCart, updateCartCount, clearCart, logout } = authSlice.actions;

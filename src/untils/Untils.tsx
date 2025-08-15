@@ -2,7 +2,11 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import type { UseProductParams } from '../hooks/useProduct';
 
-// Function to format date/time for conversations
+export const getMessageDate = (date: string) => {
+  const messageDate = new Date(date);
+  return "Ngày " + format(messageDate, 'dd', { locale: vi }) + " tháng " + format(messageDate, 'MM', { locale: vi }) + " năm " + format(messageDate, 'yyyy', { locale: vi });
+}
+
 export const formatMessageTime = (date: Date) => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());

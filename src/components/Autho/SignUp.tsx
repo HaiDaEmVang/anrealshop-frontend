@@ -16,7 +16,7 @@ import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
 import type { RegisterRequest } from '../../types/UserType';
 import showSuccessNotification from '../Toast/NotificationSuccess';
-import { registerUser } from '../../feature/auth/authSlice';
+import { registerUser } from '../../store/authSlice';
 import showErrorNotification from '../Toast/NotificationError';
 import { validateAgreeTerms, validateConfirmPassword, validateEmail, validatePassword } from '../../untils/ValidateInput';
 

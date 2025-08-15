@@ -8,6 +8,8 @@ export const CLOUNDINARY_NAME = import.meta.env.VITE_CLOUDINARY_NAME
 
 
 
+export type TypeMode = 'myshop' | 'admin' | 'user';
+
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/login',
@@ -74,24 +76,56 @@ export const API_ENDPOINTS = {
     GET_SHIPPING_FEE_FORCART: '/shipping/fee-for-cart',
   },
   
+  ADDRESS: {
+    USER_ADDRESS_PRIMARY: 'address/get-address-primary',
+    SHOP_ADDRESS_PRIMARY: 'address/get-shop-address-primary',
+    USER_ADDRESS_ALL: 'address/get-address-all',
+    SHOP_ADDRESS_ALL: 'address/get-shop-address-all',
+    GET_WARD_LIST: 'address/get-ward-list',
+    GET_PROVINCE_LIST: 'address/get-province-list',
+    GET_DISTRICT_LIST: 'address/get-district-list',
+
+    USER_ADDRESS_CREATE: 'address/user-address',
+    USER_ADDRESS_UPDATE: (id: string) => `address/user-address/${id}`,
+    USER_ADDRESS_DELETE: (id: string) => `address/user-address/${id}`,
+    SHOP_ADDRESS_CREATE: 'address/shop-address',
+    SHOP_ADDRESS_UPDATE: (id: string) => `address/shop-address/${id}`,
+    SHOP_ADDRESS_DELETE: (id: string) => `address/shop-address/${id}`,
+
+  },
+
+  CHECKOUT: {
+    GET: 'checkout/items',
+    CREATE: 'checkout'
+  },
+
+  PAYMENT: {
+    RESULT: (orderId: string) => `payment/result/${orderId}`,
+  }
 };
 
 
+
 export const APP_ROUTES = {
-  // User Routes
   HOME: '/',
-  PRODUCTS: '/products',
-  PRODUCT_DETAIL: (slug: string) => `/products/${slug}`,
-  CHECKOUT: '/checkout',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  FORGOT_PASSWORD: '/forgot-password',
   CART: '/carts',
-  USER_SETTINGS: '/settings',
+  CHECKOUT: '/checkout',
+  PAYMENT_RESULT: `/payment/result/:orderId`,
+  PRODUCT_DETAIL: '/products/:slug',
+  USER_SETTINGS: '/settings/*',
+
+  PRODUCTS: '/products',
   SEARCH: '/search',
   CATEGORY_PAGE: (slug: string) => `/category/${slug}`,
   SHOP_PAGE: (slug: string) => `/shop/${slug}`,
 
   // MyShop Routes
   MYSHOP: {
-    BASE: '/myshop',
+    BASE: '/myshop/*',
+
     DASHBOARD: '/myshop/dashboard',
     SALE: '/myshop/sale',
     PRODUCTS: '/myshop/products',
@@ -105,7 +139,8 @@ export const APP_ROUTES = {
 
   // Admin Routes
   ADMIN: {
-    BASE: '/admin',
+    BASE: '/admin/*',
+
     DASHBOARD: '/admin/dashboard',
     CATEGORIES: '/admin/categories',
     USERS: '/admin/users',
@@ -116,6 +151,13 @@ export const APP_ROUTES = {
     SETTINGS: '/admin/settings',
   },
 };
+
+export const APP_ROUTES_PUBLIC = [
+  APP_ROUTES.HOME,
+  APP_ROUTES.LOGIN,
+  APP_ROUTES.REGISTER,
+  APP_ROUTES.FORGOT_PASSWORD,
+]
 
 export const ROUTE_NAMES: Record<string, string> = {
   admin: 'Quản trị',
@@ -159,5 +201,5 @@ export const APP_CONFIG = {
 };
 
 export const LOCAL_STORAGE_KEYS = {
-  USER_PREFERENCES: 'user-preferences',
+  ORDER_ITEM_IDS: 'orderItemIds',
 };

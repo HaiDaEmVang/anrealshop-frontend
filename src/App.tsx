@@ -1,12 +1,13 @@
 import { createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 
 import './App.css';
+import { APP_ROUTES } from './constant';
 
 const AuthoPage = lazy(() => import('./pages/Auth/AuthoPage'));
 const MyshopPage = lazy(() => import('./pages/MyshopPage/MyshopRoute'));
@@ -48,6 +49,8 @@ function App() {
     },
   });
 
+  
+
   return (
     <MantineProvider theme={theme}>
       <Notifications position="top-right" zIndex={1000} />
@@ -55,13 +58,13 @@ function App() {
         <div className="min-h-screen flex flex-col">
           <main className="flex-1">
             {/* <Suspense fallback={<div>Loading...</div>}> */}
-              <Routes>
-                <Route path="/login" element={<AuthoPage />} />
-                <Route path="/register" element={<AuthoPage />} />
-                <Route path="/myshop/*" element={<MyshopPage />} />
-                <Route path="admin/*" element={<AdminPage />} />
-                <Route path="/*" element={<UserPage />}/>
-              </Routes>
+            <Routes>
+              <Route path={APP_ROUTES.LOGIN} element={<AuthoPage />} />
+              <Route path={APP_ROUTES.REGISTER} element={<AuthoPage />} />
+              <Route path={APP_ROUTES.MYSHOP.BASE} element={<MyshopPage />} />
+              <Route path={APP_ROUTES.ADMIN.BASE} element={<AdminPage />} />
+              <Route path="/*" element={<UserPage />} />
+            </Routes>
             {/* </Suspense> */}
           </main>
         </div>

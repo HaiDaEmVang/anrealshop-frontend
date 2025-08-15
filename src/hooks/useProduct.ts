@@ -13,8 +13,8 @@ import type {
 } from '../types/ProductType';
 import { getErrorMessage } from '../untils/ErrorUntils';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../untils/Untils';
+import type { TypeMode } from '../constant';
 
-type ProductMode = 'myshop' | 'admin' | 'user';
 
 export interface UseProductParams {
     page?: number;
@@ -26,7 +26,7 @@ export interface UseProductParams {
     dateRange?: [Date | null, Date | null];
 }
 interface UseProductOptions {
-    mode?: ProductMode;
+    mode?: TypeMode;
     autoFetch?: boolean;
     initialParams?: UseProductParams;
 }

@@ -1,19 +1,13 @@
 import { Box, Collapse, Group, Paper, Radio, Stack, Text, Button } from '@mantine/core';
 import { FiCreditCard, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { useState } from 'react';
-
-// Interface cho phương thức thanh toán
-export interface PaymentMethodType {
-  id: string;
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-}
+import type { PaymentMethodInfo } from '../../../data/CheckoutData';
+import type { PaymentGatewayType } from '../../../types/CheckoutType';
 
 interface PaymentMethodProps {
-  paymentMethods: PaymentMethodType[];
-  selectedPaymentMethod: string;
-  setSelectedPaymentMethod: (id: string) => void;
+  paymentMethods: PaymentMethodInfo[];
+  selectedPaymentMethod: PaymentGatewayType;
+  setSelectedPaymentMethod: (id: PaymentGatewayType) => void;
 }
 
 const PaymentMethod = ({
@@ -21,11 +15,20 @@ const PaymentMethod = ({
   selectedPaymentMethod,
   setSelectedPaymentMethod,
 }: PaymentMethodProps) => {
-  // State để quản lý trạng thái hiển thị của danh sách phương thức thanh toán
   const [expanded, setExpanded] = useState(false);
   
-  // Tìm phương thức thanh toán hiện tại được chọn để hiển thị khi thu gọn
   const selectedMethod = paymentMethods.find(method => method.id === selectedPaymentMethod);
+  
+  const getIconBgColor = (methodId: PaymentGatewayType) => {
+    switch (methodId) {
+      case 'cash_on_delivery': return 'bg-amber-100';
+      case 'momo': return 'bg-blue-100';
+      case 'vnpay': return 'bg-blue-50';
+      case 'momo': return 'bg-pink-100';
+      case 'credit_card': return 'bg-purple-100';
+      default: return 'bg-gray-100';
+    }
+  };
   
   return (
     <Paper radius="md" shadow="sm" p="md" className="bg-white">
@@ -51,35 +54,29 @@ const PaymentMethod = ({
       {!expanded && selectedMethod && (
         <Paper
           shadow="xs"
-          p="md"
+          p="sm"
+          py="xs"
           radius="md"
-          className="border-2 border-transparent  cursor-pointer transition-all hover:!bg-gray-50"
+          className="border-2 border-transparent cursor-pointer transition-all hover:!bg-gray-50"
           onClick={() => setExpanded(true)}
         >
           <Group gap={10}>
             <Radio
+              size='xs'
               checked={true}
               readOnly
               className="!mr-1"
             />
             <Box
-              className={`w-10 h-10 flex items-center justify-center rounded-md bg-${
-                selectedMethod.id === 'cod'
-                  ? 'amber'
-                  : selectedMethod.id === 'bank_transfer'
-                  ? 'blue'
-                  : selectedMethod.id === 'zalopay'
-                  ? 'teal'
-                  : 'purple'
-              }-100`}
+              className={`w-10 h-10 flex items-center justify-center rounded-md ${getIconBgColor(selectedMethod.id)}`}
             >
               {selectedMethod.icon}
             </Box>
             <Box>
-              <Text fw={600} className="text-slate-800">
+              <Text fw={600} size='sm' className="text-slate-800">
                 {selectedMethod.name}
               </Text>
-              <Text size="sm" color="dimmed">
+              <Text size="sm" c="dimmed">
                 {selectedMethod.description}
               </Text>
             </Box>
@@ -94,7 +91,8 @@ const PaymentMethod = ({
             <Paper
               key={method.id}
               shadow="xs"
-              p="md"
+              p="sm"
+              py="xs"
               radius="md"
               className={`transition-all cursor-pointer border-2 ${
                 selectedPaymentMethod === method.id
@@ -110,23 +108,15 @@ const PaymentMethod = ({
                   className="!mr-1"
                 />
                 <Box
-                  className={`w-10 h-10 flex items-center justify-center rounded-md bg-${
-                    method.id === 'cod'
-                      ? 'amber'
-                      : method.id === 'bank_transfer'
-                      ? 'blue'
-                      : method.id === 'zalopay'
-                      ? 'teal'
-                      : 'purple'
-                  }-100`}
+                  className={`w-10 h-10 flex items-center justify-center rounded-md ${getIconBgColor(method.id)}`}
                 >
                   {method.icon}
                 </Box>
                 <Box>
-                  <Text fw={600} className="text-slate-800">
+                  <Text fw={600} size='sm' className="text-slate-800">
                     {method.name}
                   </Text>
-                  <Text size="sm" color="dimmed">
+                  <Text size="xs" c="dimmed">
                     {method.description}
                   </Text>
                 </Box>
