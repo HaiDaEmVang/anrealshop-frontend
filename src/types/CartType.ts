@@ -1,7 +1,7 @@
 import type { ShopDto } from "./ShopType";
 
 export interface CartDto {
-    shop: ShopDto;
+    shop: ShopDto; 
     items: CartItemDto[];
 }
 

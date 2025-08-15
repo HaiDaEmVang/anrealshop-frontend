@@ -1,24 +1,10 @@
-import {
-  Avatar,
-  Badge,
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  Group,
-  Image,
-  Loader,
-  NumberInput,
-  Text,
-  Title,
-  Tooltip
-} from '@mantine/core';
+import { Avatar, Box, Button, Checkbox, Divider, Group, Loader, Text, Title } from '@mantine/core';
 import React from 'react';
 import { FiChevronLeft, FiClock, FiShoppingBag, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import type { CartDto } from '../../../types/CartType';
 import type { CartShippingFee } from '../../../types/ShipmentType';
-import { formatPrice } from '../../../untils/Untils';
+import CartCard from '../Common/CartCard';
 
 interface ListProductProps {
   cartItems: CartDto[];
@@ -57,7 +43,7 @@ const ListProduct: React.FC<ListProductProps> = ({
 
   if (isEmpty) {
     return (
-      <Box className="text-center py-28">
+      <Box className="text-x'center py-28">
         <FiShoppingCart size={64} className="text-gray-300 mx-auto mb-4" />
         <Title order={4} className="text-slate-800 mb-3">Giỏ hàng của bạn đang trống</Title>
         <Text color="dimmed" mb={4}>
@@ -136,105 +122,17 @@ const ListProduct: React.FC<ListProductProps> = ({
               </Group>
             </Link>
 
-            {shopGroup.items.map((item) => {
-              const inStock = item.quantity !== undefined ? item.quantity : true;
-              const maxQuantity = item.maxQuantity || 100;
-
-              return (
-                <Box key={item.id} className="mb-4">
-                  <Group wrap="nowrap" align="flex-start">
-                    <Box className="flex items-center h-full pt-2">
-                      {inStock ? (
-                        <Checkbox
-                          checked={item.isSelected}
-                          onChange={(event) => handleChangeSelected(item.id, event.currentTarget.checked)}
-                        />
-                      ) : (
-                        <Tooltip label="Sản phẩm hết hàng">
-                          <Box>
-                            <Checkbox disabled />
-                          </Box>
-                        </Tooltip>
-                      )}
-                    </Box>
-
-                    <Link to={`/products/${item.urlSlug || item.productId}`}>
-                      <Box className="w-28 h-28 flex-shrink-0">
-                        <Image
-                          src={item.thumbnailUrl}
-                          alt={item.name || 'Product Image'}
-                          radius="md"
-                          className="w-full h-full object-cover border border-gray-200"
-                        />
-                      </Box>
-                    </Link>
-
-                    <Box style={{ flex: 1 }}>
-                      <Group justify="space-between" align="flex-start">
-                        <Box style={{ flex: 1 }}>
-                          <Text component={Link} to={`/products/${item.productId}`} lineClamp={2} fw={500} className="text-slate-800 hover:text-primary h-11" >
-                            {item.name || 'N/A'}
-                          </Text>
-
-                          {item.attributeString && (
-                            <Text size="sm" c="dimmed" mt={4}>
-                              {item.attributeString}
-                            </Text>
-                          )}
-
-                          {!inStock && (
-                            <Badge color="red" variant="light" size="sm" mt={4}>
-                              Hết hàng
-                            </Badge>
-                          )}
-
-                          <Box className="md:hidden mt-3">
-                            <Text fw={600} className="text-primary">
-                              {formatPrice(item.price)}
-                            </Text>
-                          </Box>
-                        </Box>
-
-                        <Box className="hidden md:block text-right min-w-[120px]">
-                          <Text fw={600} className="text-primary">
-                            {formatPrice(item.price)}
-                          </Text>
-                        </Box>
-                      </Group>
-
-                      <Group justify="space-between" className="mt-1 md:mt-2" align="flex-end">
-                        <NumberInput
-                          value={typeof item.quantity === 'number' && !Number.isNaN(item.quantity) ? item.quantity : 1}
-                          onChange={(val) => {
-                            if (typeof val === 'number' && !Number.isNaN(val)) {
-                              onUpdateQuantity(item.id, val);
-                            }
-                          }}
-                          min={1}
-                          max={maxQuantity}
-                          disabled={!inStock}
-                          style={{ width: '120px' }}
-                          size="sm"
-                        />
-
-                        <Group className="hidden md:flex">
-                          <Button
-                            variant="subtle"
-                            color="red"
-                            size="xs"
-                            leftSection={<FiTrash2 size={14} />}
-                            onClick={() => onRemoveItem(item.id)}
-                          >
-                            Xóa
-                          </Button>
-                        </Group>
-                      </Group>
-                    </Box>
-                  </Group>
-                  <Divider className="mt-4" />
-                </Box>
-              );
-            })}
+            {shopGroup.items.map((item) => (
+              <React.Fragment key={item.id}>
+                <CartCard
+                  item={item}
+                  onSelect={handleChangeSelected}
+                  onUpdateQuantity={onUpdateQuantity}
+                  onRemove={onRemoveItem}
+                />
+                <Divider className="mt-4" />
+              </React.Fragment>
+            ))}
           </Box>
         );
       })}

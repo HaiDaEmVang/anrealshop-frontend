@@ -106,7 +106,7 @@ export const useProductForm = ( isEditMode = false ) => {
                 for (const attribute of value) {
                     if (!attribute.attributeKeyName.trim()) return 'Tên thuộc tính không được để trống';
                     if (!attribute.attributeKeyDisplay.trim()) return 'Tên hiển thị thuộc tính không được để trống';
-                    if (!attribute.values || attribute.values.length === 0) return 'Thuộc tính phải có ít nhất một giá trị';
+                    if (!attribute.values || attribute.values.size === 0) return 'Thuộc tính phải có ít nhất một giá trị';
                 }
                 return null;
             }

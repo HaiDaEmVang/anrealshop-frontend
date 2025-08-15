@@ -1,3 +1,5 @@
+import type { AddressDto } from "./AddressType";
+
 export type GenderType = 'MALE' | 'FEMALE' | 'OTHER'; 
 
 export interface UserDto {
@@ -13,7 +15,7 @@ export interface UserDto {
   createdAt: string; 
   updatedAt: string;
 
-  address?: string;
+  address?: AddressDto;
   cartCount?: number;
 }
 

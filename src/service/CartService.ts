@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "../constant";
-import type { CartItemDto } from "../types/CartType";
+import type { CartAddItemDto } from "../types/CartType";
 import { axiosInstance } from "./AxiosInstant";
 
 
@@ -8,7 +8,7 @@ const getCart = async () => {
     return response.data;
 }
 
-const addItemToCart = async (cartItemDto: CartItemDto) => {
+const addItemToCart = async (cartItemDto: CartAddItemDto) => {
     const response = await axiosInstance.post(API_ENDPOINTS.CART.ADD_ITEM, cartItemDto);
     return response.data;
 };

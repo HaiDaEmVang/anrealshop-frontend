@@ -1,6 +1,7 @@
 import { Badge, Box, Button, Collapse, Group, Paper, Radio, Stack, Text } from '@mantine/core';
 import { FiClock, FiChevronDown, FiChevronUp, FiTruck } from 'react-icons/fi';
 import { useState } from 'react';
+import { formatPrice } from '../../../untils/Untils';
 
 // Interface cho phương thức vận chuyển
 interface ShippingMethod {
@@ -60,7 +61,8 @@ const Transport = ({
             {!expanded && selectedMethod && (
                 <Paper
                     shadow="xs"
-                    p="md"
+                    px="md"
+                    py="sm"
                     radius="md"
                     className="border-2 border-transparent  cursor-pointer transition-all hover:!bg-gray-50"
                     onClick={() => setExpanded(true)}
@@ -68,6 +70,7 @@ const Transport = ({
                     <Group justify="space-between" align="flex-start">
                         <Group gap="md">
                             <Radio
+                                size='xs'
                                 checked={true}
                                 readOnly
                                 classNames={{
@@ -82,26 +85,26 @@ const Transport = ({
                             
                             <Box>
                                 <Group wrap="nowrap" gap="xs">
-                                    <Text fw={600} size="md" className="text-slate-800">
+                                    <Text fw={600} size="sm" className="text-slate-800">
                                         {selectedMethod.name}
                                     </Text>
                                     {selectedMethod.badge && (
-                                        <Badge color={selectedMethod.badgeColor} variant="light" size="sm">
+                                        <Badge color={selectedMethod.badgeColor} variant="light" size="xs">
                                             {selectedMethod.badge}
                                         </Badge>
                                     )}
                                 </Group>
-                                <Text size="sm" color="dimmed" mt={4}>
+                                <Text size="xs" c="dimmed" mt={4}>
                                     {selectedMethod.description}
                                 </Text>
                             </Box>
                         </Group>
                         
                         <Box className="text-right">
-                            <Text fw={600} className="!text-primary">
-                                {selectedMethod.price.toLocaleString()}₫
+                            <Text fw={600} size='sm' className="!text-primary">
+                                {formatPrice(selectedMethod.price)}
                             </Text>
-                            <Text size="xs" color="dimmed">
+                            <Text size="xs" c="dimmed">
                                 <FiClock className="inline-block mr-1" size={10} />
                                 {selectedMethod.estimatedDelivery}
                             </Text>
@@ -129,6 +132,7 @@ const Transport = ({
                                 <Group gap="md">
                                     {/* Radio (Checkbox) đầu tiên */}
                                     <Radio
+                                    size='xs'
                                         classNames={{
                                             root: "flex items-center",
                                             body: "flex items-center",
@@ -145,7 +149,7 @@ const Transport = ({
                                     {/* Nội dung thứ ba */}
                                     <Box>
                                         <Group wrap="nowrap" gap="xs">
-                                            <Text fw={600} size="md" className="text-slate-800">
+                                            <Text fw={600} size="sm" className="text-slate-800">
                                                 {method.name}
                                             </Text>
                                             {method.badge && (
@@ -154,7 +158,7 @@ const Transport = ({
                                                 </Badge>
                                             )}
                                         </Group>
-                                        <Text size="sm" color="dimmed" mt={4}>
+                                        <Text size="xs" color="dimmed" mt={4}>
                                             {method.description}
                                         </Text>
                                     </Box>
@@ -162,8 +166,8 @@ const Transport = ({
                                 
                                 {/* Giá và thời gian giao hàng */}
                                 <Box className="text-right">
-                                    <Text fw={600} className="!text-primary">
-                                        {method.price.toLocaleString()}₫
+                                    <Text fw={600} size='sm' className="!text-primary">
+                                        {formatPrice(method.price)}
                                     </Text>
                                     <Text size="xs" color="dimmed">
                                         <FiClock className="inline-block mr-1" size={10} />

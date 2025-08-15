@@ -12,22 +12,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { Link, useParams } from 'react-router-dom';
 
-// Các component con
+import { APP_ROUTES } from '../../../constant';
+import { addToCart } from '../../../store/authSlice';
+import { useAppDispatch } from '../../../hooks/useAppRedux';
 import { useGetProduct } from '../../../hooks/useProduct';
+import { CartService } from '../../../service/CartService';
+import type { ProductAttribute } from '../../../types/AttributeType';
+import type { CartAddItemDto } from '../../../types/CartType';
 import type { MyShopProductSkuDto, ProductDetailDto } from '../../../types/ProductType';
+import { getErrorMessage } from '../../../untils/ErrorUntils';
+import showErrorNotification from '../../Toast/NotificationError';
+import showSuccessNotification from '../../Toast/NotificationSuccess';
 import Breadcrumbs from './Breadcrumbs';
 import ImageProduct from './ImageProduct';
 import InforProduct from './productInfo/InforProduct';
-import type { ProductAttribute } from '../../../types/AttributeType';
-import showErrorNotification from '../../Toast/NotificationError';
-import { CartService } from '../../../service/CartService';
-import type { CartItemDto } from '../../../types/CartType';
-import showSuccessNotification from '../../Toast/NotificationSuccess';
-import { getErrorMessage } from '../../../untils/ErrorUntils';
-import { useAppDispatch } from '../../../hooks/useAppRedux';
-import { addToCart } from '../../../feature/auth/authSlice';
 
 const ProductDetailPage = () => {
+  
   const { slug } = useParams<{ slug: string }>();
   const [product, setProduct] = useState<ProductDetailDto | null>(null);
   const [media, setMedia] = useState<string[]>([]);
@@ -70,7 +71,6 @@ const ProductDetailPage = () => {
     return Array.from(attributeMap.values());
   }, [product]);
 
-  // Handle attribute selection
   const handleAttributeSelect = (attributeId: string, value: string) => {
     const newSelectedAttributes = {
       ...selectedAttributes,
@@ -78,7 +78,6 @@ const ProductDetailPage = () => {
     };
     setSelectedAttributes(newSelectedAttributes);
 
-    // Find matching SKU
     if (product?.productSkus) {
       const matchingSku = product.productSkus.find(sku => {
         if (!sku.attributeForSku) return false;
@@ -93,24 +92,27 @@ const ProductDetailPage = () => {
     }
   };
 
+
+
   const handleAddToCart = (quantity: number) => {
     if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
       showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
-      return;
+      return ;
     }
     if (quantity < 1 || quantity > selectedSku.quantity) {
       showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
-      return;
+      return ;
     }
 
-    const cartItemDto: CartItemDto = {
+    const cartItemDto: CartAddItemDto = {
       productSkuId: selectedSku.id,
       quantity: quantity,
     }
+
     CartService.addItemToCart(cartItemDto)
       .then((data) => {
         showSuccessNotification("Thông báo", "Sản phẩm đã được thêm vào giỏ hàng thành công.");
-        if (data.isNew) 
+        if (data.isNew)
           dispatch(addToCart());
       })
       .catch((error) => {
@@ -118,8 +120,18 @@ const ProductDetailPage = () => {
       });
   }
 
-  const handleBuyNow = () => {
-    console.log("Buying now:", { product, selectedSku, selectedAttributes });
+  const handleBuyNow = (quantity: number) => {
+    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
+      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
+      return ;
+    }
+    if (quantity < 1 || quantity > selectedSku.quantity) {
+      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
+      return ;
+    }
+    localStorage.setItem('orderItemIds', JSON.stringify({ [selectedSku.id]: quantity }));
+
+    window.location.href = APP_ROUTES.CHECKOUT;
   }
 
   useEffect(() => {

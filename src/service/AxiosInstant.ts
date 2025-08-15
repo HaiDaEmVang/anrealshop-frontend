@@ -1,7 +1,11 @@
 import axios, { type AxiosRequestConfig } from 'axios';
-import { BASE_API_URL } from '../constant';
+import showErrorNotification from '../components/Toast/NotificationError';
+import { APP_ROUTES_PUBLIC, BASE_API_URL } from '../constant';
+import { logout } from '../store/authSlice';
+import { store } from '../store/store';
+import type { ErrorResponseDto } from '../types/CommonType';
 import authService from './AuthService';
-import type { ErrorResponseDto } from '../types/CommonType'; 
+
 
 const axiosInstance = axios.create({
   baseURL: BASE_API_URL,
@@ -28,6 +32,23 @@ const processQueue = (error: any | null, success = false) => {
   failedQueue = [];
 };
 
+const redirectToLoginWithDelay = () => {
+  store.dispatch(logout());
+
+  const currentPath = window.location.pathname;
+  if (APP_ROUTES_PUBLIC.includes(currentPath)) {
+    return;
+  }
+
+  const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+
+  showErrorNotification("Phiên đăng nhập hết hạn.", "Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.");
+
+  setTimeout(() => {
+    window.location.href = `/login?urlReturn=${returnUrl}`;
+  }, 3000);
+};
+
 axiosInstance.interceptors.response.use(
   response => response,
   async error => {
@@ -39,8 +60,8 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
+        return new Promise((resolve) => {
+          failedQueue.push({ resolve, reject: () => { } });
         }).then(() => axiosInstance(originalRequest));
       }
 
@@ -50,19 +71,18 @@ axiosInstance.interceptors.response.use(
         await authService.refreshToken();
         processQueue(null, true);
         return axiosInstance(originalRequest);
-      } catch (refreshError: any) {
-        processQueue(refreshError, false);
-        
-        const finalError = new Error(refreshError.message || 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-        (finalError as any).statusCode = refreshError.statusCode || 401;
-        (finalError as any).code = (refreshError.response?.data as ErrorResponseDto)?.code || 'TOKEN_REFRESH_FAILED';
-        (finalError as any).details = (refreshError.response?.data as ErrorResponseDto)?.details;
-        (finalError as any).traceId = (refreshError.response?.data as ErrorResponseDto)?.traceId;
-
-        return Promise.reject(finalError);
+      } catch {
+        processQueue(null, false);
+        redirectToLoginWithDelay();
+        return Promise.resolve({data: null});
       } finally {
         isRefreshing = false;
       }
+    }
+
+    if (statusCode === 401) {
+      redirectToLoginWithDelay();
+      return Promise.resolve({data: null});
     }
 
     if (errorResponseData) {

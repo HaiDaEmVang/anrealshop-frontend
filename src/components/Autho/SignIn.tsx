@@ -14,9 +14,9 @@ import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useRef } from 'react';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { API_ENDPOINTS, BASE_API_URL } from '../../constant';
-import { fetchCurrentUser, loginUser } from '../../feature/auth/authSlice';
+import { fetchCurrentUser, loginUser } from '../../store/authSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
 import type { LoginRequest } from '../../types/AuthType';
 import type { UserDto } from '../../types/UserType';
@@ -32,10 +32,14 @@ interface SignInFormValues {
 }
 
 export function SignIn() {
+
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnUrl = searchParams.get('urlReturn') || '/';
+  
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
-  const isLoading = status === 'loading' ;
+  const isLoading = status === 'loading';
   const [opened, { open, close }] = useDisclosure(false);
 
   const hasNotifiedRef = useRef(false);
@@ -51,7 +55,6 @@ export function SignIn() {
       password: (value) => { return validatePassword(value); },
     },
   });
-
   const handleSubmit = async (values: SignInFormValues) => {
     form.clearErrors();
     const loginData: LoginRequest = {
@@ -64,10 +67,8 @@ export function SignIn() {
       const user: UserDto = resultAction.user;
 
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
-      navigate('/');
+      navigate(returnUrl);
     } catch (err: any) {
-      console.error('Login failed in component:', err);
-
       let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
 
       if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
@@ -91,10 +92,10 @@ export function SignIn() {
   }
 
   useEffect(() => {
-    
+
     const handleOAuthLogin = async () => {
       if (hasNotifiedRef.current) return;
-      
+
       const params = new URLSearchParams(location.search);
       const successMessage = params.get('success');
       const errorMessage = params.get('error');
@@ -104,17 +105,16 @@ export function SignIn() {
         try {
           const user: UserDto = await dispatch(fetchCurrentUser()).unwrap();
           showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
-          navigate('/');
+          navigate(returnUrl);
         } catch (err: any) {
-          console.error('Login failed in component:', err);
-          let notificationMessage = err.message || 'Không thể lấy thông tin user.';          showErrorNotification('Đăng nhập thất bại', notificationMessage);
+          let notificationMessage = err.message || 'Không thể lấy thông tin user.'; showErrorNotification('Đăng nhập thất bại', notificationMessage);
         }
-      }else if (errorMessage) {
+      } else if (errorMessage) {
         const timeoutId = setTimeout(() => {
           params.delete('error');
           navigate({ pathname: '/login', search: params.toString() }, { replace: true });
           showErrorNotification('Đăng nhập thất bại', errorMessage);
-        }, 1000); 
+        }, 1000);
         return () => clearTimeout(timeoutId);
       }
     };

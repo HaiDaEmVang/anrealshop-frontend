@@ -9,7 +9,7 @@ import {
 } from '@mantine/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiTruck } from 'react-icons/fi';
-import { removeFromCart, updateCartCount } from '../../../feature/auth/authSlice';
+import { removeFromCart, updateCartCount } from '../../../store/authSlice';
 import { useAppDispatch } from '../../../hooks/useAppRedux';
 import { CartService } from '../../../service/CartService';
 import { ShipmentService } from '../../../service/ShipmentService';
@@ -35,10 +35,12 @@ const CartPage: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const getAllItemIds = useCallback(() => {
+    if (cartItems.length === 0) return [];
     return cartItems.flatMap(shop => shop.items.map(item => item.id));
   }, [cartItems]);
 
   const getAllSelectedItemIds = useCallback(() => {
+    if (cartItems.length === 0) return [];
     return cartItems.flatMap(shop => shop.items.filter(i => i.isSelected).map(i => i.id));
   }, [cartItems]);
 
@@ -50,8 +52,9 @@ const CartPage: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     CartService.getCart()
-      .then(data => {
-        const normalized: CartDto[] = (data as CartDto[]).map((shop: CartDto) => ({
+      .then((data: CartDto[]) => {
+        if (!Array.isArray(data)) return;
+        const normalized: CartDto[] = data.map((shop: CartDto) => ({
           ...shop,
           items: shop.items.map((item) => ({
             ...item,
@@ -95,7 +98,6 @@ const CartPage: React.FC = () => {
     setSelectAll(allItemIds.length > 0 && selected.length === allItemIds.length);
   }, [cartItems, getAllItemIds, getAllSelectedItemIds]);
 
-  // After cart data loaded, fetch shipping fee for already selected items
   useEffect(() => {
     if (loading) return;
     const initiallySelected = getAllSelectedItemIds();
@@ -185,7 +187,6 @@ const CartPage: React.FC = () => {
 
 
   const handleRemoveItem = (itemId: string) => {
-    console.log(`Removing item ${itemId} from cart`);
     CartService.removeItemFromCart(itemId)
       .then(() => {
         handleResetCartItems([itemId]);
