@@ -1,30 +1,72 @@
-import { Anchor, Badge, Box, Breadcrumbs, Container, Group, Paper, Tabs, Text, Title } from '@mantine/core';
-import { useState } from 'react';
-import { FiCheckCircle, FiChevronRight, FiClock, FiDollarSign, FiPackage, FiTruck, FiX } from 'react-icons/fi';
-import OrderTable from './OrderTable';
+import { Anchor, Box, Breadcrumbs, Card, Container, Group, Paper, Text, Title } from '@mantine/core';
+import { Suspense, useCallback, useEffect, useState } from 'react';
+import { FiChevronRight, FiPackage } from 'react-icons/fi';
+import { useSearchParams } from 'react-router-dom';
+import { useOrder } from '../../../hooks/useOrder';
+import type { OrderRejectRequest, ShopOrderStatus } from '../../../types/OrderType';
+import Pagination from '../Product/Managerment/ProductView/Pagination';
+import { PaginationSkeleton, StatusFilterSkeleton } from '../Product/Managerment/Skeleton';
+import FilterByStatus from './Filter/FilterByStatus';
+import OrderFilter from './Filter/OrderFilter';
+import NonOrderFound from './OrderView/NonOrderFond';
+import OrderView from './OrderView/OrderView';
+import SkeletonOrderView from './OrderView/SkeletonOrderView';
 
-type OrderStatus = 'all' | 'pending' | 'processing' | 'shipping' | 'completed' | 'cancelled' | 'refunded';
-
-// Dữ liệu mẫu về số lượng đơn hàng theo trạng thái
-const orderCounts = {
-  all: 128,
-  pending: 15,
-  processing: 32,
-  shipping: 24,
-  completed: 47,
-  cancelled: 8,
-  refunded: 2
-};
+export type SearchType = 'order_code' | 'customer_name' | 'product_name';
 
 const OrderPage = () => {
-  // State cho trạng thái đơn hàng đang được chọn
-  const [activeStatus, setActiveStatus] = useState<OrderStatus>('all');
-  // State cho bộ lọc đơn hàng
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  // State cho khoảng thời gian
-  const [timeRange, setTimeRange] = useState<string>('all');
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Breadcrumb items
+  const [activeStatus, setActiveStatus] = useState<ShopOrderStatus | "ALL">(
+    (searchParams.get('status') as ShopOrderStatus | "ALL") || 'ALL'
+  );
+
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [searchTypeValue, setSearchTypeValue] = useState<SearchType>(
+    (searchParams.get('searchType') as SearchType) || 'order_code'
+  );
+  const [sortBy, setSortBy] = useState<string | null>(searchParams.get('sortBy') || 'newest');
+
+  const [activePage, setActivePage] = useState(
+    parseInt(searchParams.get('page') || '1', 10)
+  );
+  const [itemsPerPage] = useState(10);
+
+  const updateURLParams = useCallback((updates: Record<string, string | null>) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === '' || value === 'ALL') {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, value);
+      }
+    });
+
+    setSearchParams(newParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  const {
+    totalCount,
+    totalPages,
+    isLoading,
+
+    orders,
+    fetchOrders,
+    orderMetadata,
+    fetchOrderMetadata,
+
+    approveOrder,
+    rejectOrder,
+    rejectOrders,
+  } = useOrder({
+    initialParams: {
+      page: 0,
+      limit: itemsPerPage,
+      status: activeStatus !== 'ALL' ? activeStatus : undefined
+    }
+  });
+
   const breadcrumbItems = [
     { title: 'Trang chủ', href: '/myshop' },
     { title: 'Quản lý đơn hàng', href: '#' },
@@ -34,41 +76,110 @@ const OrderPage = () => {
     </Anchor>
   ));
 
-  // Hàm xử lý khi chọn trạng thái đơn hàng
-  const handleStatusChange = (status: OrderStatus) => {
+  const loadOrders = useCallback(() => {
+    updateURLParams({
+      status: activeStatus !== 'ALL' ? activeStatus : null,
+      search: searchTerm || null,
+      searchType: searchTypeValue !== 'order_code' ? searchTypeValue : null,
+      sortBy: sortBy !== 'newest' ? sortBy : null,
+      page: activePage > 1 ? activePage.toString() : null
+    });
+
+    fetchOrders({
+      page: activePage - 1,
+      limit: itemsPerPage,
+      status: activeStatus !== 'ALL' ? activeStatus : undefined,
+      orderCode: searchTypeValue === 'order_code' ? searchTerm : undefined,
+      customerName: searchTypeValue === 'customer_name' ? searchTerm : undefined,
+      productName: searchTypeValue === 'product_name' ? searchTerm : undefined,
+      sortBy: sortBy || undefined
+    });
+  }, [activePage, activeStatus, sortBy, searchTypeValue, searchTerm, fetchOrders, updateURLParams]);
+
+  useEffect(() => {
+    loadOrders();
+  }, [activeStatus, activePage]);
+
+  useEffect(() => {
+    fetchOrderMetadata();
+  }, []);
+
+  const handleStatusChange = (status: ShopOrderStatus | "ALL") => {
     setActiveStatus(status);
+    setActivePage(1);
   };
 
-  // Config cho icon và màu sắc của từng trạng thái
-  const statusConfig = {
-    all: { icon: <FiPackage size={16} />, color: 'gray' },
-    pending: { icon: <FiClock size={16} />, color: 'yellow' },
-    processing: { icon: <FiPackage size={16} />, color: 'blue' },
-    shipping: { icon: <FiTruck size={16} />, color: 'indigo' },
-    completed: { icon: <FiCheckCircle size={16} />, color: 'green' },
-    cancelled: { icon: <FiX size={16} />, color: 'red' },
-    refunded: { icon: <FiDollarSign size={16} />, color: 'orange' }
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setActivePage(1);
   };
 
-  // Tạo danh sách tab cho các trạng thái đơn hàng
-  const statusTabs = [
-    { value: 'all', label: 'Tất cả', count: orderCounts.all },
-    { value: 'pending', label: 'Chờ xác nhận', count: orderCounts.pending },
-    { value: 'processing', label: 'Đang xử lý', count: orderCounts.processing },
-    { value: 'shipping', label: 'Đang giao hàng', count: orderCounts.shipping },
-    { value: 'completed', label: 'Đã hoàn thành', count: orderCounts.completed },
-    { value: 'cancelled', label: 'Đã hủy', count: orderCounts.cancelled },
-    { value: 'refunded', label: 'Hoàn tiền', count: orderCounts.refunded },
-  ];
+  const handleSearchTypeChange = (value: SearchType) => {
+    setSearchTypeValue(value);
+    setActivePage(1);
+  };
 
+  const handleSortByChange = (value: string | null) => {
+    setSortBy(value);
+  };
+
+  const handlePageChange = (page: number) => {
+    setActivePage(page);
+  };
+
+  const onFetchWithParam = useCallback(() => {
+    setActivePage(1);
+    loadOrders();
+  }, [searchTerm, sortBy, loadOrders]);
+
+  const handleClearAll = useCallback(() => {
+    setSearchTerm('');
+    setSortBy('newest');
+    setSearchTypeValue('order_code');
+
+    const newParams = new URLSearchParams();
+    if (activeStatus !== 'ALL') {
+      newParams.set('status', activeStatus);
+    }
+    setSearchParams(newParams, { replace: true });
+
+    fetchOrders({
+      page: 0,
+      limit: itemsPerPage,
+      status: activeStatus !== 'ALL' ? activeStatus : undefined
+    });
+  }, [activeStatus, fetchOrders, setSearchParams]);
+
+  const handleApproveOrder = useCallback((shopOrderId: string) => {
+    approveOrder(shopOrderId)
+      .then(() => {
+        fetchOrderMetadata();
+        loadOrders();
+      });
+  }, [approveOrder, fetchOrderMetadata, loadOrders]);
+
+  const handleRejectOrder = useCallback((orderItemId: string, reason: string) => {
+    rejectOrder(orderItemId, reason)
+      .then(() => {
+        fetchOrderMetadata();
+        loadOrders();
+      });
+  }, [rejectOrder, fetchOrderMetadata, loadOrders]);
+
+  const handleRejectOrders = useCallback((orderRejectRequest: OrderRejectRequest) => {
+    rejectOrders(orderRejectRequest)
+      .then(() => {
+        fetchOrderMetadata();
+        loadOrders();
+      });
+  }, [rejectOrders, fetchOrderMetadata, loadOrders]);
 
   return (
-    <Container fluid px="lg" py="md">
-      {/* Page Header */}
-      <Paper 
-        shadow="xs" 
-        p="md" 
-        mb="md" 
+    <Container fluid px="lg" py="md" className='relative'>
+      <Paper
+        shadow="xs"
+        p="md"
+        mb="md"
         radius="md"
         className="border-b border-gray-200"
       >
@@ -77,11 +188,11 @@ const OrderPage = () => {
             {breadcrumbItems}
           </Breadcrumbs>
         </Box>
-        
+
         <Group justify="space-between" align="center">
           <Group>
             <FiPackage size={24} className="text-primary" />
-            <Title order={2} size="h3">Quản lý đơn hàng</Title>
+            <Title order={2} size="h3">Tất cả đơn hàng</Title>
           </Group>
           <Text c="dimmed" size="sm">
             Xem và quản lý tất cả đơn hàng của cửa hàng
@@ -89,54 +200,93 @@ const OrderPage = () => {
         </Group>
       </Paper>
 
-      {/* Order Status Tabs */}
-      <Paper shadow="xs" radius="md" className="bg-white overflow-hidden">
-        <Box>
-          <Tabs
-            value={activeStatus}
-            onChange={(value) => handleStatusChange(value as OrderStatus)}
-            variant="outline"
-            classNames={{
-              tab: "py-3 px-4 font-medium",
-              tabLabel: "flex items-center gap-2"
-            }}
-          >
-            <Tabs.List>
-              {statusTabs.map((status) => (
-                <Tabs.Tab
-                  key={status.value}
-                  value={status.value}
-                  leftSection={statusConfig[status.value as OrderStatus].icon}
-                  rightSection={
-                    <Badge size="sm" variant="light" color={statusConfig[status.value as OrderStatus].color}>
-                      {status.count}
-                    </Badge>
-                  }
-                >
-                  {status.label}
-                </Tabs.Tab>
-              ))}
-            </Tabs.List>
-          </Tabs>
-        </Box>
-        
-        {/* Orders Table */}
-        <Box p="md">
-          <OrderTable status={activeStatus} timeRange={timeRange} />
+      <Paper
+        radius="md"
+        className="bg-white"
+      >
+        <Suspense fallback={<StatusFilterSkeleton />}>
+          <FilterByStatus
+            selectedStatus={activeStatus}
+            onStatusChange={handleStatusChange}
+            orderStatusData={orderMetadata}
+          />
+        </Suspense>
+        <OrderFilter
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          searchTypeValue={searchTypeValue}
+          onSearchTypeValueChange={handleSearchTypeChange}
+          sortBy={sortBy}
+          onSortByChange={handleSortByChange}
+          activeTab={activeStatus}
+          onFetchWithParam={onFetchWithParam}
+          onClearAll={handleClearAll}
+          totalOrders={totalCount}
+        />
+
+        <Box p="md" className='min-h-[60vh]'>
+          <Card withBorder p={0} className="!bg-gray-50">
+            <Box className="px-4 py-3">
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-4">
+                  <Group gap="sm">
+                    <Text size="sm" fw={500}>
+                      Sản phẩm
+                    </Text>
+                  </Group>
+                </div>
+                <div className="col-span-2">
+                  <Text size="sm" fw={500}>
+                    Thanh toán
+                  </Text>
+                </div>
+                <div className="col-span-2">
+                  <Text size="sm" fw={500}>
+                    Trạng thái
+                  </Text>
+                </div>
+                <div className="col-span-2">
+                  <Text size="sm" fw={500}>
+                    Vận chuyển
+                  </Text>
+                </div>
+                <div className="col-span-2 text-center">
+                  <Text size="sm" fw={500}>
+                    Thao tác
+                  </Text>
+                </div>
+              </div>
+            </Box>
+          </Card>
+          {isLoading ? (
+            <SkeletonOrderView />
+          ) : !orders || orders.length === 0 ? (
+            <NonOrderFound
+              searchTerm={searchTerm}
+              onClearFilters={handleClearAll}
+            />
+          ) : (
+            <>
+              <OrderView
+                items={orders}
+                onApproveOrder={handleApproveOrder}
+                onRejectOrder={handleRejectOrder}
+                onRejectOrders={handleRejectOrders}
+              />
+
+              <Suspense fallback={<PaginationSkeleton />}>
+                <Pagination
+                  currentPage={activePage}
+                  totalPages={totalPages}
+                  totalItems={totalCount}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={handlePageChange}
+                />
+              </Suspense>
+            </>
+          )}
         </Box>
       </Paper>
-
-      {/* Summary Stats */}
-      <Paper shadow="xs" p="md" mt="md" radius="md" className="bg-white">
-        <Group justify="space-between" align="center">
-          <Text size="sm" c="dimmed">Tổng số đơn hàng: {orderCounts.all}</Text>
-          <Group gap="md">
-            <Text size="sm" c="dimmed">Doanh thu: <span className="font-semibold text-primary">47,250,000₫</span></Text>
-            <Text size="sm" c="dimmed">Đơn thành công: <span className="font-semibold text-green-600">{orderCounts.completed}</span></Text>
-          </Group>
-        </Group>
-      </Paper>
-
 
     </Container>
   );

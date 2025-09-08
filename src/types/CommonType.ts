@@ -20,3 +20,8 @@ export interface MediaDto {
   url: string;
   type: 'IMAGE' | 'VIDEO';
 } 
+
+export interface ItemList {
+  key: string;
+  value : string;
+}

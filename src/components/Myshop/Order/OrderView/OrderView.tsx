@@ -1,0 +1,239 @@
+import { ActionIcon, Avatar, Box, Button, Card, Group, Text, Tooltip } from '@mantine/core';
+import { useState } from 'react';
+import { FiAlertCircle, FiChevronDown, FiChevronUp, FiMessageSquare, FiTrash } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { useOrderStatus } from '../../../../hooks/useOrderStatus';
+import type { OrderItemDto, OrderRejectRequest, ProductOrderItemDto } from '../../../../types/OrderType';
+import { formatPrice } from '../../../../untils/Untils';
+import RejectOrder from '../Modal/RejectOrder';
+import { paymentMethods } from '../../../../data/ShippingData';
+
+interface OrderViewProps {
+    items: OrderItemDto[];
+    onApproveOrder?: (shopOrderId: string) => void;
+    onRejectOrder?: (orderId: string, reason: string) => void;
+    onRejectOrders?: (orderRejectRequest: OrderRejectRequest) => void;
+    onViewDetail?: (orderId: string) => void;
+}
+
+const OrderView = ({
+    items,
+    onApproveOrder,
+    onRejectOrder
+}: OrderViewProps) => {
+    const { getStatusLabel } = useOrderStatus();
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
+    const [currentOrderId, setCurrentOrderId] = useState('');
+    const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
+
+    const calculateOrderTotal = (item: ProductOrderItemDto) => {
+        return item.quantity * item.price;
+    };
+
+    const handleApprove = (orderShopId: string) => {
+        if (onApproveOrder) {
+            onApproveOrder(orderShopId);
+        }
+    };
+
+    const openRejectModal = (orderId: string) => {
+        setCurrentOrderId(orderId);
+        setRejectModalOpen(true);
+    };
+
+    const handleRejectConfirm = (reason: string) => {
+        if (onRejectOrder && currentOrderId) {
+            onRejectOrder(currentOrderId, reason);
+        }
+    }
+
+    const toggleOrderExpansion = (orderId: string) => {
+        setExpandedOrders(prev => ({
+            ...prev,
+            [orderId]: !prev[orderId]
+        }));
+    };
+
+    return (
+        <div className="space-y-4">
+
+            {items.map((order) => {
+                const isPendingConfirmation = order.orderStatus.includes('PENDING_CONFIRMATION');
+                const hasMultipleItems = order.productOrderItemDtoSet.length > 5;
+                const isExpanded = expandedOrders[order.shopOrderId] !== false;
+                const itemsToShow = isExpanded ? order.productOrderItemDtoSet : order.productOrderItemDtoSet.slice(0, 1);
+                const hiddenItemsCount = order.productOrderItemDtoSet.length - itemsToShow.length;
+
+                return (
+                    <Card
+                        key={order.shopOrderId}
+                        withBorder
+                        p={0}
+                        className="order-card"
+                        shadow="xs"
+                        mt={"md"}
+                    >
+                        <Box className="bg-gray-50 border-b-2 border-gray-100" px="md" py="xs">
+                            <Group justify="space-between" align="center">
+                                <Group gap="sm">
+                                    <Avatar
+                                        src={order.customerImage}
+                                        size="sm"
+                                        radius="xl"
+                                    />
+                                    <div>
+                                        <Text size="sm" fw={500}>
+                                            {order.customerName}
+                                        </Text>
+                                    </div>
+                                    <Tooltip label="Nhắn tin cho khách hàng">
+                                        <ActionIcon variant="subtle" color="gray">
+                                            <FiMessageSquare size={16} />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                </Group>
+
+                                <Group >
+                                    {isPendingConfirmation && (
+                                        <>
+
+                                            <Button
+                                                variant="light"
+                                                onClick={() => handleApprove(order.shopOrderId)}
+                                                size="xs"
+                                            >
+                                                Duyệt đơn
+                                            </Button>|</>
+                                    )}
+                                    <Text size="sm" c="dimmed">
+                                        Mã đơn hàng:
+                                        <Link to={`/myshop/orders/${order.shopOrderId}`} >
+                                            <Text component="span" fw={500} className='hover:text-primary cursor-pointer !underline'> #{order.shopOrderId}</Text>
+                                        </Link>
+                                    </Text>
+                                </Group>
+                            </Group>
+                        </Box>
+
+                        <Box className={`p-4 ${hasMultipleItems ? 'pb-2' : 'pb-4'}`}>
+                            {itemsToShow.map((item, index) => {
+                                const totalPrice = calculateOrderTotal(item);
+                                const paymentMethod = paymentMethods.filter(pm => pm.key === order.paymentMethod)[0]?.value || order.paymentMethod;
+                                return (
+                                    <>
+                                        <div key={`${order.shopOrderId}-${item.productSkuId}`} className={`grid grid-cols-12 gap-4 `}>
+
+                                            <div className="col-span-4">
+                                                <div className="flex gap-3">
+                                                    <img
+                                                        className="w-[60px] h-[60px] object-cover rounded border border-gray-100"
+                                                        src={item.productImage}
+                                                        alt={item.productName}
+                                                    />
+                                                    <div className="flex-1">
+                                                        <div className="text-sm font-medium mb-1 line-clamp-2 overflow-hidden">
+                                                            {item.productName}
+                                                        </div>
+                                                        <div className="text-xs text-gray-500">
+                                                            Phiên bản: {item.variant}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-sm">
+                                                        x{item.quantity}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <div className="h-full flex flex-col ">
+                                                    <div className="text-sm font-semibold text-gray-800 mb-1">
+                                                        {formatPrice(totalPrice)}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {paymentMethod}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <div className="h-full flex flex-col ">
+                                                    <div className="text-sm font-medium mb-1 flex items-center gap-1">
+                                                        {getStatusLabel(item.orderStatus)}
+                                                        {item.cancelReason && (
+                                                            <Tooltip label={`Lý do hủy: ${item.cancelReason}`} withArrow position="top">
+                                                                <ActionIcon size="xs" color="red" radius="xl" variant="transparent">
+                                                                    <FiAlertCircle size={16} className="text-red-500" />
+                                                                </ActionIcon>
+                                                            </Tooltip>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {item.isReviewed ? "Đã đánh giá" : "Chưa có đánh giá"}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <div className="h-full flex flex-col ">
+                                                    <div className="text-sm font-medium mb-1">
+                                                        Nhanh
+                                                    </div>
+                                                    <div className="text-xs text-gray-500">
+                                                        {order.shippingMethod}
+                                                    </div>
+                                                    <div className="text-xs text-gray-600 mt-1">
+                                                        #{order.shippingId}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <div className="h-full flex items-center justify-center gap-2">
+                                                    <Button
+                                                        variant="subtle"
+                                                        leftSection={<FiTrash size={14} />}
+                                                        onClick={() => openRejectModal(item.orderItemId)}
+                                                        color='black'
+                                                        disabled={!isPendingConfirmation || item.cancelReason? true: false}
+                                                        size="sm"
+                                                    >
+                                                        Từ chối
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {index < itemsToShow.length - 1 && <hr className="my-2 border-gray-100" />}
+                                    </>
+                                );
+                            })}
+
+                            {hasMultipleItems && (
+                                <div className="mt-4 border-t border-gray-100 flex justify-center">
+                                    <Text size="sm" fw={500} className="flex items-center gap-1 !text-gray-400 cursor-pointer hover:!text-gray-900 !pt-2"
+                                        onClick={() => toggleOrderExpansion(order.shopOrderId)}
+                                    >
+                                        {isExpanded
+                                            ? 'Thu gọn danh sách'
+                                            : `Hiển thị thêm ${hiddenItemsCount} sản phẩm khác`
+                                        }
+                                        {isExpanded ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+                                    </Text>
+                                </div>
+                            )}
+                        </Box>
+                    </Card>
+                );
+            })}
+
+            {/* Reject Order Modal */}
+            <RejectOrder
+                opened={rejectModalOpen}
+                onClose={() => setRejectModalOpen(false)}
+                onConfirm={handleRejectConfirm}
+                orderId={currentOrderId}
+            />
+        </div>
+    );
+};
+
+export default OrderView;

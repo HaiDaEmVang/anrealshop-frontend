@@ -11,7 +11,7 @@ interface FilterByStatusProps {
 const FilterByStatus = ({ selectedStatus, onStatusChange, productStatusData }: FilterByStatusProps) => {
   const { getStatusIcon } = useProductStatusIcon();
   const { getStatusColor, getStatusIconColor } = useProductStatusColor();
-selectedStatus
+
   const handleStatusChange = (value: string | null) => {
     onStatusChange(value as ProductStatus);
   };

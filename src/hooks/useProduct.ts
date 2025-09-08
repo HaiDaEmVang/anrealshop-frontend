@@ -106,8 +106,6 @@ export const useProduct = (options: UseProductOptions = {}) => {
 
 
 
-
-    // Update product visibility with error handling
     const updateVisibility = useCallback(async (id: string, visible: boolean) => {
         try {
             await ProductsService.updateVisibility(id, visible);
@@ -153,7 +151,7 @@ export const useProduct = (options: UseProductOptions = {}) => {
     }, []);
 
 
-    // Refresh current data
+
     const refresh = useCallback(async (params?: {
         page?: number;
         limit?: number;

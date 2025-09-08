@@ -31,7 +31,7 @@ const UserPage = () => {
             <Route path="/search" element={<FilterProductPage />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/shop/:slug" element={<ShopPage />} />
-            <Route path={APP_ROUTES.PAYMENT_RESULT} element={<PaymentResultPage />} />
+            <Route path={APP_ROUTES.PAYMENT_RESULT(':orderId')} element={<PaymentResultPage />} />
           </Routes>
         {/* </Suspense> */}
       </div>
