@@ -16,6 +16,7 @@ import PaymentFailureView from './Error';
 import PaymentPendingView from './Pending';
 import { PaymentResultSkeleton } from './Skeleton';
 import PaymentSuccessView from './Success';
+import { LOCAL_STORAGE_KEYS } from '../../../constant';
 
 
 const PaymentResultPage = () => {
@@ -31,6 +32,7 @@ const PaymentResultPage = () => {
             CheckoutService.getOrderResult(orderId)
                 .then(data => {
                     setPaymentResult(data);
+                    localStorage.removeItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS);
                 })
                 .catch(err => {
                     setError(true);

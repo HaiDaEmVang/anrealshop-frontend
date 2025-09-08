@@ -15,7 +15,7 @@ interface FilterProps {
   onSearchChange: (term: string) => void;
   onTabChange: (tab: string | null) => void;
   onResetFilters: () => void;
-  onApplyFilters: () => void; // New prop for apply action
+  onApplyFilters: () => void;
 }
 
 const Filter: React.FC<FilterProps> = ({

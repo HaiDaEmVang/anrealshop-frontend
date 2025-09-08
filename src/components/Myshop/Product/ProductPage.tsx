@@ -180,7 +180,7 @@ const ProductPage = () => {
     setSelectedProductIds([]);
   }, [searchParams, setSearchParams, status, fetchProducts]);
 
-  // Handler functions for product selection
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       setSelectedProductIds(products.map(p => p.id));

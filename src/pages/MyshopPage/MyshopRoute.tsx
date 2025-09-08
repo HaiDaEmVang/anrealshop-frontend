@@ -1,9 +1,10 @@
 import { Suspense, lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+
 const ShopAdminHeader = lazy(() => import('../../components/header/ShopAdminHeader'));
 const MessagePage = lazy(() => import('../../components/Myshop/Message/MessagePage'));
-const OrderDetailComp = lazy(() => import('../../components/Myshop/Order/OrderDetail/OrderDetail'));
+const OrderDetailComp = lazy(() => import('../../components/Myshop/Order/OrderDetailPage'));
 const OrderPage = lazy(() => import('../../components/Myshop/Order/OrderPage'));
 const CreateProduct = lazy(() => import('../../components/Myshop/Product/Create/CreateProduct'));
 const ProductForm = lazy(() => import('../../components/Myshop/Product/Create/CreateProduct'));
@@ -27,7 +28,7 @@ const MyshopPage = () => {
             <Route path="products/create" element={<CreateProduct />} />
             <Route path="products/edit/:id" element={<ProductForm />} />
             <Route path="orders" element={<OrderPage />} />
-            <Route path="orders/:id" element={<OrderDetailComp />} />
+            <Route path="orders/:shopOrderId" element={<OrderDetailComp />} />
             <Route path="messages" element={<MessagePage />} />
             <Route path="settings" element={<Setting />} />
             <Route path="*" element={<div>Page not found</div>} />

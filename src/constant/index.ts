@@ -101,6 +101,15 @@ export const API_ENDPOINTS = {
 
   PAYMENT: {
     RESULT: (orderId: string) => `payment/result/${orderId}`,
+  },
+
+  ORDERS: {
+    BASE: '/orders',
+    MYSHOP_META_DATA: '/my-shop/orders/meta-data',
+    MYSHOP_ORDERS: '/my-shop/orders',
+    MYSHOP_APPROVAL: (shopOrderId: string) => `/my-shop/orders/approve/${shopOrderId}`,
+    MYSHOP_REJECT: (orderItemId: string) => `/my-shop/orders/reject-id/${orderItemId}`,
+    MYSHOP_REJECTS: '/my-shop/orders/reject-ids',
   }
 };
 
@@ -113,7 +122,7 @@ export const APP_ROUTES = {
   FORGOT_PASSWORD: '/forgot-password',
   CART: '/carts',
   CHECKOUT: '/checkout',
-  PAYMENT_RESULT: `/payment/result/:orderId`,
+  PAYMENT_RESULT: (orderId: string) => `/payment/result/${orderId}`,
   PRODUCT_DETAIL: '/products/:slug',
   USER_SETTINGS: '/settings/*',
 

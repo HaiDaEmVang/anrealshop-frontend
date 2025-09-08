@@ -88,7 +88,6 @@ const CheckoutPage = () => {
 
     CheckoutService.createCheckout(request)
     .then((data: CheckoutResponseDto) => {
-      localStorage.remove(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS);
       if (data.bankTransfer) {
         window.location.href = data.urlRedirect;
       }else {

@@ -47,19 +47,16 @@ const getMyShopProductsAdmin = async (params?: UseProductParams): Promise<MyShop
     return response.data;
 };
 
-// Get my shop product by ID
 const getMyShopProductById = async (id: string): Promise<ProductCreateRequest> => {
     const response = await axiosInstance.get(API_ENDPOINTS.PRODUCTS.GET_MY_SHOP_PRODUCT_BY_ID(id));
     return response.data;
 };
 
-// Update product
 const update = async (id: string, data: ProductCreateRequest): Promise<MyShopProductDto> => {
     const response = await axiosInstance.put(API_ENDPOINTS.PRODUCTS.UPDATE(id), data);
     return response.data;
 };
 
-// Delete product
 const deleteProduct = async (id: string, isForce: boolean = false) => {
     const response = await axiosInstance.delete(API_ENDPOINTS.PRODUCTS.DELETE(id), {
         params: { isForce }
@@ -67,7 +64,7 @@ const deleteProduct = async (id: string, isForce: boolean = false) => {
     return response.data;
 };
 
-// Update product visibility (show/hide)
+
 const updateVisibility = async (id: string, visible: boolean) => {
     const response = await axiosInstance.put(API_ENDPOINTS.PRODUCTS.UPDATE_VISIBILITY(id), null, {
         params: { visible }
@@ -75,7 +72,7 @@ const updateVisibility = async (id: string, visible: boolean) => {
     return response.data;
 };
 
-// Get product name suggestions for autocomplete
+
 const getProductNameSuggestions = async (keyword: string): Promise<string[]> => {
     const response = await axiosInstance.get(
         `${API_ENDPOINTS.PRODUCTS.GET_MY_SHOP_SUGGEST_PRODUCT_NAME}?keyword=${encodeURIComponent(keyword)}`
@@ -84,8 +81,6 @@ const getProductNameSuggestions = async (keyword: string): Promise<string[]> => 
 };
 
 
-
-// Get product status metadata (counts for each status)
 const getProductStatusMetadata = async (): Promise<ProductStatusDto[]> => {
     const response = await axiosInstance.get(API_ENDPOINTS.PRODUCTS.GET_META_STATUS);
     return response.data;
