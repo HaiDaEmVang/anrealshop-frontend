@@ -140,11 +140,7 @@ const OrderFilter = ({
               onChange={onSortByChange}
               data={[
                 { value: 'newest', label: 'Đơn hàng mới nhất' },
-                { value: 'oldest', label: 'Đơn hàng cũ nhất' },
-                { value: 'price-asc', label: 'Giá tăng dần' },
-                { value: 'price-desc', label: 'Giá giảm dần' },
-                { value: 'name-asc', label: 'Tên A-Z' },
-                { value: 'name-desc', label: 'Tên Z-A' },
+                { value: 'oldest', label: 'Đơn hàng cũ nhất' }
               ]}
               style={{ width: 200 }}
             />

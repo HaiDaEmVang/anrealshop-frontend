@@ -29,7 +29,7 @@ export const OrderStatusDefaultDataAdmin: OrderStatusDto[] = [
   },
   {
     id: 'CLOSED',
-    name: 'Đã hoàn thành',
+    name: 'Hủy/Hoàn/Trả',
     count: 0
   }
 ];
