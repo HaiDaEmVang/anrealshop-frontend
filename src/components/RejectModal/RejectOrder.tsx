@@ -1,17 +1,19 @@
 import { Button, Group, Modal, Radio, Stack, Text, Textarea } from '@mantine/core';
 import { useState } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
-import { defaultRejectReasons } from '../../../../data/OrderData';
+import type { ItemList } from '../../types/CommonType';
 
-interface RejectOrderProps {
+interface RejectModalProps {
+  data: ItemList[];
   opened: boolean;
   onClose: () => void;
   onConfirm: (reason: string) => void;
   orderId: string;
 }
 
-const RejectOrder = ({ opened, onClose, onConfirm, orderId }: RejectOrderProps) => {
-  const [reason, setReason] = useState<string>('out_of_stock');
+const RejectModal = ({ data, opened, onClose, onConfirm, orderId }: RejectModalProps) => {
+
+  const [reason, setReason] = useState<string>(data[0].key);
   const [customReason, setCustomReason] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -21,11 +23,9 @@ const RejectOrder = ({ opened, onClose, onConfirm, orderId }: RejectOrderProps) 
     onConfirm(finalReason);
     setIsSubmitting(false);
     onClose();
-    setReason('out_of_stock');
+    setReason(data[0].key);
     setCustomReason('');
   };
-
-  const rejectReasons = defaultRejectReasons;
 
   return (
     <Modal
@@ -47,11 +47,11 @@ const RejectOrder = ({ opened, onClose, onConfirm, orderId }: RejectOrderProps) 
           withAsterisk
         >
           <Stack mt="xs">
-            {rejectReasons.map(option => (
-              <Radio 
-                key={option.key} 
-                value={option.value} 
-                label={option.value} 
+            {data.map(option => (
+              <Radio
+                key={option.key}
+                value={option.key}
+                label={option.value}
               />
             ))}
           </Stack>
@@ -85,4 +85,4 @@ const RejectOrder = ({ opened, onClose, onConfirm, orderId }: RejectOrderProps) 
   );
 };
 
-export default RejectOrder;
+export default RejectModal;

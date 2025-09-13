@@ -16,8 +16,7 @@ import {
     FiPackage
 } from 'react-icons/fi';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SampleOrderDetail } from '../../../data/OrderData';
-import type { OrderDetail } from '../../../types/OrderType';
+import { SampleOrderDetail } from '../../../data/OrderData';``
 import Customer from './OrderDetails/Customer';
 import FinancialDetail from './OrderDetails/FinancialDetail';
 import Option from './OrderDetails/Option';

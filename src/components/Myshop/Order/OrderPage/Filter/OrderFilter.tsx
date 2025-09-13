@@ -2,10 +2,11 @@ import { Button, Card, Group, Menu, SegmentedControl, Select, Text, TextInput } 
 import '@mantine/dates/styles.css';
 import { useState } from 'react';
 import { FiCheck, FiDownload, FiSearch, FiTruck, FiX } from 'react-icons/fi';
-import type { ShopOrderStatus } from '../../../../types/OrderType';
+import { Link } from 'react-router-dom';
+import type { ShopOrderStatus } from '../../../../../types/OrderType';
 import HistoryExport from '../Modal/HistoryExport';
 import ModalExport from '../Modal/ModalExport';
-import type { SearchType } from '../OrderPage';
+import type { SearchType } from '../../../../../hooks/useOrder';
 
 interface OrderFilterProps {
   searchTerm: string;
@@ -14,7 +15,7 @@ interface OrderFilterProps {
   onSearchTypeValueChange: (value: SearchType) => void;
   sortBy: string | null;
   onSortByChange: (value: string | null) => void;
-  activeTab: ShopOrderStatus | "ALL";
+  activeTab: ShopOrderStatus | "all";
   totalOrders?: number;
   onStatusFilterChange?: (value: string) => void;
   onFetchWithParam: () => void;
@@ -28,7 +29,7 @@ const OrderFilter = ({
   onSearchTypeValueChange,
   sortBy,
   onSortByChange,
-  activeTab = 'ALL',
+  activeTab = 'all',
   totalOrders = 0,
   onStatusFilterChange,
   onFetchWithParam,
@@ -57,9 +58,6 @@ const OrderFilter = ({
     }
   };
 
-  const handleBulkShipping = () => {
-    console.log('Giao hàng loạt được kích hoạt');
-  };
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value);
@@ -176,15 +174,16 @@ const OrderFilter = ({
           </Group>
           <Group>
             {activeTab === 'PREPARING' && (
-              <Button
-                color="blue"
-                leftSection={<FiTruck size={14} />}
-                variant="filled"
-                size='xs'
-                onClick={handleBulkShipping}
-              >
-                Giao hàng loạt
-              </Button>
+              <Link to="/myshop/orders/shipping">
+                <Button
+                  color="blue"
+                  leftSection={<FiTruck size={14} />}
+                  variant="filled"
+                  size='xs'
+                >
+                  Giao hàng loạt
+                </Button>
+              </Link>
             )}
 
             <Menu shadow="md" width={200} position="bottom-end">

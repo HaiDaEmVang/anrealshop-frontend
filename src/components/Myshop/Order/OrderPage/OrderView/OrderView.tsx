@@ -2,11 +2,12 @@ import { ActionIcon, Avatar, Box, Button, Card, Group, Text, Tooltip } from '@ma
 import { useState } from 'react';
 import { FiAlertCircle, FiChevronDown, FiChevronUp, FiMessageSquare, FiTrash } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { useOrderStatus } from '../../../../hooks/useOrderStatus';
-import type { OrderItemDto, OrderRejectRequest, ProductOrderItemDto } from '../../../../types/OrderType';
-import { formatPrice } from '../../../../untils/Untils';
-import RejectOrder from '../Modal/RejectOrder';
-import { paymentMethods } from '../../../../data/ShippingData';
+import { getRejectReasons } from '../../../../../data/RejectData';
+import { paymentMethods } from '../../../../../data/ShippingData';
+import { useOrderStatus } from '../../../../../hooks/useOrderStatus';
+import type { OrderItemDto, OrderRejectRequest, ProductOrderItemDto } from '../../../../../types/OrderType';
+import { formatPrice } from '../../../../../untils/Untils';
+import RejectModal from '../../../../RejectModal/RejectOrder';
 
 interface OrderViewProps {
     items: OrderItemDto[];
@@ -59,7 +60,7 @@ const OrderView = ({
 
             {items.map((order) => {
                 const isPendingConfirmation = order.orderStatus.includes('PENDING_CONFIRMATION');
-                const hasMultipleItems = order.productOrderItemDtoSet.length > 5;
+                const hasMultipleItems = order.productOrderItemDtoSet.length > 2;
                 const isExpanded = expandedOrders[order.shopOrderId] !== false;
                 const itemsToShow = isExpanded ? order.productOrderItemDtoSet : order.productOrderItemDtoSet.slice(0, 1);
                 const hiddenItemsCount = order.productOrderItemDtoSet.length - itemsToShow.length;
@@ -194,7 +195,7 @@ const OrderView = ({
                                                         leftSection={<FiTrash size={14} />}
                                                         onClick={() => openRejectModal(item.orderItemId)}
                                                         color='black'
-                                                        disabled={!isPendingConfirmation || item.cancelReason? true: false}
+                                                        disabled={!isPendingConfirmation || item.cancelReason ? true : false}
                                                         size="sm"
                                                     >
                                                         Từ chối
@@ -226,7 +227,8 @@ const OrderView = ({
             })}
 
             {/* Reject Order Modal */}
-            <RejectOrder
+            <RejectModal
+                data={getRejectReasons('order')}
                 opened={rejectModalOpen}
                 onClose={() => setRejectModalOpen(false)}
                 onConfirm={handleRejectConfirm}

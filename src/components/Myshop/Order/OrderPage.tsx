@@ -2,23 +2,23 @@ import { Anchor, Box, Breadcrumbs, Card, Container, Group, Paper, Text, Title } 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiPackage } from 'react-icons/fi';
 import { useSearchParams } from 'react-router-dom';
-import { useOrder } from '../../../hooks/useOrder';
+import { useOrder, type SearchType } from '../../../hooks/useOrder';
 import type { OrderRejectRequest, ShopOrderStatus } from '../../../types/OrderType';
 import Pagination from '../Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton, StatusFilterSkeleton } from '../Product/Managerment/Skeleton';
-import FilterByStatus from './Filter/FilterByStatus';
-import OrderFilter from './Filter/OrderFilter';
-import NonOrderFound from './OrderView/NonOrderFond';
-import OrderView from './OrderView/OrderView';
-import SkeletonOrderView from './OrderView/SkeletonOrderView';
+import NonOrderFound from './OrderPage/OrderView/NonOrderFond';
+import OrderView from './OrderPage/OrderView/OrderView';
+import SkeletonOrderView from './OrderPage/OrderView/SkeletonOrderView';
+import FilterByStatus from './OrderPage/Filter/FilterByStatus';
+import OrderFilter from './OrderPage/Filter/OrderFilter';
 
-export type SearchType = 'order_code' | 'customer_name' | 'product_name';
+
 
 const OrderPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [activeStatus, setActiveStatus] = useState<ShopOrderStatus | "ALL">(
-    (searchParams.get('status') as ShopOrderStatus | "ALL") || 'ALL'
+  const [activeStatus, setActiveStatus] = useState<ShopOrderStatus | "all">(
+    (searchParams.get('status') as ShopOrderStatus | "all") || 'all'
   );
 
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
@@ -36,10 +36,10 @@ const OrderPage = () => {
     const newParams = new URLSearchParams(searchParams);
 
     Object.entries(updates).forEach(([key, value]) => {
-      if (value === null || value === '' || value === 'ALL') {
+      if (value === null || value === '' || value === 'all') {
         newParams.delete(key);
       } else {
-        newParams.set(key, value);
+        newParams.set(key, value); 
       }
     });
 
@@ -63,7 +63,7 @@ const OrderPage = () => {
     initialParams: {
       page: 0,
       limit: itemsPerPage,
-      status: activeStatus !== 'ALL' ? activeStatus : undefined
+      status: activeStatus,
     }
   });
 
@@ -78,7 +78,7 @@ const OrderPage = () => {
 
   const loadOrders = useCallback(() => {
     updateURLParams({
-      status: activeStatus !== 'ALL' ? activeStatus : null,
+      status: activeStatus,
       search: searchTerm || null,
       searchType: searchTypeValue !== 'order_code' ? searchTypeValue : null,
       sortBy: sortBy !== 'newest' ? sortBy : null,
@@ -88,10 +88,10 @@ const OrderPage = () => {
     fetchOrders({
       page: activePage - 1,
       limit: itemsPerPage,
-      status: activeStatus !== 'ALL' ? activeStatus : undefined,
-      orderCode: searchTypeValue === 'order_code' ? searchTerm : undefined,
-      customerName: searchTypeValue === 'customer_name' ? searchTerm : undefined,
-      productName: searchTypeValue === 'product_name' ? searchTerm : undefined,
+      mode: 'home',
+      status: activeStatus,
+      search: searchTerm,
+      searchType: searchTypeValue,
       sortBy: sortBy || undefined
     });
   }, [activePage, activeStatus, sortBy, searchTypeValue, searchTerm, fetchOrders, updateURLParams]);
@@ -104,7 +104,7 @@ const OrderPage = () => {
     fetchOrderMetadata();
   }, []);
 
-  const handleStatusChange = (status: ShopOrderStatus | "ALL") => {
+  const handleStatusChange = (status: ShopOrderStatus | "all") => {
     setActiveStatus(status);
     setActivePage(1);
   };
@@ -138,7 +138,7 @@ const OrderPage = () => {
     setSearchTypeValue('order_code');
 
     const newParams = new URLSearchParams();
-    if (activeStatus !== 'ALL') {
+    if (activeStatus !== 'all') {
       newParams.set('status', activeStatus);
     }
     setSearchParams(newParams, { replace: true });
@@ -146,7 +146,8 @@ const OrderPage = () => {
     fetchOrders({
       page: 0,
       limit: itemsPerPage,
-      status: activeStatus !== 'ALL' ? activeStatus : undefined
+      mode: 'home',
+      status: activeStatus
     });
   }, [activeStatus, fetchOrders, setSearchParams]);
 

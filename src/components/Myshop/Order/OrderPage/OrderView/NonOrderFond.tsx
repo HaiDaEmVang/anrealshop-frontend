@@ -2,8 +2,8 @@ import { Button, Card, Text } from '@mantine/core';
 import { FiPackage } from 'react-icons/fi';
 
 interface NonOrderFoundProps {
-  searchTerm: string;
-  onClearFilters: () => void;
+  searchTerm?: string;
+  onClearFilters?: () => void;
   message?: string;
   subMessage?: string;
 }

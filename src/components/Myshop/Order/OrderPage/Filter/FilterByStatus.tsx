@@ -1,17 +1,18 @@
 import { Tabs, Text } from '@mantine/core';
-import type { OrderStatusDto, ShopOrderStatus } from '../../../../types/OrderType';
-import { OrderStatusDefaultDataAdmin } from '../../../../data/OrderData';
+import type { OrderStatusDto, ShopOrderStatus } from '../../../../../types/OrderType';
+import { OrderStatusDefaultDataAdmin } from '../../../../../data/OrderData';
+
 
 interface FilterByStatusProps {
-  selectedStatus: ShopOrderStatus | "ALL";
-  onStatusChange: (status: ShopOrderStatus | "ALL") => void;
+  selectedStatus: ShopOrderStatus | "all";
+  onStatusChange: (status: ShopOrderStatus | "all") => void;
   orderStatusData: OrderStatusDto[];
 }
 
 const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData }: FilterByStatusProps) => {
   const handleStatusChange = (value: string | null) => {
-    if (value as ShopOrderStatus | "ALL" != selectedStatus) {
-      onStatusChange(value as ShopOrderStatus | "ALL");
+    if (value as ShopOrderStatus | "all" != selectedStatus) {
+      onStatusChange(value as ShopOrderStatus | "all");
     }
   };
 

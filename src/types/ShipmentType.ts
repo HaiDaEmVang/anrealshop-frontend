@@ -20,3 +20,9 @@ export interface CheckoutInfoDto {
 
 export type PaymentMethodId = 'cod' | 'bank_transfer' | 'zalopay' | 'momo' | 'vnpay';
 
+export interface CreateShipmentRequest {
+    shopOrderIds: string[],
+    addressId: string,
+    note: string,
+    pickupDate: string,
+}

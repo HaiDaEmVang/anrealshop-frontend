@@ -5,7 +5,7 @@ export type ShopOrderStatus = 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'PREP
 export interface OrderStatusDto {
   id: string;
   name: string;
-  count: number; 
+  count: number;
 }
 
 export interface ProductOrderItemDto {
@@ -18,6 +18,8 @@ export interface ProductOrderItemDto {
     quantity: number;
     price: number;
     orderStatus: string;
+
+    submitConfirmDate?: string;
  
     cancelReason: string;
     isReviewed: boolean;

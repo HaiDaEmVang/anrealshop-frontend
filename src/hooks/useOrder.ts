@@ -1,21 +1,25 @@
 import { useCallback, useEffect, useState } from 'react';
 import showErrorNotification from '../components/Toast/NotificationError';
 import showSuccessNotification from '../components/Toast/NotificationSuccess';
-import { OrderService } from '../service/OrderService';
-import type { MyShopOrderListResponse, OrderItemDto, OrderRejectRequest, OrderStatus, OrderStatusDto, ShopOrderStatus } from '../types/OrderType';
-import { getErrorMessage } from '../untils/ErrorUntils';
 import type { TypeMode } from '../constant';
 import { OrderStatusDefaultDataAdmin } from '../data/OrderData';
+import { OrderService } from '../service/OrderService';
+import type { MyShopOrderListResponse, OrderItemDto, OrderRejectRequest, OrderStatusDto, ShopOrderStatus } from '../types/OrderType';
+import { getErrorMessage } from '../untils/ErrorUntils';
+import { getDefaultDateRange_Now_Yesterday } from '../untils/Untils';
 
 export interface UseOrderParams {
     page?: number;
     limit?: number;
-    status?: ShopOrderStatus | 'ALL';
-    orderCode?: string;
-    customerName?: string;
-    productName?: string;
-    sortBy?: string;
-    dateRange?: [Date | null, Date | null];
+    mode?: ModeType;
+    status?: ShopOrderStatus | 'all';
+    search?: string;
+    searchType?: SearchType;
+    confirmSD?: string | null;
+    confirmED?: string | null;
+    orderType?: OrderCountType;
+    preparingStatus?: PreparingStatus;
+    sortBy?: string | null;
 }
 
 interface UseOrderOptions {
@@ -32,7 +36,12 @@ interface UseOrderState {
     isLoading: boolean;
     error: string | null;
     isEmpty: boolean;
-}
+} 
+
+export type SearchType = 'order_code' | 'customer_name' | 'product_name';
+export type ModeType = 'home' | 'shipping';
+export type OrderCountType = 'all' | 'one' | 'more';
+export type PreparingStatus = 'all' | 'preparing' | 'wait_shipment';
 
 export const useOrder = (options: UseOrderOptions = {}) => {
     const { autoFetch = false, initialParams, mode = 'myshop' } = options;
@@ -56,7 +65,6 @@ export const useOrder = (options: UseOrderOptions = {}) => {
             error: null
         }));
         try {
-
             console.log('Fetching orders with params:', params);
             const response: MyShopOrderListResponse = await OrderService.getMyShopOrders(params);
             const orderItems = Array.isArray(response.orderItemDtoSet) && response.orderItemDtoSet.length === 1 && response.orderItemDtoSet[0] === null ? [] : response.orderItemDtoSet;
@@ -116,7 +124,7 @@ export const useOrder = (options: UseOrderOptions = {}) => {
         }
     }, []);
 
-    const rejectOrder = useCallback( async (orderItemId: string, reason: string) => {
+    const rejectOrder = useCallback(async (orderItemId: string, reason: string) => {
         try {
             console.log('Rejecting order:', orderItemId, 'with reason:', reason);
             await OrderService.rejectOrder(orderItemId, reason);
@@ -129,7 +137,7 @@ export const useOrder = (options: UseOrderOptions = {}) => {
         }
     }, []);
 
-    const rejectOrders = useCallback( async (orderRejectRequest: OrderRejectRequest) => {
+    const rejectOrders = useCallback(async (orderRejectRequest: OrderRejectRequest) => {
         try {
             await OrderService.rejectOrders(orderRejectRequest);
             showSuccessNotification('Từ chối đơn hàng', 'Các đơn hàng đã được từ chối thành công.');
