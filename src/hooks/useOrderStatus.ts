@@ -49,7 +49,7 @@ export const useOrderStatusColor = () => {
                     return 'yellow';
                 case 'preparing':
                     return 'cyan';
-                case 'awaiting_shipment':
+                case 'await_shipment':
                     return 'teal';
                 case 'in_transit':
                     return 'indigo';
@@ -110,7 +110,7 @@ export const useOrderStatusLabel = () => {
                     return 'Chờ xác nhận';
                 case 'preparing':
                     return 'Đang chuẩn bị';
-                case 'awaiting_shipment':
+                case 'wait_shipment':
                     return 'Chờ giao';
                 case 'in_transit':
                     return 'Đang vận chuyển';

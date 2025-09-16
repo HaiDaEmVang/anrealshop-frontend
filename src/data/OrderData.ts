@@ -29,18 +29,11 @@ export const OrderStatusDefaultDataAdmin: OrderStatusDto[] = [
   },
   {
     id: 'CLOSED',
-    name: 'Đã hoàn thành',
+    name: 'Hủy/Hoàn/Trả',
     count: 0
   }
 ];
 
-export const defaultRejectReasons: ItemList[] = [
-  { key: 'out_of_stock', value: 'Hết hàng' },
-  { key: 'price_incorrect', value: 'Giá sản phẩm không chính xác' },
-  { key: 'unable_to_fulfill', value: 'Không thể đáp ứng yêu cầu khách hàng' },
-  { key: 'shipping_issue', value: 'Vấn đề về vận chuyển' },
-  { key: 'other', value: 'Lý do khác' }
-];
 
 export const SampleOrderDetail: OrderDetailDto = {
   orderId: "ORD12345",

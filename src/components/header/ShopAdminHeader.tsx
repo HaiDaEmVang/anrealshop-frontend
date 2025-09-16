@@ -9,13 +9,15 @@ import {
   Menu,
   Stack,
   Text,
-  UnstyledButton
+  UnstyledButton,
+  Collapse
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import {
   FiBell,
   FiChevronDown,
+  FiChevronRight,
   FiHome,
   FiLogOut,
   FiMessageSquare,
@@ -23,14 +25,34 @@ import {
   FiPieChart,
   FiSettings,
   FiShoppingBag,
-  FiUser
+  FiUser,
+  FiTruck,
+  FiPrinter,
+  FiPlus
 } from 'react-icons/fi';
 import { Link, useLocation } from 'react-router-dom';
 
 const navLinks = [
   { label: 'Tổng quan', icon: <FiPieChart size={16} />, path: '/myshop/dashboard' },
-  { label: 'Sản phẩm', icon: <FiShoppingBag size={16} />, path: '/myshop/products' },
-  { label: 'Đơn hàng', icon: <FiPackage size={16} />, path: '/myshop/orders' },
+  { 
+    label: 'Sản phẩm', 
+    icon: <FiShoppingBag size={16} />, 
+    path: '/myshop/products',
+    children: [
+      { label: 'Quản lý', icon: <FiPackage size={16} />, path: '/myshop/products' },
+      { label: 'Tạo sản phẩm', icon: <FiPlus size={16} />, path: '/myshop/products/create' },
+    ]
+  },
+  { 
+    label: 'Đơn hàng', 
+    icon: <FiPackage size={16} />, 
+    path: '/myshop/orders',
+    children: [
+      { label: 'Đơn hàng', icon: <FiPackage size={16} />, path: '/myshop/orders' },
+      { label: 'Giao hàng loạt', icon: <FiTruck size={16} />, path: '/myshop/orders/shipping' },
+      { label: 'In phiếu giao hàng', icon: <FiPrinter size={16} />, path: '/myshop/orders/printing' },
+    ]
+  },
   { label: 'Tin nhắn', icon: <FiMessageSquare size={16} />, path: '/myshop/messages' },
   { label: 'Cài đặt', icon: <FiSettings size={16} />, path: '/myshop/settings' },
 ];
@@ -39,6 +61,11 @@ export function ShopAdminHeader() {
   const location = useLocation();
   const [opened, { toggle, close }] = useDisclosure(false);
   const [hasUnread] = useState(true); // For notification indicator
+  const [openedSubmenu, setOpenedSubmenu] = useState<string | null>(null);
+
+  const toggleSubmenu = (label: string) => {
+    setOpenedSubmenu(openedSubmenu === label ? null : label);
+  };
 
   const userMenuItems = [
     { label: 'Hồ sơ của tôi', icon: <FiUser size={14} />, onClick: () => console.log('Profile') },
@@ -46,11 +73,21 @@ export function ShopAdminHeader() {
     { label: 'Quay lại cửa hàng', icon: <FiHome size={14} />, onClick: () => console.log('Go to shop') },
   ];
 
+  const isUnderPath = (parentPath: string) => {
+    return location.pathname.startsWith(parentPath);
+  };
+
+  const isMenuActive = (item: any) => {
+    if (item.children) {
+      return item.children.some((child: any) => location.pathname === child.path || location.pathname.startsWith(child.path));
+    }
+    return location.pathname === item.path || location.pathname.startsWith(item.path);
+  };
+
   return (
     <div className="sticky top-0 z-10">
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-          {/* Logo and mobile menu button */}
           <div className="flex items-center">
             <Burger opened={opened} onClick={toggle} className="mr-2 lg:hidden" />
             <Link to="/shop-admin/dashboard" className="flex items-center gap-2">
@@ -62,11 +99,48 @@ export function ShopAdminHeader() {
             </Link>
           </div>
 
-          {/* Desktop navigation */}
           <div className="hidden lg:flex flex-1 items-center justify-center">
             <nav className="flex items-center space-x-1">
               {navLinks.map((item) => {
-                const isActive = location.pathname.includes(item.path);
+                const isActive = isMenuActive(item);
+                
+                if (item.children) {
+                  return (
+                    <Menu key={item.label} trigger="hover" openDelay={100} closeDelay={200} position="bottom-start">
+                      <Menu.Target>
+                        <Link
+                          to={item.path}
+                          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors ${
+                            isActive
+                              ? 'text-primary bg-primary/5'
+                              : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          {item.icon}
+                          {item.label}
+                          <FiChevronDown size={14} className="ml-1" />
+                        </Link>
+                      </Menu.Target>
+                      <Menu.Dropdown>
+                        {item.children.map((child: any) => {
+                          const isChildActive = location.pathname === child.path || location.pathname.startsWith(child.path);
+                          return (
+                            <Menu.Item
+                              key={child.path}
+                              leftSection={child.icon}
+                              component={Link}
+                              to={child.path}
+                              className={isChildActive ? 'bg-primary/5 text-primary' : ''}
+                            >
+                              {child.label}
+                            </Menu.Item>
+                          );
+                        })}
+                      </Menu.Dropdown>
+                    </Menu>
+                  );
+                }
+
                 return (
                   <Link
                     key={item.path}
@@ -213,7 +287,52 @@ export function ShopAdminHeader() {
       >
         <Stack>
           {navLinks.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = isMenuActive(item);
+            
+            if (item.children) {
+              const isOpen = openedSubmenu === item.label;
+              return (
+                <div key={item.label}>
+                  <UnstyledButton
+                    className={`w-full px-3 py-2 rounded-md text-sm font-medium flex items-center justify-between ${
+                      isActive
+                        ? 'text-primary bg-primary/5'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                    onClick={() => toggleSubmenu(item.label)}
+                  >
+                    <div className="flex items-center gap-2">
+                      {item.icon}
+                      {item.label}
+                    </div>
+                    {isOpen ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+                  </UnstyledButton>
+                  <Collapse in={isOpen}>
+                    <div className="pl-6 space-y-1 mt-1">
+                      {item.children.map((child: any) => {
+                        const isChildActive = location.pathname === child.path;
+                        return (
+                          <Link
+                            key={child.path}
+                            to={child.path}
+                            className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${
+                              isChildActive
+                                ? 'text-primary bg-primary/5'
+                                : 'text-gray-600 hover:bg-gray-100'
+                            }`}
+                            onClick={close}
+                          >
+                            {child.icon}
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </Collapse>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={item.path}

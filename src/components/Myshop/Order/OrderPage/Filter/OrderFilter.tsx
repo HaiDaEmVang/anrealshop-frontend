@@ -2,10 +2,11 @@ import { Button, Card, Group, Menu, SegmentedControl, Select, Text, TextInput } 
 import '@mantine/dates/styles.css';
 import { useState } from 'react';
 import { FiCheck, FiDownload, FiSearch, FiTruck, FiX } from 'react-icons/fi';
-import type { ShopOrderStatus } from '../../../../types/OrderType';
+import { Link } from 'react-router-dom';
+import type { ShopOrderStatus } from '../../../../../types/OrderType';
 import HistoryExport from '../Modal/HistoryExport';
 import ModalExport from '../Modal/ModalExport';
-import type { SearchType } from '../OrderPage';
+import type { PreparingStatus, SearchType } from '../../../../../hooks/useOrder';
 
 interface OrderFilterProps {
   searchTerm: string;
@@ -14,9 +15,9 @@ interface OrderFilterProps {
   onSearchTypeValueChange: (value: SearchType) => void;
   sortBy: string | null;
   onSortByChange: (value: string | null) => void;
-  activeTab: ShopOrderStatus | "ALL";
+  activeTab: ShopOrderStatus | "all";
   totalOrders?: number;
-  onStatusFilterChange?: (value: string) => void;
+  onStatusFilterChange?: (value: PreparingStatus) => void;
   onFetchWithParam: () => void;
   onClearAll: () => void;
 }
@@ -28,7 +29,7 @@ const OrderFilter = ({
   onSearchTypeValueChange,
   sortBy,
   onSortByChange,
-  activeTab = 'ALL',
+  activeTab = 'all',
   totalOrders = 0,
   onStatusFilterChange,
   onFetchWithParam,
@@ -57,14 +58,11 @@ const OrderFilter = ({
     }
   };
 
-  const handleBulkShipping = () => {
-    console.log('Giao hàng loạt được kích hoạt');
-  };
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value);
     if (onStatusFilterChange) {
-      onStatusFilterChange(value);
+      onStatusFilterChange(value as PreparingStatus);
     }
   };
 
@@ -80,8 +78,8 @@ const OrderFilter = ({
               onChange={handleStatusFilterChange}
               data={[
                 { label: 'Tất cả', value: 'all' },
-                { label: 'Chưa xử lý', value: 'pending' },
-                { label: 'Đã xử lý', value: 'processed' },
+                { label: 'Chưa xử lý', value: 'preparing' },
+                { label: 'Đã xử lý', value: 'wait_shipment' },
               ]}
               size="sm"
               radius="md"
@@ -98,7 +96,7 @@ const OrderFilter = ({
                 },
                 control: {
                   border: 'none',
-                  minWidth: '80px',
+                  minWidth: '120px',
                 }
               }}
             />
@@ -140,11 +138,7 @@ const OrderFilter = ({
               onChange={onSortByChange}
               data={[
                 { value: 'newest', label: 'Đơn hàng mới nhất' },
-                { value: 'oldest', label: 'Đơn hàng cũ nhất' },
-                { value: 'price-asc', label: 'Giá tăng dần' },
-                { value: 'price-desc', label: 'Giá giảm dần' },
-                { value: 'name-asc', label: 'Tên A-Z' },
-                { value: 'name-desc', label: 'Tên Z-A' },
+                { value: 'oldest', label: 'Đơn hàng cũ nhất' }
               ]}
               style={{ width: 200 }}
             />
@@ -180,15 +174,16 @@ const OrderFilter = ({
           </Group>
           <Group>
             {activeTab === 'PREPARING' && (
-              <Button
-                color="blue"
-                leftSection={<FiTruck size={14} />}
-                variant="filled"
-                size='xs'
-                onClick={handleBulkShipping}
-              >
-                Giao hàng loạt
-              </Button>
+              <Link to="/myshop/orders/shipping">
+                <Button
+                  color="blue"
+                  leftSection={<FiTruck size={14} />}
+                  variant="filled"
+                  size='xs'
+                >
+                  Giao hàng loạt
+                </Button>
+              </Link>
             )}
 
             <Menu shadow="md" width={200} position="bottom-end">

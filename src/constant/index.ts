@@ -74,6 +74,8 @@ export const API_ENDPOINTS = {
   SHIPMENT: {
     BASE: '/shipping',
     GET_SHIPPING_FEE_FORCART: '/shipping/fee-for-cart',
+    CREATE_SHIPMENTS: '/shipping/create-shipments',
+    MYSHOP_LIST: '/shipping/my-shop',
   },
   
   ADDRESS: {

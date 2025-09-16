@@ -33,20 +33,20 @@ const processQueue = (error: any | null, success = false) => {
 };
 
 const redirectToLoginWithDelay = () => {
-  store.dispatch(logout());
+  // store.dispatch(logout());
 
-  const currentPath = window.location.pathname;
-  if (APP_ROUTES_PUBLIC.includes(currentPath)) {
-    return;
-  }
+  // const currentPath = window.location.pathname;
+  // if (APP_ROUTES_PUBLIC.includes(currentPath)) {
+  //   return;
+  // }
 
-  const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+  // const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
 
-  showErrorNotification("Phiên đăng nhập hết hạn.", "Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.");
+  // showErrorNotification("Phiên đăng nhập hết hạn.", "Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.");
 
-  setTimeout(() => {
-    window.location.href = `/login?urlReturn=${returnUrl}`;
-  }, 3000);
+  // setTimeout(() => {
+  //   window.location.href = `/login?urlReturn=${returnUrl}`;
+  // }, 3000);
 };
 
 axiosInstance.interceptors.response.use(
