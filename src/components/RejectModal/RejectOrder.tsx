@@ -35,7 +35,7 @@ const RejectModal = ({ data, opened, onClose, onConfirm, orderId }: RejectModalP
       centered
     >
       <Text size="sm" c="dimmed" mb="md">
-        Vui lòng chọn lý do từ chối đơn hàng {orderId}
+        Vui lòng chọn lý do từ chối đơn hàng #{orderId.split('-')[0]}...
       </Text>
 
       <Stack>

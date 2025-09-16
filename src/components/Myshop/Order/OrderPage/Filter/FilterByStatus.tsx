@@ -29,7 +29,7 @@ const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData }: Fil
       >
         <Tabs.List>
           {OrderStatusDefaultDataAdmin.map((status) => {
-            const isActive = selectedStatus === status.id;
+            const isActive = status.id.toLocaleLowerCase() === selectedStatus.toLocaleLowerCase();
             const statusCount = orderStatusData.find(s => s.id === status.id)?.count || 0;
 
             return (

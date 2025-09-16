@@ -13,6 +13,7 @@ const ProductForm = lazy(() => import('../../components/Myshop/Product/Create/Cr
 const ProductPage = lazy(() => import('../../components/Myshop/Product/ProductPage'));
 const Setting = lazy(() => import('../../components/Myshop/Setting/SettingPage'));
 const OrderShippingPage = lazy(() => import('../../components/Myshop/Order/OrderShippingPage'));
+const OrderPrintPage = lazy(() => import('../../components/Myshop/Order/OrderPrintPage'));
 
 const MyshopPage = () => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
@@ -43,6 +44,7 @@ const MyshopPage = () => {
           <Route path="orders" element={<OrderPage />} />
           <Route path="orders/:shopOrderId" element={<OrderDetailComp />} />
           <Route path="orders/shipping" element={<OrderShippingPage />} />
+          <Route path="orders/printing" element={<OrderPrintPage />} />
           <Route path="messages" element={<MessagePage />} />
           <Route path="settings" element={<Setting />} />
           <Route path="*" element={<div>Page not found</div>} />

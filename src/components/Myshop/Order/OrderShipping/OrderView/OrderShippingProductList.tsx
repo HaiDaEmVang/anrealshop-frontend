@@ -75,6 +75,7 @@ const OrderShippingProductList = ({
                                                         onChange={() => {
                                                             onSelectOrder(order.shopOrderId);
                                                         }}
+                                                        disabled={order.productOrderItemDtoSet && order.productOrderItemDtoSet.some(p => p.orderStatus !== 'PREPARING')}
                                                     />
                                                     <Avatar
                                                         radius="xl"

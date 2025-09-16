@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import type { ShopOrderStatus } from '../../../../../types/OrderType';
 import HistoryExport from '../Modal/HistoryExport';
 import ModalExport from '../Modal/ModalExport';
-import type { SearchType } from '../../../../../hooks/useOrder';
+import type { PreparingStatus, SearchType } from '../../../../../hooks/useOrder';
 
 interface OrderFilterProps {
   searchTerm: string;
@@ -17,7 +17,7 @@ interface OrderFilterProps {
   onSortByChange: (value: string | null) => void;
   activeTab: ShopOrderStatus | "all";
   totalOrders?: number;
-  onStatusFilterChange?: (value: string) => void;
+  onStatusFilterChange?: (value: PreparingStatus) => void;
   onFetchWithParam: () => void;
   onClearAll: () => void;
 }
@@ -62,7 +62,7 @@ const OrderFilter = ({
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value);
     if (onStatusFilterChange) {
-      onStatusFilterChange(value);
+      onStatusFilterChange(value as PreparingStatus);
     }
   };
 
@@ -78,8 +78,8 @@ const OrderFilter = ({
               onChange={handleStatusFilterChange}
               data={[
                 { label: 'Tất cả', value: 'all' },
-                { label: 'Chưa xử lý', value: 'pending' },
-                { label: 'Đã xử lý', value: 'processed' },
+                { label: 'Chưa xử lý', value: 'preparing' },
+                { label: 'Đã xử lý', value: 'wait_shipment' },
               ]}
               size="sm"
               radius="md"
@@ -96,7 +96,7 @@ const OrderFilter = ({
                 },
                 control: {
                   border: 'none',
-                  minWidth: '80px',
+                  minWidth: '120px',
                 }
               }}
             />

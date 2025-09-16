@@ -2,7 +2,7 @@ import { Anchor, Box, Breadcrumbs, Card, Container, Group, Paper, Text, Title } 
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiPackage } from 'react-icons/fi';
 import { useSearchParams } from 'react-router-dom';
-import { useOrder, type SearchType } from '../../../hooks/useOrder';
+import { useOrder, type PreparingStatus, type SearchType } from '../../../hooks/useOrder';
 import type { OrderRejectRequest, ShopOrderStatus } from '../../../types/OrderType';
 import Pagination from '../Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton, StatusFilterSkeleton } from '../Product/Managerment/Skeleton';
@@ -26,6 +26,7 @@ const OrderPage = () => {
     (searchParams.get('searchType') as SearchType) || 'order_code'
   );
   const [sortBy, setSortBy] = useState<string | null>(searchParams.get('sortBy') || 'newest');
+  const [preparingStatus, setPreparingStatus] = useState<PreparingStatus>('all');
 
   const [activePage, setActivePage] = useState(
     parseInt(searchParams.get('page') || '1', 10)
@@ -92,7 +93,8 @@ const OrderPage = () => {
       status: activeStatus,
       search: searchTerm,
       searchType: searchTypeValue,
-      sortBy: sortBy || undefined
+      sortBy: sortBy || undefined,
+      preparingStatus: preparingStatus
     });
   }, [activePage, activeStatus, sortBy, searchTypeValue, searchTerm, fetchOrders, updateURLParams]);
 
@@ -175,6 +177,9 @@ const OrderPage = () => {
       });
   }, [rejectOrders, fetchOrderMetadata, loadOrders]);
 
+  const handlePreparingStatusChange = (value : PreparingStatus) => {
+    setPreparingStatus(value);
+  }
   return (
     <Container fluid px="lg" py="md" className='relative'>
       <Paper
@@ -223,6 +228,7 @@ const OrderPage = () => {
           onFetchWithParam={onFetchWithParam}
           onClearAll={handleClearAll}
           totalOrders={totalCount}
+          onStatusFilterChange={handlePreparingStatusChange}
         />
 
         <Box p="md" className='min-h-[60vh]'>

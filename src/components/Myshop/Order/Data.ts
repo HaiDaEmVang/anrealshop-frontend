@@ -1,6 +1,12 @@
+export type ShippingMethod = {
+  id: string;
+  name: string;
+  description: string;
+  estimatedDelivery: string;
+  cost: number;
+  code: string;
+}
 
-
-import type { ShippingMethod } from '../../../types/ShippingType';
 
 export const shippingMethods: ShippingMethod[] = [
   {
@@ -79,6 +85,7 @@ export const searchTypes = [
   { value: 'product_name', label: 'Tên sản phẩm' },
 ];
 
+
 export const getSearchPlaceholder = (searchTypeValue: string) => {
   switch (searchTypeValue) {
     case 'order_code':
@@ -106,3 +113,23 @@ export const defaultRejectReasons = [
   { key: 'customer_request', value: 'Theo yêu cầu của khách hàng' },
   { key: 'other', value: 'Lý do khác' }
 ];
+
+
+
+// ------------------------------------------------meetj qua may bac oi 
+
+export type PreparingShippingStatus = 'all' | 'waiting_for_pickup' | 'pick_up';
+
+
+export const preparingShippingMethods = [
+  { label: 'Tất cả', value: 'all' as PreparingShippingStatus },
+  { label: 'Chờ giao', value: 'waiting_for_pickup' as PreparingShippingStatus },
+  { label: 'Đã lấy hàng', value: 'pick_up' as PreparingShippingStatus },
+]
+
+export const searchShipTypes = [
+  { value: 'order_code', label: 'Mã đơn hàng' },
+  { value: 'customer_name', label: 'Tên người mua' },
+  { value: 'shipping_code', label: 'Mã vận chuyển' },
+];
+

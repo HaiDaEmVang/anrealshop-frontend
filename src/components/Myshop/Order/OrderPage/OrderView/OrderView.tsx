@@ -121,7 +121,7 @@ const OrderView = ({
                                 const totalPrice = calculateOrderTotal(item);
                                 const paymentMethod = paymentMethods.filter(pm => pm.key === order.paymentMethod)[0]?.value || order.paymentMethod;
                                 return (
-                                    <>
+                                    <div key={item.orderItemId}>
                                         <div key={`${order.shopOrderId}-${item.productSkuId}`} className={`grid grid-cols-12 gap-4 `}>
 
                                             <div className="col-span-4">
@@ -204,7 +204,7 @@ const OrderView = ({
                                             </div>
                                         </div>
                                         {index < itemsToShow.length - 1 && <hr className="my-2 border-gray-100" />}
-                                    </>
+                                    </div>
                                 );
                             })}
 

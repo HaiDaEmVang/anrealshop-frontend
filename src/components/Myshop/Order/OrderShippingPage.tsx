@@ -13,18 +13,18 @@ import { getErrorMessage } from '../../../untils/ErrorUntils';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../../../untils/Untils';
 import showErrorNotification from '../../Toast/NotificationError';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
+import Pagination from '../Product/Managerment/ProductView/Pagination';
+import { PaginationSkeleton } from '../Product/Managerment/Skeleton';
+import NonOrderFound from './OrderPage/OrderView/NonOrderFond';
 import Filter, { type SortByType } from './OrderShipping/Filter/Filter';
 import OrderShippingProductList from './OrderShipping/OrderView/OrderShippingProductList';
-import ShippingInfoForm from './OrderShipping/shopAddress/ShippingInfoForm';
-import { PaginationSkeleton } from '../Product/Managerment/Skeleton';
-import Pagination from '../Product/Managerment/ProductView/Pagination';
-import NonOrderFound from './OrderPage/OrderView/NonOrderFond';
 import InfoPage from './OrderShipping/shopAddress/InfoPage';
+import ShippingInfoForm from './OrderShipping/shopAddress/ShippingInfoForm';
 
 
 const OrderShippingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const init_params: UseOrderParams = {
     orderType: (searchParams.get('orderType') as OrderCountType) || 'all',
     searchType: (searchParams.get('searchType') as SearchType) || 'order_code',
@@ -57,7 +57,7 @@ const OrderShippingPage = () => {
       if (value === null || value === '' || value === 'all') {
         newParams.delete(key);
       } else {
-        newParams.set(key, value); 
+        newParams.set(key, value);
       }
     });
 
@@ -84,15 +84,13 @@ const OrderShippingPage = () => {
   const loadOrders = useCallback(() => {
     updateURLParams({
       page: activePage > 1 ? activePage.toString() : null,
-      orderType: params.orderType ? params.orderType : null,
-      searchType: params.searchType ? params.searchType : null,
+      orderType: params.orderType && params.orderType !== 'all' ? params.orderType : null,
+      searchType: params.searchType && params.searchType !== 'order_code' ? params.searchType : null,
       search: params.search || null,
-      sortBy: params.sortBy ? params.sortBy : null,
+      sortBy: params.sortBy && params.sortBy !== 'newest' ? params.sortBy : null,
       confirmSD: params.confirmSD ? params.confirmSD : null,
       confirmED: params.confirmED ? params.confirmED : null,
-      preparingStatus: params.preparingStatus ? params.preparingStatus : null,
-      pickupDate: pickupDate !== new Date().toISOString().split('T')[0] ? pickupDate : null,
-      note: note || null
+      preparingStatus: params.preparingStatus && params.preparingStatus !== 'all' ? params.preparingStatus : null,
     });
 
     fetchOrders({
@@ -101,11 +99,11 @@ const OrderShippingPage = () => {
       mode: 'shipping',
       ...params
     });
-  }, [activePage, params, pickupDate, note, fetchOrders, updateURLParams]);
+  }, [activePage, params, fetchOrders, updateURLParams]);
 
   useEffect(() => {
     loadOrders();
-  }, [loadOrders, activePage]);
+  }, [loadOrders, activePage, params.preparingStatus]);
 
   const handleSelectAll = () => {
     setSelectedOrder(selectAll ? [] : orders.flatMap(order => order.shopOrderId));
@@ -128,7 +126,7 @@ const OrderShippingPage = () => {
 
   const handleParamsChange = (newParams: UseOrderParams) => {
     setParams(newParams);
-    setActivePage(1); 
+    setActivePage(1);
   };
 
   const handleResetFilter = () => {
@@ -141,10 +139,10 @@ const OrderShippingPage = () => {
       confirmED: formatDateForBe(getDefaultDateRange_Now_Yesterday()[1]),
       preparingStatus: 'all' as PreparingStatus,
     };
-    
+
     setParams(defaultParams);
     setActivePage(1);
-    
+
     setSearchParams({}, { replace: true });
   };
 
@@ -153,13 +151,11 @@ const OrderShippingPage = () => {
   const handlePickupDateChange = (value: string | null) => {
     if (value) {
       setPickupDate(value);
-      updateURLParams({ pickupDate: value });
     }
   };
 
   const handleNoteChange = (value: string) => {
     setNote(value);
-    updateURLParams({ note: value || null });
   };
 
   const handleSubmitShipping = async () => {
@@ -167,7 +163,7 @@ const OrderShippingPage = () => {
       shopOrderIds: selectedOrder,
       addressId: user?.address?.id || '',
       note,
-      pickupDate
+      pickupDate: formatDateForBe(new Date(pickupDate)),
     };
     setIsSubmitting(true);
     ShipmentService.createShipment(createShipmentRequest)

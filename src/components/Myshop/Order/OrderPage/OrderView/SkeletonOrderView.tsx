@@ -29,7 +29,7 @@ const SkeletonOrderView = () => {
 
           <Box className="p-4">
             {[1, 2].map((item, idx) => (
-              <div key={idx-item}>
+              <div key={item}>
                 <div className="grid grid-cols-12 gap-4">
                   <div className="col-span-4">
                     <div className="flex gap-3">

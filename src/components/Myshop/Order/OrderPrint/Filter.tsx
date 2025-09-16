@@ -1,56 +1,47 @@
 import { Button, Card, Divider, SegmentedControl, Select, TextInput } from '@mantine/core';
-import { DatePickerInput } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { useCallback, useEffect, useState } from 'react';
-import { FiCalendar, FiFilter, FiPrinter, FiRefreshCw, FiSearch } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
-import type { OrderCountType, PreparingStatus, SearchType, UseOrderParams } from '../../../../../hooks/useOrder';
-import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../../../../../untils/Untils';
-import { getSearchPlaceholder, orderTypeOptions, searchTypes } from '../../Data';
+import { FiFilter, FiRefreshCw, FiSearch } from 'react-icons/fi';
+import type { SearchType } from '../../../../hooks/useOrder';
+import { getSearchPlaceholder, preparingShippingMethods, searchShipTypes, type PreparingShippingStatus } from '../Data';
+import type { shipParams } from '../../../../hooks/useShipping';
 
 export type SortByType = 'newest' | 'oldest';
 
 interface FilterProps {
-    initialParams?: UseOrderParams;
-    onFilterChange?: (filters: UseOrderParams) => void;
+    initialParams?: shipParams;
+    onFilterChange?: (filters: shipParams) => void;
     onResetFilter?: () => void;
     orderCount?: number;
 }
 
 const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }: FilterProps) => {
-    const [orderType, setOrderType] = useState<OrderCountType | null>(initialParams?.orderType || 'all');
-    const [value, setValue] = useState<[Date | null, Date | null]>(getDefaultDateRange_Now_Yesterday());
     const [searchTypeValue, setSearchTypeValue] = useState<SearchType>(initialParams?.searchType || 'order_code');
     const [searchTerm, setSearchTerm] = useState(initialParams?.search || '');
     const [sortValue, setSortValue] = useState<SortByType>(
         initialParams?.sortBy === 'oldest' ? 'oldest' : 'newest');
-    const [preparingStatus, setPreparingStatus] = useState<PreparingStatus>(initialParams?.preparingStatus || 'all');
+    const [preparingStatus, setPreparingStatus] = useState<PreparingShippingStatus>(initialParams?.preparingStatus || 'all');
 
-    const dataParams = useCallback(() => {
+    const onFillterChangeCallback = useCallback(() => {
         if (onFilterChange) {
             onFilterChange({
-                orderType: orderType || 'all',
                 searchType: searchTypeValue,
                 search: searchTerm,
                 sortBy: sortValue || 'newest',
-                confirmSD: formatDateForBe(value[0]),
-                confirmED: formatDateForBe(value[1]),
-                preparingStatus: preparingStatus || 'all',
+                preparingStatus: preparingStatus || 'all'
             });
         }
-    }, [orderType, searchTypeValue, searchTerm, sortValue, value, preparingStatus, onFilterChange]);
+    }, [onFilterChange, preparingStatus, searchTerm, searchTypeValue, sortValue]);
 
     useEffect(() => {
-        dataParams();
-    }, [preparingStatus]);
+        onFillterChangeCallback();
+    }, [ preparingStatus]);
 
     const applyFilters = () => {
-        dataParams();
+        onFillterChangeCallback();
     };
 
     const resetFilters = () => {
-        setOrderType('all');
-        setValue(getDefaultDateRange_Now_Yesterday());
         setSearchTerm('');
         setSearchTypeValue('order_code');
         setSortValue('newest');
@@ -67,21 +58,17 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
     const onSearchChange = (value: string) => {
         setSearchTerm(value);
     };
-   
+
 
     return (
         <Card shadow="xs" p="md" radius="md" withBorder mb="md">
             <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between gap-4" style={{ width: '100%' }}>
-                    <div style={{ width: '28%' }}>
+                    <div style={{ width: '38%' }}>
                         <SegmentedControl
                             value={preparingStatus}
-                            onChange={(value) => setPreparingStatus(value as PreparingStatus)}
-                            data={[
-                                { label: 'Tất cả', value: 'all' as PreparingStatus },
-                                { label: 'Chưa xử lý', value: 'preparing' as PreparingStatus },
-                                { label: 'Đã xử lý', value: 'wait_shipment' as PreparingStatus },
-                            ]}
+                            onChange={(value) => { setPreparingStatus(value as PreparingShippingStatus); onFillterChangeCallback(); }}
+                            data={preparingShippingMethods}
                             size="sm"
                             radius="md"
                             styles={{
@@ -97,7 +84,7 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
                                 },
                                 control: {
                                     border: 'none',
-                                    minWidth: '80px',
+                                    minWidth: '120px',
                                 }
                             }}
                         />
@@ -105,7 +92,7 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
 
                     <div className="flex items-center flex-1" >
                         <Select
-                            data={searchTypes}
+                            data={searchShipTypes}
                             value={searchTypeValue}
                             onChange={(value) => onSearchTypeValueChange(value as SearchType)}
                             styles={{
@@ -134,64 +121,25 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
 
                 </div>
 
-                <div className="flex items-end gap-4">
-                    <div style={{ width: '25%' }}>
-                        <Select
-                            placeholder="Chọn loại đơn hàng"
-                            label="Loại đơn hàng"
-                            data={orderTypeOptions}
-                            value={orderType || null}
-                            onChange={(val) => setOrderType(val as OrderCountType | null)}
-
-                        />
-                    </div>
-
-
-
-                    <div className='flex-1'>
-                        <DatePickerInput
-                            type='range'
-                            label="Thời gian xác nhận đơn hàng"
-                            placeholder="Chọn khoảng thời gian"
-                            valueFormat="DD/MM/YYYY"
-                            maxDate={new Date()}
-                            value={value}
-                            onChange={setValue}
-                            rightSection={<FiCalendar size={16} />}
-                        />
-                    </div>
-
-                    <div style={{ width: '25%' }}>
-                        <Select
-                            label="Sắp xếp theo"
-                            placeholder="Sắp xếp theo"
-                            value={sortValue}
-                            onChange={(value) => {
-                                const sortBy = value as SortByType;
-                                setSortValue(sortBy);
-                            }}
-                            data={[
-                                { value: 'newest', label: 'Đơn hàng mới nhất' },
-                                { value: 'oldest', label: 'Đơn hàng cũ nhất' }
-                            ]}
-                        />
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between">
+                <div className="flex flex-1 items-center justify-between">
                     <div className="font-medium">
                         {orderCount} đơn hàng
                     </div>
-                    <div className="flex gap-2">
-                        <Link to="/myshop/orders/printing">
-                            <Button
-                                variant="light"
-                                // onClick={applyFilters}
-                                leftSection={<FiPrinter size={14} />}
-                            >
-                                In phiếu
-                            </Button>
-                        </Link>
+                    <div className="flex gap-2 justify-end items-center">
+                        <div style={{ width: '40%' }}>
+                            <Select
+                                placeholder="Sắp xếp theo"
+                                value={sortValue}
+                                onChange={(value) => {
+                                    const sortBy = value as SortByType;
+                                    setSortValue(sortBy);
+                                }}
+                                data={[
+                                    { value: 'newest', label: 'Đơn vận mới nhất' },
+                                    { value: 'oldest', label: 'Đơn vận cũ nhất' }
+                                ]}
+                            />
+                        </div>
                         <Divider orientation="vertical" mx={"sm"} />
                         <Button
                             onClick={applyFilters}
