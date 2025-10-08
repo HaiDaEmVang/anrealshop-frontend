@@ -23,6 +23,7 @@ import SuggestSearch from '../header/SuggestSearch';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import { APP_ROUTES } from '../../constant';
+import { disconnectWs } from '../../service/websocketClient';
 
 // Dữ liệu danh mục
 const POPULAR_CATEGORIES = [
@@ -76,7 +77,6 @@ const Header: React.FC = () => {
     const searchContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log(isAuthenticated)
         if (!isAuthenticated && !user) {
             useDispatch(fetchCurrentUser());
         }
@@ -139,6 +139,7 @@ const Header: React.FC = () => {
         await useDispatch(logoutUser()).unwrap()
             .then(() => {
                 showSuccessNotification('Đăng xuất thành công!', 'Bạn đã đăng xuất khỏi tài khoản.');
+                disconnectWs();
             })
             .catch((error) => {
                 showErrorNotification('Đăng xuất thất bại!', error.message);

@@ -3,6 +3,8 @@ import { Route, Routes } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/header/Header';
 import { APP_ROUTES } from '../../constant';
+import { Button } from '@mantine/core';
+import { connectWs, disconnectWs, sendMessage } from '../../service/websocketClient';
 
 const CartPage = lazy(() => import('../../components/User/Cart/CartPage'));
 const CategoryPage = lazy(() => import('../../components/User/CategoryPage/CategoryPage'));
@@ -16,9 +18,23 @@ const ShopPage = lazy(() => import('../../components/User/Shop/ShopPage'));
 const PaymentResultPage = lazy(() => import('../../components/User/paymentResult/PaymentResultPage'));
 
 const UserPage = () => {
+
+
+
   return (
     <div className="min-h-screen flex flex-col">
         <Header />
+        <div className="">
+          <Button variant="light" color="blue"  mt="md" radius="md" onClick={() => connectWs()}>
+            connect
+          </Button>
+          <Button variant="light" color="blue"  mt="md" radius="md" onClick={() => disconnectWs()}>
+            disconnect
+          </Button>
+          <Button variant="light" color="blue"  mt="md" radius="md" onClick={() => sendMessage('/chat.send', { name: 'User' })}>
+            send message
+          </Button>
+        </div>
       <div className="flex-1 bg-gray-50">
         {/* <Suspense fallback={<div>Loading...</div>}> */}
           <Routes>
