@@ -23,6 +23,7 @@ import { fetchCurrentUser, logoutUser } from '../../store/authSlice';
 import SuggestSearch from '../header/SuggestSearch';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
+import { disconnectWs } from '../../service/websocketClient';
 
 // Dữ liệu danh mục
 const POPULAR_CATEGORIES = [
@@ -71,7 +72,6 @@ const Header: React.FC = () => {
     const searchContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // console.log(isAuthenticated)
         if (!isAuthenticated && !user) {
             useDispatch(fetchCurrentUser());
         }
