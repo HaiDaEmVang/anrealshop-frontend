@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/header/Header';
 import { APP_ROUTES } from '../../constant';
+import LandingPage from '../../components/User/LandingPage/LandingPage';
 
 const CartPage = lazy(() => import('../../components/User/Cart/CartPage'));
 const CategoryPage = lazy(() => import('../../components/User/CategoryPage/CategoryPage'));
@@ -18,11 +19,12 @@ const PaymentResultPage = lazy(() => import('../../components/User/paymentResult
 const UserPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
-        <Header />
+        {!APP_ROUTES.HOME && <Header />}
       <div className="flex-1 bg-gray-50">
         {/* <Suspense fallback={<div>Loading...</div>}> */}
           <Routes>
-            <Route path={APP_ROUTES.HOME} element={<HomePage />} />
+            {/* <Route path="/" element={<LandingPage />} /> */}
+            <Route path={APP_ROUTES.HOME} element={<LandingPage />} />
             {/* <Route path="/products" element={<ListProduct />} /> */}
             <Route path={APP_ROUTES.PRODUCT_DETAIL} element={<ProductDetailPage />} />
             <Route path={APP_ROUTES.CHECKOUT} element={<CheckoutPage />} />
@@ -35,7 +37,7 @@ const UserPage = () => {
           </Routes>
         {/* </Suspense> */}
       </div>
-        <Footer />
+        {/* <Footer /> */}
     </div>
   );
 };

@@ -53,7 +53,7 @@ function App() {
 
   return (
     <MantineProvider theme={theme}>
-      <Notifications position="top-right" zIndex={1000} />
+      <Notifications position="bottom-right" zIndex={1000} />
       <BrowserRouter>
         <div className="min-h-screen flex flex-col">
           <main className="flex-1">
