@@ -27,6 +27,7 @@ const rejectOrder = async (orderItemId: string, reason: string): Promise<void> =
     await axiosInstance.put(API_ENDPOINTS.ORDERS.MYSHOP_REJECT(orderItemId), reason);
 };
 
+
 const rejectOrders = async (orderRejectRequest: OrderRejectRequest): Promise<void> => {
     await axiosInstance.put(API_ENDPOINTS.ORDERS.MYSHOP_REJECTS, orderRejectRequest);
 };
@@ -36,6 +37,11 @@ const getUserOrders = async (params?: UseOrderParams): Promise<UserOrderListResp
     const response = await axiosInstance.get(API_ENDPOINTS.ORDERS.USER_ORDERS, { params });
     return response.data;
 }; 
+
+
+const rejectShopOrder = async (shopOrderId: string, reason: string): Promise<void> => {
+    await axiosInstance.put(API_ENDPOINTS.ORDERS.USER_REJECT_ORDER(shopOrderId), reason);
+};
 
 
 
@@ -48,4 +54,5 @@ export const OrderService = {
     rejectOrders,
 
     getUserOrders,
+    rejectShopOrder,
 };

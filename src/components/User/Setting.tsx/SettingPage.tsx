@@ -128,7 +128,7 @@ const SettingPage = () => {
             <Grid gutter="md">
                 {/* Sidebar Navigation */}
                 <Grid.Col span={{ base: 12, md: 3 }}>
-                    <Paper shadow="sm" radius="md" className="overflow-hidden sticky top-4 h-[96vh]">
+                    <Paper shadow="sm" radius="md" className="overflow-hidden h-full">
                         <div className="p-4">
                             {navItems.map((item) => (
                                 <NavLink

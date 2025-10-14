@@ -16,6 +16,7 @@ import { PaginationSkeleton } from '../../../Myshop/Product/Managerment/Skeleton
 import OrderFilter from './OrderFilter';
 import ShopOrderItem from './ShopOrderItem';
 import OrderSkeleton from './Skeleton';
+import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
 
 
@@ -35,6 +36,7 @@ const OrderHistory = () => {
 
         orders,
         fetchOrders,
+        rejectShopOrder,
     } = useOrder({
         initialParams: {
             page: 0,
@@ -79,24 +81,23 @@ const OrderHistory = () => {
         loadOrders();
     };
 
-    // Handlers for ShopOrderItem actions
-    const handleCancelOrder = (orderId: string) => {
-        console.log(`Cancel order: ${orderId}`);
-        // Implement cancel order logic
-    };
+    const handleCancelOrder = useCallback((orderItemId: string, reason: string) => {
+        rejectShopOrder(orderItemId, reason)
+            .then(() => {
+                loadOrders();
+            });
+    }, [rejectShopOrder, loadOrders]);
 
     const handleBuyAgain = (productIds: string[]) => {
-        console.log(`Buy again products: ${productIds.join(', ')}`);
-        // Implement buy again logic
+        showSuccessNotification("Hệ thống", "Chức năng mua lại đang được phát triển")
     };
 
     const handleReview = (productId: string) => {
-        console.log(`Review product: ${productId}`);
-        // Implement review logic
+        showSuccessNotification("Hệ thống", "Chức năng mua lại đang được phát triển")
     };
 
     return (
-        <>
+        <div className=' overflow-hidden h-[94vh]'>
             <Title order={4} className="!mb-4 text-slate-800">Đơn hàng của tôi</Title>
 
             {/* Filter by status */}
@@ -122,8 +123,8 @@ const OrderHistory = () => {
             {isLoading ? (
                 <OrderSkeleton count={3} />
             ) : data.length > 0 ? (
-                <>
-                    <Stack gap="md" mt="md">
+                <div className='flex flex-col h-[77vh]'>
+                    <Stack gap="md" mt="md" className='overflow-y-scroll'>
                         {data.map((order) => (
                             <ShopOrderItem
                                 key={order.shopOrderId}
@@ -133,20 +134,22 @@ const OrderHistory = () => {
                                 onReview={handleReview}
                             />
                         ))}
+                    <div className="flex-1">
+                        <Suspense fallback={<PaginationSkeleton />} >
+                            <Pagination
+                                currentPage={activePage}
+                                totalPages={totalPages}
+                                totalItems={totalCount}
+                                itemsPerPage={itemsPerPage}
+                                onPageChange={setActivePage}
+                            />
+                        </Suspense>
+                    </div>
                     </Stack>
 
-                    <Suspense fallback={<PaginationSkeleton />}>
-                        <Pagination
-                            currentPage={activePage}
-                            totalPages={totalPages}
-                            totalItems={totalCount}
-                            itemsPerPage={itemsPerPage}
-                            onPageChange={setActivePage}
-                        />
-                    </Suspense>
-                </>
+                </div>
             ) : (
-                <Paper withBorder p="xl" radius="md" className="text-center">
+                <Paper withBorder p="xl" radius="md" className="text-center h-[72vh]">
                     <Text size="lg" fw={500} mb="xs">Không có đơn hàng nào</Text>
                     <Text size="sm" color="dimmed" mb="lg">
                         Bạn chưa có đơn hàng thời trang nào trong danh mục này
@@ -156,7 +159,7 @@ const OrderHistory = () => {
                     </Button>
                 </Paper>
             )}
-        </>
+        </div>
     );
 };
 
