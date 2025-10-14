@@ -114,6 +114,7 @@ export const API_ENDPOINTS = {
     MYSHOP_REJECTS: '/my-shop/orders/reject-ids',
 
     USER_ORDERS: '/user/orders',
+    USER_REJECT_ORDER: (shopOrderId: string) => `/user/orders/reject/${shopOrderId}`,
   }
 };
 

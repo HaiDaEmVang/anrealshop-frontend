@@ -1,4 +1,5 @@
 import {
+    ActionIcon,
     Box,
     Button,
     Divider,
@@ -7,11 +8,13 @@ import {
     Paper,
     Rating,
     Stack,
-    Text
+    Text,
+    Tooltip
 } from '@mantine/core';
 import React, { useState } from 'react';
 import { FaStore } from 'react-icons/fa';
 import {
+    FiAlertCircle,
     FiEye,
     FiMessageCircle,
     FiShoppingCart,
@@ -19,30 +22,12 @@ import {
     FiX
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { getRejectReasons } from '../../../../data/RejectData';
+import { getReasonValueByKey, getRejectReasons } from '../../../../data/RejectData';
+import { useOrderStatus } from '../../../../hooks/useOrderStatus';
 import { type UserOrderItemDto } from '../../../../types/OrderType';
 import { formatDate, formatPrice } from '../../../../untils/Untils';
 import RejectModal from '../../../RejectModal/RejectOrder';
 
-// Map status to display labels
-const getStatusLabel = (status: string): string => {
-    switch (status.toUpperCase()) {
-        case 'DELIVERED':
-            return 'Đã giao hàng';
-        case 'PREPARING':
-            return 'Đang xử lý';
-        case 'SHIPPING':
-            return 'Đang giao hàng';
-        case 'CLOSED':
-            return 'Đã hủy';
-        case 'PENDING_CONFIRMATION':
-            return 'Chờ xác nhận';
-        case 'INIT_PROCESSING':
-            return 'Đang xử lý';
-        default:
-            return 'Không xác định';
-    }
-};
 
 interface ShopOrderItemProps {
     order: UserOrderItemDto;
@@ -57,6 +42,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
     onBuyAgain,
     onReview
 }) => {
+    const { getStatusLabel } = useOrderStatus();
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
     const handleCancelOrder = () => {
         setRejectModalOpen(true);
@@ -75,13 +61,12 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
         }
     };
 
-     const handleRejectConfirm = (reason: string) => {
+    const handleRejectConfirm = (reason: string) => {
         if (onCancelOrder) {
             onCancelOrder(order.shopOrderId, reason);
         }
     }
 
-    // Get the primary order status
     const primaryStatus = order.orderStatus[0] || 'PENDING_CONFIRMATION';
     const isPending = primaryStatus === 'PENDING_CONFIRMATION';
     const isCompleted = primaryStatus === 'DELIVERED';
@@ -110,7 +95,34 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                         Chat shop
                     </Button>
                 </Group>
-                <Text size='sm'>{getStatusLabel(primaryStatus)}</Text>
+                <Group gap={"xs"}>
+                    <Text size='sm'>{getStatusLabel(primaryStatus)}</Text>
+                    {order.productOrderItemDtoSet.some(p => p.cancelReason) && (
+                        <Tooltip
+                            label={
+                                <div>
+                                    <Text size="sm" fw={500} mb={2}>Lý do hủy:</Text>
+                                    {order.productOrderItemDtoSet
+                                        .filter(p => p.cancelReason)
+                                        .map((p, idx) => (
+                                            <Text size="xs" key={idx}>
+                                                • <b>{p.productName}</b>: {getReasonValueByKey(p.cancelReason)}
+                                            </Text>
+                                        ))}
+                                </div>
+                            }
+                            multiline
+                            withArrow
+                        >
+                            <ActionIcon size="sm" radius="xl" variant="subtle" color="red">
+                                <FiAlertCircle size={16} />
+                            </ActionIcon>
+                        </Tooltip>
+
+                    )}
+                </Group>
+
+
             </Group>
 
             {/* Products */}
@@ -171,7 +183,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
             </Box>
 
             {/* Action buttons */}
-            <Group justify="flex-end" mt="sm">
+            <Group justify='flex-end' mt="sm">
                 <Button
                     variant="light"
                     size="xs"

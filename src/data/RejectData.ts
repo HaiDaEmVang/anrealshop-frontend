@@ -42,3 +42,15 @@ export const getRejectReasons = (type: RejectType): ItemList[] => {
       return defaultRejectOrderReasons;
   }
 };
+
+
+export const getReasonValueByKey = (key: string): string | undefined => {
+  const allReasons = [
+    ...defaultRejectOrderReasons,
+    ...defaultRejectShippingReasons,
+    ...userCancelOrderReasons
+  ];
+  
+  const foundItem = allReasons.find(item => item.key === key);
+  return foundItem?.value;
+};

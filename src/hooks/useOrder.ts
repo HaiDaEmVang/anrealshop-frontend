@@ -144,6 +144,19 @@ export const useOrder = (options: UseOrderOptions = {}) => {
         }
     }, []);
 
+    const rejectShopOrder = useCallback(async (shopOrderId: string, reason: string) => {
+        try {
+            console.log('Rejecting order:', shopOrderId, 'with reason:', reason);
+            await OrderService.rejectShopOrder(shopOrderId, reason);
+            showSuccessNotification('Từ chối đơn hàng', 'Đơn hàng đã được từ chối thành công.');
+            return true;
+        } catch (err: any) {
+            const errorMessage = getErrorMessage(err);
+            showErrorNotification('Lỗi từ chối đơn hàng', errorMessage);
+            return false;
+        }
+    }, []);
+
     const rejectOrders = useCallback(async (orderRejectRequest: OrderRejectRequest) => {
         try {
             await OrderService.rejectOrders(orderRejectRequest);
@@ -194,6 +207,7 @@ export const useOrder = (options: UseOrderOptions = {}) => {
         approveOrder,
         rejectOrder,
         rejectOrders,
+        rejectShopOrder, // CHO USER HUY DON 
 
         // Computed values 
         hasOrders: state.orders.length > 0,
