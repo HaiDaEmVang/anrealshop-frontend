@@ -108,7 +108,7 @@ const MOCK_CATEGORIES: {[key: string]: Category} = {
         imageUrl: 'https://i.imgur.com/wXuQ7bm.jpg',
         productCount: 211,
         slug: 'accessories'
-      },
+      }, 
     ]
   },
   'smartphones': {

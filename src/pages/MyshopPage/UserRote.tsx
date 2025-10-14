@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Footer from '../../components/Footer/Footer';
 import Header from '../../components/header/Header';
 import { APP_ROUTES } from '../../constant';
@@ -17,14 +17,15 @@ const ShopPage = lazy(() => import('../../components/User/Shop/ShopPage'));
 const PaymentResultPage = lazy(() => import('../../components/User/paymentResult/PaymentResultPage'));
 
 const UserPage = () => {
+  const navigate = useLocation();
   return (
     <div className="min-h-screen flex flex-col">
-        {!APP_ROUTES.HOME && <Header />}
+        {navigate.pathname !== APP_ROUTES.HOME && <Header />}
       <div className="flex-1 bg-gray-50">
         {/* <Suspense fallback={<div>Loading...</div>}> */}
           <Routes>
-            {/* <Route path="/" element={<LandingPage />} /> */}
-            <Route path={APP_ROUTES.HOME} element={<LandingPage />} />
+            <Route path="/" element={<LandingPage />} />
+            {/* <Route path={APP_ROUTES.HOME} element={<HomePage />} /> */}
             {/* <Route path="/products" element={<ListProduct />} /> */}
             <Route path={APP_ROUTES.PRODUCT_DETAIL} element={<ProductDetailPage />} />
             <Route path={APP_ROUTES.CHECKOUT} element={<CheckoutPage />} />

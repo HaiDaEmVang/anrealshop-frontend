@@ -42,7 +42,7 @@ export interface OrderItemDto {
 
 export interface MyShopOrderListResponse {
     totalCount: number;
-    totalPages: number;
+    totalPages: number; 
     currentPage: number;
     orderItemDtoSet: OrderItemDto[];
 }
@@ -56,7 +56,6 @@ export interface OrderRejectRequest {
 
 
 // orderDetails
-
 export interface HistoryTrackDto {
   id: string;
   status: OrderStatus;
@@ -107,3 +106,43 @@ export interface OrderDetailDto {
   isReviewed: boolean;
 
 }
+
+
+
+// ------------------- cho maays thang cha giau co hay di mua sam -------------------
+
+export interface UserProductOrderItemDto {
+    productId: string;
+    productSkuId: string;
+    productName: string;
+    productImage: string;
+    variant: string;
+    quantity: number;
+    price: number;
+    orderStatus: string;
+ 
+    cancelReason: string;
+    isReviewed: boolean;
+} 
+
+export interface UserOrderItemDto {
+  shopOrderId: string;
+  shopOrderName: string;
+  shopOrderImage: string;
+  orderStatus: ShopOrderStatus[];
+  paymentMethod: string;
+  totalPrice: number;
+  updateAt: string;
+
+  productOrderItemDtoSet: UserProductOrderItemDto[];
+
+} 
+
+export interface UserOrderListResponse {
+    totalCount: number;
+    totalPages: number; 
+    currentPage: number;
+    orderItemDtoSet: UserOrderItemDto[];
+}
+
+

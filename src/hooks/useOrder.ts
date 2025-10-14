@@ -4,7 +4,7 @@ import showSuccessNotification from '../components/Toast/NotificationSuccess';
 import type { TypeMode } from '../constant';
 import { OrderStatusDefaultDataAdmin } from '../data/OrderData';
 import { OrderService } from '../service/OrderService';
-import type { MyShopOrderListResponse, OrderItemDto, OrderRejectRequest, OrderStatusDto, ShopOrderStatus } from '../types/OrderType';
+import type { OrderRejectRequest, OrderStatusDto, ShopOrderStatus } from '../types/OrderType';
 import { getErrorMessage } from '../untils/ErrorUntils';
 
 export interface UseOrderParams {
@@ -28,7 +28,7 @@ interface UseOrderOptions {
 }
 
 interface UseOrderState {
-    orders: OrderItemDto[];
+    orders: [];
     totalCount: number;
     totalPages: number;
     currentPage: number;
@@ -64,8 +64,17 @@ export const useOrder = (options: UseOrderOptions = {}) => {
             error: null
         }));
         try {
-            const response: MyShopOrderListResponse = await OrderService.getMyShopOrders(params);
-            const orderItems = Array.isArray(response.orderItemDtoSet) && response.orderItemDtoSet.length === 1 && response.orderItemDtoSet[0] === null ? [] : response.orderItemDtoSet;
+            let response: any;
+            let orderItems: any;
+            if (mode === 'user') {
+                response = await OrderService.getUserOrders(params);
+            } else {
+                response = await OrderService.getMyShopOrders(params);
+            }
+            orderItems = Array.isArray(response.orderItemDtoSet) && response.orderItemDtoSet.length === 1 && response.orderItemDtoSet[0] === null ? [] : response.orderItemDtoSet;
+            console.log(mode)
+            console.log('Fetched orders:', response.orderItemDtoSet);
+
             setState(prev => ({
                 ...prev,
                 orders: orderItems || [],

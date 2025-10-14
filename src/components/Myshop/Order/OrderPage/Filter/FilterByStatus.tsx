@@ -1,15 +1,15 @@
 import { Tabs, Text } from '@mantine/core';
 import type { OrderStatusDto, ShopOrderStatus } from '../../../../../types/OrderType';
-import { OrderStatusDefaultDataAdmin } from '../../../../../data/OrderData';
 
 
 interface FilterByStatusProps {
-  selectedStatus: ShopOrderStatus | "all";
+  selectedStatus: any;
   onStatusChange: (status: ShopOrderStatus | "all") => void;
-  orderStatusData: OrderStatusDto[];
+  orderStatusData: OrderStatusDto[]; 
+  isShowCount?: boolean;
 }
 
-const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData }: FilterByStatusProps) => {
+const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData, isShowCount = true }: FilterByStatusProps) => {
   const handleStatusChange = (value: string | null) => {
     if (value as ShopOrderStatus | "all" != selectedStatus) {
       onStatusChange(value as ShopOrderStatus | "all");
@@ -17,7 +17,7 @@ const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData }: Fil
   };
 
   return (
-    <div className="p-4 pb-0">
+    <div className="pb-0">
       <Tabs
         value={selectedStatus}
         onChange={handleStatusChange}
@@ -28,7 +28,7 @@ const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData }: Fil
         }}
       >
         <Tabs.List>
-          {OrderStatusDefaultDataAdmin.map((status) => {
+          {orderStatusData.map((status) => {
             const isActive = status.id.toLocaleLowerCase() === selectedStatus.toLocaleLowerCase();
             const statusCount = orderStatusData.find(s => s.id === status.id)?.count || 0;
 
@@ -41,14 +41,14 @@ const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData }: Fil
                   : 'hover:bg-gray-100'
                   }`}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-24 justify-center">
                   {status.name}
-                  <Text
+                  {isShowCount && <Text
                     size="sm"
                     fw={500}
                   >
                     ({statusCount})
-                  </Text>
+                  </Text>}
                 </div>
               </Tabs.Tab>
             );
