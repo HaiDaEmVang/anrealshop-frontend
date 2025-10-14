@@ -34,6 +34,44 @@ export const OrderStatusDefaultDataAdmin: OrderStatusDto[] = [
   }
 ];
 
+export const OrderStatusDefaultDataUser: OrderStatusDto[] = [
+  {
+    id: 'INIT_PROCESSING',
+    name: 'Chờ xử lý',
+    count: 0
+  },
+  {
+    id: 'PENDING_CONFIRMATION',
+    name: 'Chờ xác nhận',
+    count: 0
+  },
+  {
+    id: 'PREPARING',
+    name: 'vận chuyển',
+    count: 0
+  },
+  {
+    id: 'SHIPPING',
+    name: 'Chờ nhận hàng',
+    count: 0
+  },
+  {
+    id: 'DELIVERED',
+    name: 'Hoàn thành',
+    count: 0
+  },
+  {
+    id: 'CANCELED',
+    name: 'Hủy đơn',
+    count: 0
+  },
+  {
+    id: 'REFUND',
+    name: 'Hoàn/Trả',
+    count: 0
+  }
+];
+
 
 export const SampleOrderDetail: OrderDetailDto = {
   orderId: "ORD12345",

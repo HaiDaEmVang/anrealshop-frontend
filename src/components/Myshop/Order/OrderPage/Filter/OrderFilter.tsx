@@ -68,7 +68,7 @@ const OrderFilter = ({
 
   return (
     <>
-      <Card p="md" pb={0}>
+      <Card  px={0} pb={0}>
 
         {activeTab === 'PREPARING' &&
           <Group mb="md">

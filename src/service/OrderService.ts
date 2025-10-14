@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from "../constant";
 import type { UseOrderParams } from "../hooks/useOrder";
-import type { MyShopOrderListResponse, OrderRejectRequest, OrderStatusDto } from "../types/OrderType";
+import type { MyShopOrderListResponse, OrderRejectRequest, OrderStatusDto, UserOrderListResponse } from "../types/OrderType";
 import { axiosInstance } from "./AxiosInstant";
 
 const getOrderMetaData = async (): Promise<OrderStatusDto[]> => {
@@ -11,7 +11,7 @@ const getOrderMetaData = async (): Promise<OrderStatusDto[]> => {
 const getMyShopOrders = async (params?: UseOrderParams): Promise<MyShopOrderListResponse> => {
     const response = await axiosInstance.get(API_ENDPOINTS.ORDERS.MYSHOP_ORDERS, { params });
     return response.data;
-};
+}; 
 
 // const getOrderDetail = async (orderId: string): Promise<OrderDetailDto> => {
 //     const response = await axiosInstance.get(`${API_ENDPOINTS.ORDERS.DETAILS}/${orderId}`);
@@ -32,6 +32,12 @@ const rejectOrders = async (orderRejectRequest: OrderRejectRequest): Promise<voi
 };
 
 
+const getUserOrders = async (params?: UseOrderParams): Promise<UserOrderListResponse> => {
+    const response = await axiosInstance.get(API_ENDPOINTS.ORDERS.USER_ORDERS, { params });
+    return response.data;
+}; 
+
+
 
 export const OrderService = {
     getOrderMetaData,
@@ -39,5 +45,7 @@ export const OrderService = {
     // getOrderDetail,
     approveOrder,
     rejectOrder,
-    rejectOrders
+    rejectOrders,
+
+    getUserOrders,
 };

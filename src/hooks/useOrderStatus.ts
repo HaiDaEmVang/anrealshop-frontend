@@ -20,7 +20,7 @@ export const useOrderStatusIcon = () => {
                     return FiBox;
                 case 'in_transit':
                     return FiSend;
-                case 'out_for_delivery':
+                case 'out_for_delivery': 
                     return FiNavigation;
                 case 'delivered':
                     return FiCheckCircle;

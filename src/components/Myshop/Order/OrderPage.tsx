@@ -208,7 +208,7 @@ const OrderPage = () => {
 
       <Paper
         radius="md"
-        className="bg-white"
+        className="bg-white p-4"
       >
         <Suspense fallback={<StatusFilterSkeleton />}>
           <FilterByStatus
@@ -231,7 +231,7 @@ const OrderPage = () => {
           onStatusFilterChange={handlePreparingStatusChange}
         />
 
-        <Box p="md" className='min-h-[60vh]'>
+        <Box pt={"md"} className='min-h-[60vh]'>
           <Card withBorder p={0} className="!bg-gray-50">
             <Box className="px-4 py-3">
               <div className="grid grid-cols-12 gap-4">
