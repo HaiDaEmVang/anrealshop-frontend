@@ -9,6 +9,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { OrderStatusDefaultDataUser } from '../../../../data/OrderData';
 import { useOrder, type SearchType } from '../../../../hooks/useOrder';
+import { useURLParams } from '../../../../hooks/useURLParams';
 import type { ShopOrderStatus, UserOrderItemDto } from '../../../../types/OrderType';
 import FilterByStatus from '../../../Myshop/Order/OrderPage/Filter/FilterByStatus';
 import Pagination from '../../../Myshop/Product/Managerment/ProductView/Pagination';
@@ -18,14 +19,24 @@ import ShopOrderItem from './ShopOrderItem';
 import OrderSkeleton from './Skeleton';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
-
-
 const OrderHistory = () => {
-    const [activePage, setActivePage] = useState(1);
-    const [activeStatus, setActiveStatus] = useState<ShopOrderStatus>("PENDING_CONFIRMATION");
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchType, setSearchType] = useState<SearchType>("order_code");
-    const [sortBy, setSortBy] = useState<string | null>("newest");
+    const { getParam, updateParams, setPageParam } = useURLParams();
+
+    const [activePage, setActivePage] = useState(() => {
+        const page = getParam('page');
+        return page ? parseInt(page, 10) : 1;
+    });
+
+    const [activeStatus, setActiveStatus] = useState<ShopOrderStatus>(() => {
+        const status = getParam('status');
+        return (status as ShopOrderStatus) || "INIT_PROCESSING";
+    });
+
+    const [searchTerm, setSearchTerm] = useState(() => getParam('search') || '');
+    const [searchType, setSearchType] = useState<SearchType>(() =>
+        (getParam('searchType') as SearchType) || "order_code"
+    );
+    const [sortBy, setSortBy] = useState<string | null>(() => getParam('sortBy') || "newest");
 
     const [itemsPerPage] = useState(10);
     const [data, setData] = useState<UserOrderItemDto[]>([]);
@@ -47,6 +58,14 @@ const OrderHistory = () => {
     });
 
     const loadOrders = useCallback(() => {
+        // Update URL parameters when loading orders
+        updateParams({
+            status: activeStatus,
+            search: searchTerm,
+            searchType: searchType !== 'order_code' ? searchType : null,
+            sortBy: sortBy !== 'newest' ? sortBy : null,
+            page: activePage > 1 ? activePage : null
+        });
 
         fetchOrders({
             page: activePage - 1,
@@ -56,7 +75,7 @@ const OrderHistory = () => {
             searchType: searchType,
             sortBy: sortBy || undefined,
         });
-    }, [activePage, activeStatus, sortBy, searchTerm, fetchOrders]);
+    }, [activePage, activeStatus, sortBy, searchTerm, searchType, fetchOrders, updateParams]);
 
     useEffect(() => {
         loadOrders();
@@ -67,18 +86,31 @@ const OrderHistory = () => {
     }, [orders]);
 
     const handleStatusChange = (status: ShopOrderStatus | "all") => {
-        setActiveStatus(status.toUpperCase() as ShopOrderStatus);
+        const newStatus = status.toUpperCase() as ShopOrderStatus;
+        setActiveStatus(newStatus);
         setActivePage(1);
+        updateParams({ status: newStatus, page: null });
     };
 
     const handleClearFilters = () => {
         setSearchTerm('');
         setSortBy("newest");
+        updateParams({
+            search: null,
+            searchType: null,
+            sortBy: null
+        });
         loadOrders();
     };
 
     const handleApplyFilters = () => {
+        setActivePage(1);
         loadOrders();
+    };
+
+    const handlePageChange = (page: number) => {
+        setActivePage(page);
+        setPageParam(page);
     };
 
     const handleCancelOrder = useCallback((orderItemId: string, reason: string) => {
@@ -123,7 +155,7 @@ const OrderHistory = () => {
             {isLoading ? (
                 <OrderSkeleton count={3} />
             ) : data.length > 0 ? (
-                <div className='flex flex-col h-[77vh]'>
+                <div className='flex flex-col 2xl:h-[80vh] md:h-[74vh]'>
                     <Stack gap="md" mt="md" className='overflow-y-scroll'>
                         {data.map((order) => (
                             <ShopOrderItem
@@ -134,6 +166,7 @@ const OrderHistory = () => {
                                 onReview={handleReview}
                             />
                         ))}
+                    </Stack>
                     <div className="flex-1">
                         <Suspense fallback={<PaginationSkeleton />} >
                             <Pagination
@@ -141,11 +174,10 @@ const OrderHistory = () => {
                                 totalPages={totalPages}
                                 totalItems={totalCount}
                                 itemsPerPage={itemsPerPage}
-                                onPageChange={setActivePage}
+                                onPageChange={handlePageChange}
                             />
                         </Suspense>
                     </div>
-                    </Stack>
 
                 </div>
             ) : (
