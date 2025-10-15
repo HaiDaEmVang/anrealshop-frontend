@@ -4,10 +4,11 @@ import {
 } from '@mantine/core';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiTruck } from 'react-icons/fi';
-import { useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '../../../hooks/useAppRedux';
 import { useOrder, type OrderCountType, type PreparingStatus, type SearchType, type UseOrderParams } from '../../../hooks/useOrder';
+import { useURLParams } from '../../../hooks/useURLParams';
 import { ShipmentService } from '../../../service/ShipmentService';
+import type { OrderItemDto } from '../../../types/OrderType';
 import type { CreateShipmentRequest } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../../../untils/Untils';
@@ -23,46 +24,33 @@ import ShippingInfoForm from './OrderShipping/shopAddress/ShippingInfoForm';
 
 
 const OrderShippingPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { getParam, updateParams, clearParams } = useURLParams();
 
   const init_params: UseOrderParams = {
-    orderType: (searchParams.get('orderType') as OrderCountType) || 'all',
-    searchType: (searchParams.get('searchType') as SearchType) || 'order_code',
-    search: searchParams.get('search') || '',
-    sortBy: (searchParams.get('sortBy') as SortByType) || 'newest',
-    confirmSD: searchParams.get('confirmSD') || formatDateForBe(getDefaultDateRange_Now_Yesterday()[0]),
-    confirmED: searchParams.get('confirmED') || formatDateForBe(getDefaultDateRange_Now_Yesterday()[1]),
-    preparingStatus: (searchParams.get('preparingStatus') as PreparingStatus) || 'all',
+    orderType: (getParam('orderType', 'all') as OrderCountType),
+    searchType: (getParam('searchType', 'order_code') as SearchType),
+    search: getParam('search', ''),
+    sortBy: (getParam('sortBy', 'newest') as SortByType),
+    confirmSD: getParam('confirmSD', formatDateForBe(getDefaultDateRange_Now_Yesterday()[0])),
+    confirmED: getParam('confirmED', formatDateForBe(getDefaultDateRange_Now_Yesterday()[1])),
+    preparingStatus: (getParam('preparingStatus', 'all') as PreparingStatus),
   }
 
   const [selectedOrder, setSelectedOrder] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [activePage, setActivePage] = useState(parseInt(searchParams.get('page') || '1', 10));
+  const [activePage, setActivePage] = useState(parseInt(getParam('page', '1'), 10));
   const [itemsPerPage] = useState(10);
 
   const [params, setParams] = useState<UseOrderParams>(init_params);
 
   const [pickupDate, setPickupDate] = useState<string>(
-    searchParams.get('pickupDate') || new Date().toISOString().split('T')[0]
+    getParam('pickupDate', new Date().toISOString().split('T')[0])
   );
-  const [note, setNote] = useState(searchParams.get('note') || '');
+  const [note, setNote] = useState(getParam('note', ''));
   const { user } = useAppSelector((state) => state.auth);
-
-  const updateURLParams = useCallback((updates: Record<string, string | null>) => {
-    const newParams = new URLSearchParams(searchParams);
-
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === null || value === '' || value === 'all') {
-        newParams.delete(key);
-      } else {
-        newParams.set(key, value);
-      }
-    });
-
-    setSearchParams(newParams, { replace: true });
-  }, [searchParams, setSearchParams]);
+  const [data, setData] = useState<OrderItemDto[]>([]);
 
   const {
     totalCount,
@@ -82,15 +70,15 @@ const OrderShippingPage = () => {
   });
 
   const loadOrders = useCallback(() => {
-    updateURLParams({
-      page: activePage > 1 ? activePage.toString() : null,
-      orderType: params.orderType && params.orderType !== 'all' ? params.orderType : null,
-      searchType: params.searchType && params.searchType !== 'order_code' ? params.searchType : null,
+    updateParams({
+      page: activePage > 1 ? activePage : null,
+      orderType: params.orderType !== 'all' ? params.orderType : null,
+      searchType: params.searchType !== 'order_code' ? params.searchType : null,
       search: params.search || null,
-      sortBy: params.sortBy && params.sortBy !== 'newest' ? params.sortBy : null,
-      confirmSD: params.confirmSD ? params.confirmSD : null,
-      confirmED: params.confirmED ? params.confirmED : null,
-      preparingStatus: params.preparingStatus && params.preparingStatus !== 'all' ? params.preparingStatus : null,
+      sortBy: params.sortBy !== 'newest' ? params.sortBy : null,
+      confirmSD: params.confirmSD || null,
+      confirmED: params.confirmED || null,
+      preparingStatus: params.preparingStatus !== 'all' ? params.preparingStatus : null,
     });
 
     fetchOrders({
@@ -99,20 +87,23 @@ const OrderShippingPage = () => {
       mode: 'shipping',
       ...params
     });
-  }, [activePage, params, fetchOrders, updateURLParams]);
+  }, [activePage, params, fetchOrders, updateParams]);
 
   useEffect(() => {
     loadOrders();
   }, [loadOrders, activePage, params.preparingStatus]);
+  useEffect(() => {
+    setData(orders);
+  },[orders]);
 
   const handleSelectAll = () => {
-    setSelectedOrder(selectAll ? [] : orders.flatMap(order => order.shopOrderId));
+    setSelectedOrder(selectAll ? [] : data.flatMap(order => order.shopOrderId));
     setSelectAll(!selectAll);
   };
 
   useEffect(() => {
-    setSelectAll(selectedOrder.length === orders.length && orders.length > 0);
-  }, [selectedOrder, orders]);
+    setSelectAll(selectedOrder.length === data.length && data.length > 0);
+  }, [selectedOrder, data]);
 
   const handleSelectOrder = (orderId: string) => {
     setSelectedOrder(prev => {
@@ -142,20 +133,26 @@ const OrderShippingPage = () => {
 
     setParams(defaultParams);
     setActivePage(1);
-
-    setSearchParams({}, { replace: true });
+    clearParams(); // Clear all URL parameters
   };
 
-  const orderItemDtos = orders.filter(order => selectedOrder.includes(order.shopOrderId));
+  const handlePageChange = (page: number) => {
+    setActivePage(page);
+    updateParams({ page: page > 1 ? page : null });
+  };
+
+  const orderItemDtos = data.filter(order => selectedOrder.includes(order.shopOrderId));
 
   const handlePickupDateChange = (value: string | null) => {
     if (value) {
       setPickupDate(value);
+      updateParams({ pickupDate: value });
     }
   };
 
   const handleNoteChange = (value: string) => {
     setNote(value);
+    updateParams({ note: value || null });
   };
 
   const handleSubmitShipping = async () => {
@@ -231,9 +228,9 @@ const OrderShippingPage = () => {
             initialParams={params}
             onFilterChange={handleParamsChange}
             onResetFilter={handleResetFilter}
-            orderCount={orders.length}
+            orderCount={data.length}
           />
-          {orders.length > 0 ? (
+          {data.length > 0 ? (
             <>
               <OrderShippingProductList
                 orders={orders}
@@ -251,7 +248,7 @@ const OrderShippingPage = () => {
                   totalPages={totalPages}
                   totalItems={totalCount}
                   itemsPerPage={itemsPerPage}
-                  onPageChange={setActivePage}
+                  onPageChange={handlePageChange}
                 />
               </Suspense>
             </>

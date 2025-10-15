@@ -1,3 +1,5 @@
+import type { simpleAddressDto } from "./AddressType";
+
 export type OrderStatus = 'ALL'| 'COMPLETED' | 'PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'AWAITING_SHIPMENT' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'REFUND' | 'CANCELED';
 
 export type ShopOrderStatus = 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'SHIPPING' | 'DELIVERED' | 'CLOSED';
@@ -60,7 +62,7 @@ export interface HistoryTrackDto {
   id: string;
   status: OrderStatus;
   title: string;
-  timestamp: Date;
+  timestamp: Date|string;
 }
 
 
@@ -145,4 +147,25 @@ export interface UserOrderListResponse {
     orderItemDtoSet: UserOrderItemDto[];
 }
 
+export interface UserOrderDetailDto {
+  shopOrderId: string;
+  shopOrderStatus: OrderStatus;
 
+  shopId: string;
+  shopName: string;
+  shopImage: string;
+
+  orderHistory: HistoryTrackDto[];
+  productItems: ProductOrderItemDto[];
+
+  totalProductCost: number;
+  totalShippingCost: number;
+  shippingFee: number;
+  shippingDiscount: number;
+
+  totalCost: number;
+
+  isReviewed: boolean;
+
+  address: simpleAddressDto;
+}

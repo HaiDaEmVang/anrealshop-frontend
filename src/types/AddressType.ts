@@ -3,24 +3,31 @@ export interface SingleAddressDto {
   nameDisplay: string;
 }
 
+export interface simpleAddressDto {
+  id: string;
+  receiverOrSenderName: string;
+  phoneNumber: string;
+  detailAddress: string;
+}
+
 export interface AddressDto {
-    id: string;
-    receiverOrSenderName: string;
-    phoneNumber: string;
-    detailAddress: string;
-    provinceId: string;
-    districtId: string;
-    wardId: string;
-    provinceName: string;
-    districtName: string;
-    wardName: string;
-    primary: boolean;
+  id: string;
+  receiverOrSenderName: string;
+  phoneNumber: string;
+  detailAddress: string;
+  provinceId: string;
+  districtId: string;
+  wardId: string;
+  provinceName: string;
+  districtName: string;
+  wardName: string;
+  primary: boolean;
 }
 
 export interface AddressRequestDto {
-    receiverOrSenderName: string;
-    phoneNumber: string;
-    detailAddress: string;
-    wardId: string;
-    isPrimary: boolean;
+  receiverOrSenderName: string;
+  phoneNumber: string;
+  detailAddress: string;
+  wardId: string;
+  isPrimary: boolean;
 }
