@@ -5,9 +5,9 @@ export const useURLParams = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const getParam = useCallback(
-        <T extends string>(key: string, defaultValue?: T): T | null => {
-            const value = searchParams.get(key) as T;
-            return value || defaultValue || null;
+        <T extends string>(key: string, defaultValue?: T): string => {
+            const value = searchParams.get(key);
+            return value || defaultValue || '';
         },
         [searchParams]
     );
@@ -55,7 +55,7 @@ export const useURLParams = () => {
                     updates[param] = null;
                 });
             }
-            
+
             updates.page = page > 1 ? String(page) : null;
 
             updateParams(updates);

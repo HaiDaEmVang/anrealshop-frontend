@@ -1,31 +1,31 @@
 import {
-    Box,
     Container,
     Grid,
     NavLink,
-    Paper,
+    Paper
 } from '@mantine/core';
 import {
+    FiAward,
     FiBell,
-    FiLock,
-    FiSettings,
-    FiUser,
-    FiShoppingBag,
-    FiHeart,
     FiCreditCard,
+    FiHeart,
+    FiLock,
     FiMapPin,
+    FiRotateCcw,
+    FiSettings,
+    FiShoppingBag,
     FiStar,
     FiTag,
-    FiRotateCcw,
-    FiAward
+    FiUser
 } from 'react-icons/fi';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import Infor from './Infor';
 import Notification from './Notification';
-import Security from './Security';
-import Preferences from './Preferences';
+import { OrderDetail } from './OrderDetail/OrderDetail';
 import OrderHistory from './OrderHistory/OrderHistory';
+import Preferences from './Preferences';
+import Security from './Security';
 
 // Define navigation item interface
 interface NavItem {
@@ -115,9 +115,8 @@ const SettingPage = () => {
         }
     ];
 
-    // Determine which path is active
     const isActive = (path: string) => {
-        return location.pathname === `/settings${path}`;
+        return location.pathname.substring(0, `/settings${path}`.length) === `/settings${path}`;
     };
 
     return (
@@ -156,6 +155,7 @@ const SettingPage = () => {
                                     element={item.component}
                                 />
                             ))}
+                            <Route path="/orders/:orderId" element={<OrderDetail />} />
                         </Routes>
                     </Paper>
                 </Grid.Col>

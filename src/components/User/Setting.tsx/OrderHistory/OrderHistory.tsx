@@ -58,7 +58,6 @@ const OrderHistory = () => {
     });
 
     const loadOrders = useCallback(() => {
-        // Update URL parameters when loading orders
         updateParams({
             status: activeStatus,
             search: searchTerm,
@@ -129,10 +128,9 @@ const OrderHistory = () => {
     };
 
     return (
-        <div className=' overflow-hidden h-[94vh]'>
+        <div className=' overflow-hidden 2xl:h-[94vh] md:h-[91vh]'>
             <Title order={4} className="!mb-4 text-slate-800">Đơn hàng của tôi</Title>
 
-            {/* Filter by status */}
             <FilterByStatus
                 selectedStatus={activeStatus}
                 onStatusChange={handleStatusChange}
@@ -140,7 +138,6 @@ const OrderHistory = () => {
                 isShowCount={false}
             />
 
-            {/* Search and sort */}
             <OrderFilter
                 searchTerm={searchTerm}
                 searchTypeValue={searchType}
@@ -155,7 +152,7 @@ const OrderHistory = () => {
             {isLoading ? (
                 <OrderSkeleton count={3} />
             ) : data.length > 0 ? (
-                <div className='flex flex-col 2xl:h-[80vh] md:h-[74vh]'>
+                <div className='flex flex-col 2xl:h-[80vh] md:h-[71vh]'>
                     <Stack gap="md" mt="md" className='overflow-y-scroll'>
                         {data.map((order) => (
                             <ShopOrderItem

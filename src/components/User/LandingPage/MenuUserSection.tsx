@@ -8,7 +8,7 @@ import showSuccessNotification from '../../Toast/NotificationSuccess';
 import showErrorNotification from '../../Toast/NotificationError';
 
 interface MenuUserSectionProps {
-    user: any; // Replace with proper user type
+    user: any; 
     isAuthenticated: boolean;
     scrolled: boolean;
 }
@@ -80,7 +80,7 @@ const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionPro
                         </Menu.Item>
                         <Menu.Item
                             component={Link}
-                            to="/account/orders"
+                            to="/settings/orders"
                             leftSection={<FaClipboardList size={14} />}
                         >
                             Đơn hàng của tôi

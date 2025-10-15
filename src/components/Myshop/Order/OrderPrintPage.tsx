@@ -4,8 +4,8 @@ import {
 } from '@mantine/core';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiPrinter } from 'react-icons/fi';
-import { useSearchParams } from 'react-router-dom';
 import { type SearchType } from '../../../hooks/useOrder';
+import { useURLParams } from '../../../hooks/useURLParams';
 import { useShipping, type shipParams } from '../../../hooks/useShipping';
 import Pagination from '../Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton } from '../Product/Managerment/Skeleton';
@@ -20,41 +20,25 @@ import showErrorNotification from '../../Toast/NotificationError';
 
 
 const OrderPrintPage = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const { getParam, updateParams, clearParams } = useURLParams();
 
     const init_params: shipParams = {
-        page: parseInt(searchParams.get('page') || '1', 10),
+        page: parseInt(getParam('page', '1') || '1', 10),
         limit: 10,
-        searchType: (searchParams.get('searchType') as SearchType) || 'order_code',
-        search: searchParams.get('search') || '',
-        sortBy: (searchParams.get('sortBy') as SortByType) || 'newest',
-        preparingStatus: (searchParams.get('preparingStatus') as PreparingShippingStatus) || 'all',
+        searchType: (getParam('searchType', 'order_code') || 'order_code') as SearchType,
+        search: getParam('search', '') || '',
+        sortBy: (getParam('sortBy', 'newest') || 'newest') as SortByType,
+        preparingStatus: (getParam('preparingStatus', 'all') || 'all') as PreparingShippingStatus,
     }
 
     const [selectedShipping, setSelectedShipping] = useState<string[]>([]);
     const [selectAll, setSelectAll] = useState(false);
     const [isPrinted, setIsPrinted] = useState(false);
 
-    const [activePage, setActivePage] = useState(parseInt(searchParams.get('page') || '1', 10));
+    const [activePage, setActivePage] = useState(parseInt(getParam('page', '1') || '1', 10));
     const [itemsPerPage] = useState(10);
 
     const [params, setParams] = useState<shipParams>(init_params);
-
-
-
-    const updateURLParams = useCallback((updates: Record<string, string | null>) => {
-        const newParams = new URLSearchParams(searchParams);
-
-        Object.entries(updates).forEach(([key, value]) => {
-            if (value === null || value === '' || value === 'all') {
-                newParams.delete(key);
-            } else {
-                newParams.set(key, value);
-            }
-        });
-
-        setSearchParams(newParams, { replace: true });
-    }, [searchParams, setSearchParams]);
 
     const {
         totalCount,
@@ -67,12 +51,12 @@ const OrderPrintPage = () => {
     });
 
     const loadShipping = useCallback(() => {
-        updateURLParams({
-            page: activePage > 1 ? activePage.toString() : null,
-            searchType: params.searchType && params.searchType != 'order_code' ? params.searchType : null,
+        updateParams({
+            page: activePage > 1 ? activePage : null,
+            searchType: params.searchType !== 'order_code' ? params.searchType : null,
             search: params.search || null,
-            sortBy: params.sortBy && params.sortBy != 'newest' ? params.sortBy : null,
-            preparingStatus: params.preparingStatus && params.preparingStatus != 'all' ? params.preparingStatus : null,
+            sortBy: params.sortBy !== 'newest' ? params.sortBy : null,
+            preparingStatus: params.preparingStatus !== 'all' ? params.preparingStatus : null,
         });
 
         const paramsForFetch: shipParams = {
@@ -82,11 +66,11 @@ const OrderPrintPage = () => {
         }
 
         fetchShipping(paramsForFetch)
-    }, [activePage, params, fetchShipping, updateURLParams]);
+    }, [activePage, params, fetchShipping, updateParams]);
 
     useEffect(() => {
         loadShipping();
-    }, [ activePage, params.preparingStatus]);
+    }, [activePage, params.preparingStatus, loadShipping]);
 
     const handleSelectAll = () => {
         setSelectedShipping(selectAll ? [] : shippingLists.flatMap(order => order.shippingId));
@@ -122,12 +106,16 @@ const OrderPrintPage = () => {
 
         setParams(defaultParams);
         setActivePage(1);
+        clearParams(); // Clear all URL parameters
+    };
 
-        setSearchParams({}, { replace: true });
+    const handlePageChange = (page: number) => {
+        setActivePage(page);
+        updateParams({ page: page > 1 ? page : null });
     };
 
     const handlePrintShipping = () => {
-        showErrorNotification("Nhac Nho", "Chức năng đang được phát triển");
+        showErrorNotification("Nhắc nhở", "Chức năng đang được phát triển");
     };
 
     const breadcrumbItems = [
@@ -195,7 +183,7 @@ const OrderPrintPage = () => {
                                         totalPages={totalPages}
                                         totalItems={totalCount}
                                         itemsPerPage={itemsPerPage}
-                                        onPageChange={setActivePage}
+                                        onPageChange={handlePageChange}
                                     />
                                 </Suspense>
                             </>

@@ -188,7 +188,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                     variant="light"
                     size="xs"
                     component={Link}
-                    to={`/orders/${order.shopOrderId}`}
+                    to={`/settings/orders/${order.shopOrderId}`}
                     leftSection={<FiEye size={14} />}
                 >
                     Chi tiết
