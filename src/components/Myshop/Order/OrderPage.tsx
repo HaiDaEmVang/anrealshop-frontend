@@ -1,8 +1,8 @@
 import { Anchor, Box, Breadcrumbs, Card, Container, Group, Paper, Text, Title } from '@mantine/core';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiPackage } from 'react-icons/fi';
-import { useSearchParams } from 'react-router-dom';
 import { useOrder, type PreparingStatus, type SearchType } from '../../../hooks/useOrder';
+import { useURLParams } from '../../../hooks/useURLParams';
 import type { OrderRejectRequest, ShopOrderStatus } from '../../../types/OrderType';
 import Pagination from '../Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton, StatusFilterSkeleton } from '../Product/Managerment/Skeleton';
@@ -15,37 +15,24 @@ import OrderFilter from './OrderPage/Filter/OrderFilter';
 
 
 const OrderPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { getParam, updateParams, setPageParam } = useURLParams();
 
-  const [activeStatus, setActiveStatus] = useState<ShopOrderStatus | "all">(
-    (searchParams.get('status') as ShopOrderStatus | "all") || 'all'
+  const [activeStatus, setActiveStatus] = useState<ShopOrderStatus | "all">(() =>
+    (getParam('status') as ShopOrderStatus | "all") || 'all'
   );
 
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
-  const [searchTypeValue, setSearchTypeValue] = useState<SearchType>(
-    (searchParams.get('searchType') as SearchType) || 'order_code'
+  const [searchTerm, setSearchTerm] = useState(() => getParam('search') || '');
+  const [searchTypeValue, setSearchTypeValue] = useState<SearchType>(() =>
+    (getParam('searchType') as SearchType) || 'order_code'
   );
-  const [sortBy, setSortBy] = useState<string | null>(searchParams.get('sortBy') || 'newest');
+  const [sortBy, setSortBy] = useState<string | null>(() => getParam('sortBy') || 'newest');
   const [preparingStatus, setPreparingStatus] = useState<PreparingStatus>('all');
 
-  const [activePage, setActivePage] = useState(
-    parseInt(searchParams.get('page') || '1', 10)
-  );
+  const [activePage, setActivePage] = useState(() => {
+    const page = getParam('page');
+    return page ? parseInt(page, 10) : 1;
+  });
   const [itemsPerPage] = useState(10);
-
-  const updateURLParams = useCallback((updates: Record<string, string | null>) => {
-    const newParams = new URLSearchParams(searchParams);
-
-    Object.entries(updates).forEach(([key, value]) => {
-      if (value === null || value === '' || value === 'all') {
-        newParams.delete(key);
-      } else {
-        newParams.set(key, value); 
-      }
-    });
-
-    setSearchParams(newParams, { replace: true });
-  }, [searchParams, setSearchParams]);
 
   const {
     totalCount,
@@ -78,12 +65,12 @@ const OrderPage = () => {
   ));
 
   const loadOrders = useCallback(() => {
-    updateURLParams({
+    updateParams({
       status: activeStatus,
-      search: searchTerm || null,
+      search: searchTerm,
       searchType: searchTypeValue !== 'order_code' ? searchTypeValue : null,
       sortBy: sortBy !== 'newest' ? sortBy : null,
-      page: activePage > 1 ? activePage.toString() : null
+      page: activePage > 1 ? activePage : null
     });
 
     fetchOrders({
@@ -96,7 +83,7 @@ const OrderPage = () => {
       sortBy: sortBy || undefined,
       preparingStatus: preparingStatus
     });
-  }, [activePage, activeStatus, sortBy, searchTypeValue, searchTerm, fetchOrders, updateURLParams]);
+  }, [activePage, activeStatus, sortBy, searchTypeValue, searchTerm, preparingStatus, fetchOrders, updateParams]);
 
   useEffect(() => {
     loadOrders();
@@ -109,6 +96,7 @@ const OrderPage = () => {
   const handleStatusChange = (status: ShopOrderStatus | "all") => {
     setActiveStatus(status);
     setActivePage(1);
+    updateParams({ status, page: null });
   };
 
   const handleSearchChange = (value: string) => {
@@ -127,23 +115,23 @@ const OrderPage = () => {
 
   const handlePageChange = (page: number) => {
     setActivePage(page);
+    setPageParam(page);
   };
-
-  const onFetchWithParam = useCallback(() => {
-    setActivePage(1);
-    loadOrders();
-  }, [searchTerm, sortBy, loadOrders]);
 
   const handleClearAll = useCallback(() => {
     setSearchTerm('');
     setSortBy('newest');
     setSearchTypeValue('order_code');
 
-    const newParams = new URLSearchParams();
+    updateParams({
+      search: null,
+      searchType: null,
+      sortBy: null
+    }, { preserveOthers: false });
+
     if (activeStatus !== 'all') {
-      newParams.set('status', activeStatus);
+      updateParams({ status: activeStatus });
     }
-    setSearchParams(newParams, { replace: true });
 
     fetchOrders({
       page: 0,
@@ -151,7 +139,12 @@ const OrderPage = () => {
       mode: 'home',
       status: activeStatus
     });
-  }, [activeStatus, fetchOrders, setSearchParams]);
+  }, [activeStatus, fetchOrders, updateParams]);
+
+  const onFetchWithParam = useCallback(() => {
+    setActivePage(1);
+    loadOrders();
+  }, [loadOrders]);
 
   const handleApproveOrder = useCallback((shopOrderId: string) => {
     approveOrder(shopOrderId)
@@ -177,9 +170,6 @@ const OrderPage = () => {
       });
   }, [rejectOrders, fetchOrderMetadata, loadOrders]);
 
-  const handlePreparingStatusChange = (value : PreparingStatus) => {
-    setPreparingStatus(value);
-  }
   return (
     <Container fluid px="lg" py="md" className='relative'>
       <Paper
@@ -228,7 +218,7 @@ const OrderPage = () => {
           onFetchWithParam={onFetchWithParam}
           onClearAll={handleClearAll}
           totalOrders={totalCount}
-          onStatusFilterChange={handlePreparingStatusChange}
+          onStatusFilterChange={setPreparingStatus}
         />
 
         <Box pt={"md"} className='min-h-[60vh]'>
