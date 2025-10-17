@@ -3,7 +3,7 @@ export interface SingleAddressDto {
   nameDisplay: string;
 }
 
-export interface simpleAddressDto {
+export interface SimpleAddressDto {
   id: string;
   receiverOrSenderName: string;
   phoneNumber: string;

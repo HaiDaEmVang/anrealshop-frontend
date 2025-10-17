@@ -1,4 +1,4 @@
-import type { simpleAddressDto } from "./AddressType";
+import type { SimpleAddressDto } from "./AddressType";
 
 export type OrderStatus = 'ALL'| 'COMPLETED' | 'PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'AWAITING_SHIPMENT' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'REFUND' | 'CANCELED';
 
@@ -167,5 +167,5 @@ export interface UserOrderDetailDto {
 
   isReviewed: boolean;
 
-  address: simpleAddressDto;
+  address: SimpleAddressDto;
 }
