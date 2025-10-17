@@ -1,5 +1,5 @@
 import type { HistoryTrackDto, ProductOrderItemDto, UserOrderDetailDto } from '../../../../types/OrderType';
-import type { simpleAddressDto } from '../../../../types/AddressType';
+import type { SimpleAddressDto } from '../../../../types/AddressType';
 
 // Sample history data
 export const sampleHistoryData: HistoryTrackDto[] = [
@@ -78,7 +78,7 @@ export const sampleProductItems: ProductOrderItemDto[] = [
 ];
 
 // Sample address data
-export const sampleAddress: simpleAddressDto = {
+export const sampleAddress: SimpleAddressDto = {
     id: 'addr-001',
     receiverOrSenderName: 'Le Hai',
     phoneNumber: '(+84) 941 780 045',
