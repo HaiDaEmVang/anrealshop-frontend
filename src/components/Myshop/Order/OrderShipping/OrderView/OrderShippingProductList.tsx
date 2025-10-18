@@ -8,10 +8,12 @@ import { formatDate } from '../../../../../untils/Untils';
 import RejectModal from '../../../../RejectModal/RejectOrder';
 import Header from './HeaderListView';
 import { SkeletonOrderShip } from './SkeletonOrderShip';
+import type { PreparingStatus } from '../../../../../hooks/useOrder';
 
 interface OrderShippingProductListProps {
     orders: OrderItemDto[];
     selectedOrder: string[];
+    preparingStatus?: PreparingStatus;
     selectAll: boolean;
     isLoading: boolean;
     onSelectAll: () => void;
@@ -22,6 +24,7 @@ interface OrderShippingProductListProps {
 const OrderShippingProductList = ({
     orders,
     selectedOrder,
+    preparingStatus,
     selectAll,
     isLoading,
     onSelectAll,
@@ -75,7 +78,7 @@ const OrderShippingProductList = ({
                                                         onChange={() => {
                                                             onSelectOrder(order.shopOrderId);
                                                         }}
-                                                        disabled={order.productOrderItemDtoSet && order.productOrderItemDtoSet.some(p => p.orderStatus !== 'PREPARING')}
+                                                        disabled={order.orderStatus === 'PREPARING' && preparingStatus === 'all'}
                                                     />
                                                     <Avatar
                                                         radius="xl"
@@ -101,7 +104,7 @@ const OrderShippingProductList = ({
                                                     <Text size="sm" c="dimmed">
                                                         Mã đơn hàng:
                                                         <Text component="span" fw={500} className='ml-1 hover:text-primary cursor-pointer !underline'>
-                                                            #{order.shopOrderId}
+                                                            #{order.shopOrderId?.substring(0, 15)}...
                                                         </Text>
                                                     </Text>
                                                 </Group>
@@ -159,7 +162,7 @@ const OrderShippingProductList = ({
                                                                 color={getStatusColor(product.orderStatus)}
                                                                 variant="light"
                                                             >
-                                                                {getStatusLabel(product.orderStatus)}
+                                                                {getStatusLabel(order.orderStatus)}
                                                             </Badge>
                                                         </div>
                                                         <div className="col-span-1 text-center">

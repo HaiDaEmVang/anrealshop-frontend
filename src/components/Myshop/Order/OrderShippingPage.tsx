@@ -44,18 +44,13 @@ const OrderShippingPage = () => {
   const [itemsPerPage] = useState(10);
 
   const [params, setParams] = useState<UseOrderParams>(init_params);
-
-  const [pickupDate, setPickupDate] = useState<string>(
-    getParam('pickupDate', new Date().toISOString().split('T')[0])
-  );
-  const [note, setNote] = useState(getParam('note', ''));
   const { user } = useAppSelector((state) => state.auth);
   const [data, setData] = useState<OrderItemDto[]>([]);
 
   const {
     totalCount,
     totalPages,
-    isLoading,
+    isLoadingOrders: isLoading,
 
     orders,
     fetchOrders,
@@ -69,20 +64,23 @@ const OrderShippingPage = () => {
     }
   });
 
-  const loadOrders = useCallback(() => {
+  const loadOrders = useCallback((preparingStatus?: PreparingStatus, page?: number) => {
+    if (preparingStatus === params.preparingStatus || page === activePage) return;
+    const finalStatus = preparingStatus ?? params.preparingStatus;
+    const finalPage = page ?? activePage;
     updateParams({
-      page: activePage > 1 ? activePage : null,
+      page: finalPage > 1 ? finalPage : null,
       orderType: params.orderType !== 'all' ? params.orderType : null,
       searchType: params.searchType !== 'order_code' ? params.searchType : null,
       search: params.search || null,
       sortBy: params.sortBy !== 'newest' ? params.sortBy : null,
       confirmSD: params.confirmSD || null,
       confirmED: params.confirmED || null,
-      preparingStatus: params.preparingStatus !== 'all' ? params.preparingStatus : null,
+      preparingStatus: finalStatus !== 'all' ? finalStatus : null,
     });
 
     fetchOrders({
-      page: activePage - 1,
+      page: finalPage - 1,
       limit: itemsPerPage,
       mode: 'shipping',
       ...params
@@ -90,14 +88,21 @@ const OrderShippingPage = () => {
   }, [activePage, params, fetchOrders, updateParams]);
 
   useEffect(() => {
-    loadOrders();
-  }, [loadOrders, activePage, params.preparingStatus]);
-  useEffect(() => {
     setData(orders);
-  },[orders]);
+  }, [orders]);
 
+  useEffect(() => {
+    loadOrders();
+  }, [params.preparingStatus]);
+
+  // LOGIC SELECT ORDER
   const handleSelectAll = () => {
-    setSelectedOrder(selectAll ? [] : data.flatMap(order => order.shopOrderId));
+    if (params.preparingStatus === 'preparing') {
+      setSelectedOrder(selectAll ? [] : data.flatMap(order => order.shopOrderId));
+    } else {
+      setSelectedOrder(selectAll ? [] : data.filter(order => order.orderStatus === 'CONFIRMED')
+        .flatMap(order => order.shopOrderId));
+    }
     setSelectAll(!selectAll);
   };
 
@@ -115,52 +120,25 @@ const OrderShippingPage = () => {
     });
   };
 
-  const handleParamsChange = (newParams: UseOrderParams) => {
-    setParams(newParams);
-    setActivePage(1);
-  };
-
+  // HANDLE ACTIONS
   const handleResetFilter = () => {
-    const defaultParams: UseOrderParams = {
-      orderType: 'all' as OrderCountType,
-      searchType: 'order_code' as SearchType,
-      search: '',
-      sortBy: 'newest' as SortByType,
-      confirmSD: formatDateForBe(getDefaultDateRange_Now_Yesterday()[0]),
-      confirmED: formatDateForBe(getDefaultDateRange_Now_Yesterday()[1]),
-      preparingStatus: 'all' as PreparingStatus,
-    };
-
-    setParams(defaultParams);
+    setParams(init_params);
     setActivePage(1);
-    clearParams(); // Clear all URL parameters
+    clearParams();
   };
 
   const handlePageChange = (page: number) => {
     setActivePage(page);
-    updateParams({ page: page > 1 ? page : null });
+    loadOrders(undefined, page);
   };
 
-  const orderItemDtos = data.filter(order => selectedOrder.includes(order.shopOrderId));
 
-  const handlePickupDateChange = (value: string | null) => {
-    if (value) {
-      setPickupDate(value);
-      updateParams({ pickupDate: value });
-    }
-  };
-
-  const handleNoteChange = (value: string) => {
-    setNote(value);
-    updateParams({ note: value || null });
-  };
-
-  const handleSubmitShipping = async () => {
+  const handleSubmitShipping = async (note: string, pickupDate: string) => {
     const createShipmentRequest: CreateShipmentRequest = {
       shopOrderIds: selectedOrder,
       addressId: user?.address?.id || '',
       note,
-      pickupDate: formatDateForBe(new Date(pickupDate)),
+      pickupDate,
     };
     setIsSubmitting(true);
     ShipmentService.createShipments(createShipmentRequest)
@@ -226,7 +204,7 @@ const OrderShippingPage = () => {
         <div className="col-span-12 lg:col-span-9">
           <Filter
             initialParams={params}
-            onFilterChange={handleParamsChange}
+            onFilterChange={setParams}
             onResetFilter={handleResetFilter}
             orderCount={data.length}
           />
@@ -235,6 +213,7 @@ const OrderShippingPage = () => {
               <OrderShippingProductList
                 orders={orders}
                 selectedOrder={selectedOrder}
+                preparingStatus={params.preparingStatus}
                 selectAll={selectAll}
                 isLoading={isLoading}
                 onSelectAll={handleSelectAll}
@@ -260,14 +239,11 @@ const OrderShippingPage = () => {
         <div className="col-span-12 lg:col-span-3">
           <div className="sticky top-20">
             <ShippingInfoForm
-              pickupDate={pickupDate}
-              note={note}
               shopAddress={user?.address}
-              selectedOrders={orderItemDtos}
+              countOrderItems={selectedOrder.length}
               isSubmitting={isSubmitting}
-              onPickupDateChange={handlePickupDateChange}
-              onNoteChange={handleNoteChange}
               onSubmit={handleSubmitShipping}
+              preparingStatus={params.preparingStatus}
             />
             <InfoPage />
           </div>

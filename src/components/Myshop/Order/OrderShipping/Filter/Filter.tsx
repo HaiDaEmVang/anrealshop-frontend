@@ -14,8 +14,8 @@ interface FilterProps {
     initialParams?: UseOrderParams;
     onFilterChange?: (filters: UseOrderParams) => void;
     onResetFilter?: () => void;
-    orderCount?: number;
-}
+    orderCount?: number; 
+}  
 
 const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }: FilterProps) => {
     const [orderType, setOrderType] = useState<OrderCountType | null>(initialParams?.orderType || 'all');
@@ -79,8 +79,8 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
                             onChange={(value) => setPreparingStatus(value as PreparingStatus)}
                             data={[
                                 { label: 'Tất cả', value: 'all' as PreparingStatus },
-                                { label: 'Chưa xử lý', value: 'preparing' as PreparingStatus },
-                                { label: 'Đã xử lý', value: 'wait_shipment' as PreparingStatus },
+                                { label: 'Chưa xử lý', value: 'confirmed' as PreparingStatus },
+                                { label: 'Đã xử lý', value: 'preparing' as PreparingStatus },
                             ]}
                             size="sm"
                             radius="md"
@@ -183,7 +183,8 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
                         {orderCount} đơn hàng
                     </div>
                     <div className="flex gap-2">
-                        <Link to="/myshop/orders/printing">
+                        { preparingStatus === 'preparing' && (
+                            <Link to="/myshop/orders/printing">
                             <Button
                                 variant="light"
                                 // onClick={applyFilters}
@@ -192,6 +193,7 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
                                 In phiếu
                             </Button>
                         </Link>
+                        )}
                         <Divider orientation="vertical" mx={"sm"} />
                         <Button
                             onClick={applyFilters}

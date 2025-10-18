@@ -8,6 +8,7 @@ export interface SimpleAddressDto {
   receiverOrSenderName: string;
   phoneNumber: string;
   detailAddress: string;
+  isDefault: boolean;
 }
 
 export interface AddressDto {
