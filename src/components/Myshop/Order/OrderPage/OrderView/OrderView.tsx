@@ -8,6 +8,7 @@ import { useOrderStatus } from '../../../../../hooks/useOrderStatus';
 import type { OrderItemDto, OrderRejectRequest, ProductOrderItemDto } from '../../../../../types/OrderType';
 import { formatPrice } from '../../../../../untils/Untils';
 import RejectModal from '../../../../RejectModal/RejectOrder';
+import ModalCreateOrderShip from '../Modal/ModalCreateOrderShip';
 
 interface OrderViewProps {
     items: OrderItemDto[];
@@ -15,17 +16,21 @@ interface OrderViewProps {
     onRejectOrder?: (orderId: string, reason: string) => void;
     onRejectOrders?: (orderRejectRequest: OrderRejectRequest) => void;
     onViewDetail?: (orderId: string) => void;
+    onCreateShipOrder?: (orderId: string, pickupDate: string, note: string) => void;
 }
 
 const OrderView = ({
     items,
     onApproveOrder,
-    onRejectOrder
+    onRejectOrder,
+    onCreateShipOrder
 }: OrderViewProps) => {
     const { getStatusLabel } = useOrderStatus();
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
+    const [shipModalOpen, setShipModalOpen] = useState(false);
     const [currentOrderId, setCurrentOrderId] = useState('');
     const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const calculateOrderTotal = (item: ProductOrderItemDto) => {
         return item.quantity * item.price;
@@ -55,11 +60,26 @@ const OrderView = ({
         }));
     };
 
+    const handleAvailableShip = (orderShopId: string) => {
+        setCurrentOrderId(orderShopId);
+        setShipModalOpen(true);
+    };
+
+    const handleCreateShipOrder = async (orderId: string, pickupDate: string, note: string) => {
+        setIsSubmitting(true);
+        if (onCreateShipOrder) {
+            await onCreateShipOrder(orderId, pickupDate, note);
+            setIsSubmitting(false);
+            setShipModalOpen(false);
+        }
+    };
+
     return (
         <div className="space-y-4">
 
             {items.map((order) => {
                 const isPendingConfirmation = order.orderStatus.includes('PENDING_CONFIRMATION');
+                const isAvailableShip = order.orderStatus.includes("CONFIRMED");
                 const hasMultipleItems = order.productOrderItemDtoSet.length > 2;
                 const isExpanded = expandedOrders[order.shopOrderId] !== false;
                 const itemsToShow = isExpanded ? order.productOrderItemDtoSet : order.productOrderItemDtoSet.slice(0, 1);
@@ -106,10 +126,21 @@ const OrderView = ({
                                                 Duyệt đơn
                                             </Button>|</>
                                     )}
+                                    {isAvailableShip && (
+                                        <>
+
+                                            <Button
+                                                variant="light"
+                                                onClick={() => handleAvailableShip(order.shopOrderId)}
+                                                size="xs"
+                                            >
+                                                Hẹn giao hàng
+                                            </Button>|</>
+                                    )}
                                     <Text size="sm" c="dimmed">
                                         Mã đơn hàng:
                                         <Link to={`/myshop/orders/${order.shopOrderId}`} >
-                                            <Text component="span" fw={500} className='hover:text-primary cursor-pointer !underline'> #{order.shopOrderId}</Text>
+                                            <Text component="span" fw={500} className='hover:text-primary cursor-pointer !underline'> #{order.shopOrderId.substring(0, 15)}</Text>
                                         </Link>
                                     </Text>
                                 </Group>
@@ -233,6 +264,15 @@ const OrderView = ({
                 onClose={() => setRejectModalOpen(false)}
                 onConfirm={handleRejectConfirm}
                 orderId={currentOrderId}
+            />
+
+            {/* Create Ship Order Modal */}
+            <ModalCreateOrderShip
+                opened={shipModalOpen}
+                orderId={currentOrderId}
+                onClose={() => setShipModalOpen(false)}
+                onSubmit={handleCreateShipOrder}
+                isSubmitting={isSubmitting}
             />
         </div>
     );

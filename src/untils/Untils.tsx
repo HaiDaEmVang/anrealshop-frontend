@@ -49,6 +49,15 @@ export const getDefaultDateRange_Now_Yesterday = (): [Date, Date] => {
   return [yesterday, today];
 };
 
+export const getDefaultDateRange_Now_Tomorrow = (): [Date, Date] => {
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
+  today.setHours(0, 0, 0, 0);
+  tomorrow.setHours(23, 59, 59, 999);
+  return [today, tomorrow];
+};
+
 export const equalDates = (date1: Date | null, date2: Date | null): boolean => {
   if (!date1 || !date2) return false;
   return date1.getDate() === date2.getDate() &&

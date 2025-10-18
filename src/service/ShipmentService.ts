@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "../constant";
-import type { CartShippingFee, CreateShipmentRequest } from "../types/ShipmentType";
+import type { BaseCreateShipmentRequest, CartShippingFee, CreateShipmentRequest } from "../types/ShipmentType";
 import { axiosInstance } from "./AxiosInstant";
 
 const getFeeForCart = async (cartItemIds: string[]): Promise<CartShippingFee[]> => {
@@ -8,11 +8,17 @@ const getFeeForCart = async (cartItemIds: string[]): Promise<CartShippingFee[]> 
 };
 
 
-const createShipment = async (createShipmentRequest: CreateShipmentRequest): Promise<void> => {
+const createShipments = async (createShipmentRequest: CreateShipmentRequest): Promise<void> => {
   await axiosInstance.put(API_ENDPOINTS.SHIPMENT.CREATE_SHIPMENTS, createShipmentRequest);
 }
 
+const createShipmentForShopOrder = async (orderId: string, createShipmentRequest: BaseCreateShipmentRequest): Promise<void> => {
+  await axiosInstance.put(`${API_ENDPOINTS.SHIPMENT.CREATE_SHIPMENTS}/${orderId}`, createShipmentRequest);
+}
+
+
 export const ShipmentService = {
     getFeeForCart,
-    createShipment
+    createShipments,
+    createShipmentForShopOrder,
 };

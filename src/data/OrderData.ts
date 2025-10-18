@@ -1,4 +1,3 @@
-import type { ItemList } from "../types/CommonType";
 import type { OrderDetailDto, OrderStatusDto } from "../types/OrderType";
 
 export const OrderStatusDefaultDataAdmin: OrderStatusDto[] = [

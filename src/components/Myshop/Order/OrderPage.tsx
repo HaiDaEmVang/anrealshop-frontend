@@ -1,21 +1,24 @@
 import { Anchor, Box, Breadcrumbs, Card, Container, Group, Paper, Text, Title } from '@mantine/core';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { FiChevronRight, FiPackage } from 'react-icons/fi';
+import { OrderStatusDefaultDataAdmin } from '../../../data/OrderData';
 import { useOrder, type PreparingStatus, type SearchType } from '../../../hooks/useOrder';
 import { useURLParams } from '../../../hooks/useURLParams';
+import { ShipmentService } from '../../../service/ShipmentService';
 import type { OrderRejectRequest, ShopOrderStatus } from '../../../types/OrderType';
+import type { BaseCreateShipmentRequest } from '../../../types/ShipmentType';
 import Pagination from '../Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton, StatusFilterSkeleton } from '../Product/Managerment/Skeleton';
+import FilterByStatus from './OrderPage/Filter/FilterByStatus';
+import OrderFilter from './OrderPage/Filter/OrderFilter';
 import NonOrderFound from './OrderPage/OrderView/NonOrderFond';
 import OrderView from './OrderPage/OrderView/OrderView';
 import SkeletonOrderView from './OrderPage/OrderView/SkeletonOrderView';
-import FilterByStatus from './OrderPage/Filter/FilterByStatus';
-import OrderFilter from './OrderPage/Filter/OrderFilter';
 
 
 
 const OrderPage = () => {
-  const { getParam, updateParams, setPageParam } = useURLParams();
+  const { getParam, updateParams } = useURLParams();
 
   const [activeStatus, setActiveStatus] = useState<ShopOrderStatus | "all">(() =>
     (getParam('status') as ShopOrderStatus | "all") || 'all'
@@ -34,15 +37,18 @@ const OrderPage = () => {
   });
   const [itemsPerPage] = useState(10);
 
+  const [orderMetadataView] = useState(OrderStatusDefaultDataAdmin);
+
   const {
     totalCount,
     totalPages,
-    isLoading,
+    isLoadingOrders: isLoading,
 
     orders,
     fetchOrders,
     orderMetadata,
     fetchOrderMetadata,
+    reset,
 
     approveOrder,
     rejectOrder,
@@ -55,68 +61,69 @@ const OrderPage = () => {
     }
   });
 
-  const breadcrumbItems = [
-    { title: 'Trang chủ', href: '/myshop' },
-    { title: 'Quản lý đơn hàng', href: '#' },
-  ].map((item, index) => (
-    <Anchor href={item.href} key={index} size="sm">
-      {item.title}
-    </Anchor>
-  ));
-
-  const loadOrders = useCallback(() => {
+  const loadOrders = useCallback((status?: ShopOrderStatus | "all", page?: number) => {
+    const finalStatus = status ?? activeStatus;
+    const finalPage = page ?? activePage;
     updateParams({
-      status: activeStatus,
-      search: searchTerm,
+      status: finalStatus,
+      search: searchTerm || null,
       searchType: searchTypeValue !== 'order_code' ? searchTypeValue : null,
       sortBy: sortBy !== 'newest' ? sortBy : null,
-      page: activePage > 1 ? activePage : null
+      page: finalPage > 1 ? finalPage : null,
     });
 
     fetchOrders({
-      page: activePage - 1,
+      page: finalPage - 1,
       limit: itemsPerPage,
       mode: 'home',
-      status: activeStatus,
+      status: finalStatus,
       search: searchTerm,
       searchType: searchTypeValue,
       sortBy: sortBy || undefined,
-      preparingStatus: preparingStatus
+      preparingStatus,
     });
   }, [activePage, activeStatus, sortBy, searchTypeValue, searchTerm, preparingStatus, fetchOrders, updateParams]);
 
   useEffect(() => {
-    loadOrders();
-  }, [activeStatus, activePage]);
+    orderMetadataView.map(item => {
+      if (item.id === 'PREPARING') {
+        item.count = orderMetadata
+          .filter(meta => meta.id === 'PREPARING' || meta.id === 'CONFIRMED')
+          .reduce((sum, meta) => sum + meta.count, 0);
+        return;
+      }
+      item.count = orderMetadata.find(meta => meta.id === item.id)?.count || 0;
+    })
+  }, [orderMetadata]);
+
 
   useEffect(() => {
     fetchOrderMetadata();
+    loadOrders();
   }, []);
 
-  const handleStatusChange = (status: ShopOrderStatus | "all") => {
-    setActiveStatus(status);
-    setActivePage(1);
-    updateParams({ status, page: null });
-  };
+  useEffect(() => {
+    if (orders.length !== orderMetadataView[0].count)
+      fetchOrderMetadata();
+  }, [orders]);
 
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    setActivePage(1);
-  };
+  const handleStatusChange = useCallback(
+    (status: ShopOrderStatus | "all") => {
+      if (status === activeStatus) return;
+      setActiveStatus(status);
+      setActivePage(1);
+      if (orderMetadataView.find(item => item.id === status)?.count === 0) {
+        reset();
+      } 
+      else loadOrders(status, 1);
+    }, [activeStatus, loadOrders]);
 
-  const handleSearchTypeChange = (value: SearchType) => {
-    setSearchTypeValue(value);
-    setActivePage(1);
-  };
 
-  const handleSortByChange = (value: string | null) => {
-    setSortBy(value);
-  };
-
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
+    if (page === activePage) return;
     setActivePage(page);
-    setPageParam(page);
-  };
+    loadOrders(activeStatus, page);
+  }, [activePage, activeStatus, loadOrders]);
 
   const handleClearAll = useCallback(() => {
     setSearchTerm('');
@@ -170,6 +177,27 @@ const OrderPage = () => {
       });
   }, [rejectOrders, fetchOrderMetadata, loadOrders]);
 
+  const handleCreateShipOrder = useCallback((orderId: string, pickupDate: string, note: string) => {
+    const baseCreateShipOrder: BaseCreateShipmentRequest = {
+      note,
+      pickupDate,
+    };
+    ShipmentService.createShipmentForShopOrder(orderId, baseCreateShipOrder)
+      .then(() => {
+        fetchOrderMetadata();
+        loadOrders();
+      });
+  }, [fetchOrderMetadata, loadOrders]);
+
+  const breadcrumbItems = [
+    { title: 'Trang chủ', href: '/myshop' },
+    { title: 'Quản lý đơn hàng', href: '#' },
+  ].map((item, index) => (
+    <Anchor href={item.href} key={index} size="sm">
+      {item.title}
+    </Anchor>
+  ));
+
   return (
     <Container fluid px="lg" py="md" className='relative'>
       <Paper
@@ -204,16 +232,16 @@ const OrderPage = () => {
           <FilterByStatus
             selectedStatus={activeStatus}
             onStatusChange={handleStatusChange}
-            orderStatusData={orderMetadata}
+            orderStatusData={orderMetadataView}
           />
         </Suspense>
         <OrderFilter
           searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
+          onSearchChange={setSearchTerm}
           searchTypeValue={searchTypeValue}
-          onSearchTypeValueChange={handleSearchTypeChange}
+          onSearchTypeValueChange={setSearchTypeValue}
           sortBy={sortBy}
-          onSortByChange={handleSortByChange}
+          onSortByChange={setSortBy}
           activeTab={activeStatus}
           onFetchWithParam={onFetchWithParam}
           onClearAll={handleClearAll}
@@ -269,6 +297,7 @@ const OrderPage = () => {
                 onApproveOrder={handleApproveOrder}
                 onRejectOrder={handleRejectOrder}
                 onRejectOrders={handleRejectOrders}
+                onCreateShipOrder={handleCreateShipOrder}
               />
 
               <Suspense fallback={<PaginationSkeleton />}>
