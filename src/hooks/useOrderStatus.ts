@@ -108,8 +108,10 @@ export const useOrderStatusLabel = () => {
                     return 'Đang xử lý';
                 case 'pending_confirmation':
                     return 'Chờ xác nhận';
+                case 'confirmed':
+                    return 'Chưa xử lý';
                 case 'preparing':
-                    return 'Đang chuẩn bị';
+                    return 'Chờ lấy hàng';
                 case 'wait_shipment':
                     return 'Chờ giao';
                 case 'in_transit':
@@ -142,6 +144,7 @@ export const useOrderStatus = () => {
             case 'COMPLETED':
             case 'PROCESSING':
             case 'PENDING_CONFIRMATION':
+            case 'CONFIRMED':
             case 'PREPARING':
             case 'AWAITING_SHIPMENT':
             case 'IN_TRANSIT':

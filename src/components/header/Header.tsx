@@ -18,12 +18,12 @@ import { FiHome, FiLogIn, FiLogOut, FiMapPin, FiPackage, FiShoppingCart, FiUser 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { fetchCurrentUser, logoutUser } from '../../store/authSlice';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
-import ModalAddress, { type Address } from '../header/ModalAddress';
+import ModalAddress from '../header/ModalAddress';
 import SuggestSearch from '../header/SuggestSearch';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import { APP_ROUTES } from '../../constant';
-import { disconnectWs } from '../../service/websocketClient';
+import type { SimpleAddressDto } from '../../types/AddressType';
 
 // Dữ liệu danh mục
 const POPULAR_CATEGORIES = [
@@ -38,27 +38,21 @@ const POPULAR_CATEGORIES = [
 ];
 
 // Dữ liệu địa chỉ mẫu
-const SAVED_ADDRESSES: Address[] = [
+const SAVED_ADDRESSES: SimpleAddressDto[] = [
     {
-        id: '1',
-        name: 'Nguyễn Văn A',
-        phone: '0901234567',
-        address: '123 Nguyễn Văn Linh',
-        ward: 'Phường Tân Phú',
-        district: 'Quận 7',
-        city: 'TP. Hồ Chí Minh',
-        isDefault: true
-    },
-    {
-        id: '2',
-        name: 'Nguyễn Văn A',
-        phone: '0901234567',
-        address: '45 Lê Văn Lương',
-        ward: 'Phường Tân Hưng',
-        district: 'Quận 7',
-        city: 'TP. Hồ Chí Minh',
-        isDefault: false
-    }
+    id: '2',
+    receiverOrSenderName: 'Trần Thị Bình',
+    phoneNumber: '0912345678',
+    detailAddress: '45 Lê Văn Lương, Phường Tân Hưng, Quận 7, TP. Hồ Chí Minh',
+    isDefault: false
+  },
+  {
+    id: '3',
+    receiverOrSenderName: 'Lê Văn Cường',
+    phoneNumber: '0987654321',
+    detailAddress: '78 Nguyễn Thị Minh Khai, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
+    isDefault: false
+  }
 ];
 
 
@@ -344,15 +338,14 @@ const Header: React.FC = () => {
                 </div>
             </Container>
             {/* Modal địa chỉ */}
-            <ModalAddress
+            {/* <ModalAddress
                 opened={addressModalOpened}
                 onClose={() => setAddressModalOpened(false)}
                 addresses={SAVED_ADDRESSES}
                 selectedAddressId={selectedAddressId}
                 onSelectAddress={handleSelectAddress}
                 onApplyAddress={handleApplyAddress}
-                isLoggedIn={isAuthenticated}
-            />
+            /> */}
         </header>
     );
 }

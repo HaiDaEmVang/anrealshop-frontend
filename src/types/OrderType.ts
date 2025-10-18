@@ -29,7 +29,7 @@ export interface ProductOrderItemDto {
 
 export interface OrderItemDto {
   shopOrderId: string;
-  orderStatus: ShopOrderStatus[];
+  orderStatus: ShopOrderStatus;
   paymentMethod: string;
   customerName: string;
   customerImage: string;

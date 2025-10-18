@@ -43,7 +43,7 @@ const OrderHistory = () => {
     const {
         totalCount,
         totalPages,
-        isLoading,
+        isLoadingOrders: isLoading,
 
         orders,
         fetchOrders,

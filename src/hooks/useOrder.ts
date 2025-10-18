@@ -40,7 +40,7 @@ interface UseOrderState {
   isLoadingMetadata: boolean;
   error: string | null;
   isEmpty: boolean;
-}
+} 
 
 export type SearchType = 'order_code' | 'customer_name' | 'product_name' | 'shipping_code';
 export type ModeType = 'home' | 'shipping';
@@ -68,10 +68,13 @@ export const useOrder = (options: UseOrderOptions = {}) => {
   const fetchOrders = useCallback(async (params?: UseOrderParams) => {
     setState(prev => ({ ...prev, isLoadingOrders: true, error: null }));
     try {
+
+      
       const response = mode === 'user'
         ? await OrderService.getUserOrders(params)
         : await OrderService.getMyShopOrders(params);
 
+      console.log('Fetched orders:', response);
       const orderItems =
         Array.isArray(response.orderItemDtoSet) &&
         response.orderItemDtoSet.length === 1 &&
@@ -156,6 +159,17 @@ export const useOrder = (options: UseOrderOptions = {}) => {
     }
   }, []);
 
+  const rejectShopOrder = useCallback(async (shopOrderId: string, reason: string) => {
+    try {
+      await OrderService.rejectShopOrder(shopOrderId, reason);
+      showSuccessNotification('Từ chối đơn hàng', 'Đơn hàng đã được từ chối thành công.');
+      return true;
+    } catch (err: any) {
+      showErrorNotification('Lỗi từ chối đơn hàng', getErrorMessage(err));
+      return false;
+    }
+  }, []);
+
   // === UTILITIES ===
   const refresh = useCallback(async (params?: UseOrderParams) => {
     return Promise.allSettled([
@@ -199,6 +213,7 @@ export const useOrder = (options: UseOrderOptions = {}) => {
     approveOrder,
     rejectOrder,
     rejectOrders,
+    rejectShopOrder,
 
     // Flags tiện lợi
     hasOrders: state.orders.length > 0,
