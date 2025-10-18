@@ -5,7 +5,7 @@ import type { OrderStatusDto, ShopOrderStatus } from '../../../../../types/Order
 interface FilterByStatusProps {
   selectedStatus: any;
   onStatusChange: (status: ShopOrderStatus | "all") => void;
-  orderStatusData: OrderStatusDto[]; 
+  orderStatusData: OrderStatusDto[];
   isShowCount?: boolean;
 }
 

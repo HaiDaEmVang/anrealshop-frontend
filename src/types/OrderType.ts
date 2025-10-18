@@ -2,7 +2,7 @@ import type { SimpleAddressDto } from "./AddressType";
 
 export type OrderStatus = 'ALL'| 'COMPLETED' | 'PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'AWAITING_SHIPMENT' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'REFUND' | 'CANCELED';
 
-export type ShopOrderStatus = 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'SHIPPING' | 'DELIVERED' | 'CLOSED';
+export type ShopOrderStatus = 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'CONFIRMED' | 'PREPARING' | 'SHIPPING' | 'DELIVERED' | 'CLOSED';
 
 export interface OrderStatusDto {
   id: string;

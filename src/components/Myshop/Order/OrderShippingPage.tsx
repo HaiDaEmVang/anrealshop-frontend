@@ -163,7 +163,7 @@ const OrderShippingPage = () => {
       pickupDate: formatDateForBe(new Date(pickupDate)),
     };
     setIsSubmitting(true);
-    ShipmentService.createShipment(createShipmentRequest)
+    ShipmentService.createShipments(createShipmentRequest)
       .then(() => {
         setIsSubmitting(false);
         showSuccessNotification('Tạo đơn giao hàng thành công', 'Đơn giao hàng đã được tạo thành công.');

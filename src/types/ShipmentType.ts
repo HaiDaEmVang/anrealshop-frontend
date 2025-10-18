@@ -27,6 +27,10 @@ export interface CreateShipmentRequest {
     pickupDate: string,
 }
 
+export interface BaseCreateShipmentRequest {
+    note: string,
+    pickupDate: string,
+}
 
 // myshop get list shipping
 

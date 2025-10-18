@@ -78,8 +78,8 @@ const OrderFilter = ({
               onChange={handleStatusFilterChange}
               data={[
                 { label: 'Tất cả', value: 'all' },
-                { label: 'Chưa xử lý', value: 'preparing' },
-                { label: 'Đã xử lý', value: 'wait_shipment' },
+                { label: 'Chưa xử lý', value: 'confirmed' },
+                { label: 'Đã xử lý', value: 'preparing' },
               ]}
               size="sm"
               radius="md"
