@@ -1,4 +1,4 @@
-import { ActionIcon, Avatar, Box, Button, Card, Group, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Avatar, Box, Button, Card, Checkbox, Group, Text, Tooltip } from '@mantine/core';
 import { useState } from 'react';
 import { FiAlertCircle, FiChevronDown, FiChevronUp, FiMessageSquare, FiTrash } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
@@ -13,19 +13,25 @@ import ModalCreateOrderShip from '../Modal/ModalCreateOrderShip';
 interface OrderViewProps {
     items: OrderItemDto[];
     onApproveOrder?: (shopOrderId: string) => void;
-    onRejectOrder?: (orderId: string, reason: string) => void;
+    onRejectItem?: (orderId: string, reason: string, rejectType: 'order' | 'shipping') => void;
     onRejectOrders?: (orderRejectRequest: OrderRejectRequest) => void;
     onViewDetail?: (orderId: string) => void;
     onCreateShipOrder?: (orderId: string, pickupDate: string, note: string) => void;
     currentStatus: ShopOrderStatus | 'all';
+    selectAll: boolean;
+    onSelectOrder: (orderId: string) => void;
+    selectedOrder: string[];
 }
 
 const OrderView = ({
     items,
     onApproveOrder,
-    onRejectOrder,
+    onRejectItem,
     onCreateShipOrder,
-    currentStatus
+    currentStatus,
+    selectAll,
+    onSelectOrder,
+    selectedOrder
 }: OrderViewProps) => {
     const { getStatusLabel } = useOrderStatus();
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -33,6 +39,8 @@ const OrderView = ({
     const [currentOrderId, setCurrentOrderId] = useState('');
     const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [currentRejectType, setCurrentRejectType] = useState<'order' | 'shipping'>('order');
+
 
     const calculateOrderTotal = (item: ProductOrderItemDto) => {
         return item.quantity * item.price;
@@ -44,14 +52,16 @@ const OrderView = ({
         }
     };
 
-    const openRejectModal = (orderId: string) => {
-        setCurrentOrderId(orderId);
+
+    const openRejectModal = (shippingId: string, rejectType: 'order' | 'shipping') => {
+        setCurrentOrderId(shippingId);
+        setCurrentRejectType(rejectType);
         setRejectModalOpen(true);
     };
 
     const handleRejectConfirm = (reason: string) => {
-        if (onRejectOrder && currentOrderId) {
-            onRejectOrder(currentOrderId, reason);
+        if (onRejectItem && currentOrderId) {
+            onRejectItem(currentOrderId, reason, currentRejectType);
         }
     }
 
@@ -99,6 +109,14 @@ const OrderView = ({
                         <Box className="bg-gray-50 border-b-2 border-gray-100" px="md" py="xs">
                             <Group justify="space-between" align="center">
                                 <Group gap="sm">
+                                    {currentStatus === 'PENDING_CONFIRMATION' && (
+                                        <Checkbox
+                                            checked={selectAll || selectedOrder.includes(order.shopOrderId)}
+                                            onChange={() => {
+                                                onSelectOrder(order.shopOrderId);
+                                            }}
+                                        />
+                                    )}
                                     <Avatar
                                         src={order.customerImage}
                                         size="sm"
@@ -117,6 +135,23 @@ const OrderView = ({
                                 </Group>
 
                                 <Group >
+                                    {order.orderStatus === 'PREPARING' && (
+                                        <>
+                                            <div className="col-span-1 text-center">
+                                                <Tooltip label={"Hủy đơn vận"}>
+                                                    <Button
+                                                        color="red"
+                                                        variant="light"
+                                                        size='xs'
+                                                        onClick={() => openRejectModal(order.shippingId, order.orderStatus !== 'PREPARING' ? 'shipping' : 'order')}
+                                                    >
+                                                        Xóa đơn vận
+                                                    </Button>
+                                                </Tooltip>
+                                            </div>
+                                            <Text size="sm" c="dimmed">|</Text>
+                                        </>
+                                    )}
                                     {isPendingConfirmation && currentStatus !== 'CLOSED' && (
                                         <>
 
@@ -226,7 +261,7 @@ const OrderView = ({
                                                     <Button
                                                         variant="subtle"
                                                         leftSection={<FiTrash size={14} />}
-                                                        onClick={() => openRejectModal(item.orderItemId)}
+                                                        onClick={() => openRejectModal(item.orderItemId, 'order')}
                                                         color='black'
                                                         disabled={!isPendingConfirmation || item.cancelReason ? true : false}
                                                         size="sm"
@@ -261,7 +296,7 @@ const OrderView = ({
 
             {/* Reject Order Modal */}
             <RejectModal
-                data={getRejectReasons('order')}
+                data={getRejectReasons(currentRejectType)}
                 opened={rejectModalOpen}
                 onClose={() => setRejectModalOpen(false)}
                 onConfirm={handleRejectConfirm}

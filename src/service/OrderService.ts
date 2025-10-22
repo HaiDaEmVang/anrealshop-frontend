@@ -23,6 +23,10 @@ const approveOrder = async (shopOrderId: string): Promise<void> => {
     await axiosInstance.put(API_ENDPOINTS.ORDERS.MYSHOP_APPROVAL(shopOrderId));
 };
 
+const approveOrders = async (shopOrderIds: string[]): Promise<void> => {
+    await axiosInstance.put(API_ENDPOINTS.ORDERS.MYSHOP_APPROVALS, shopOrderIds);
+};
+
 const rejectOrder = async (orderItemId: string, reason: string): Promise<void> => {
     await axiosInstance.put(API_ENDPOINTS.ORDERS.MYSHOP_REJECT(orderItemId), reason);
 };
@@ -50,6 +54,7 @@ export const OrderService = {
     getMyShopOrders,
     // getOrderDetail,
     approveOrder,
+    approveOrders,
     rejectOrder,
     rejectOrders,
 

@@ -137,6 +137,17 @@ export const useOrder = (options: UseOrderOptions = {}) => {
     }
   }, []);
 
+  const approveOrders = useCallback(async (shopOrderIds: string[]) => {
+    try {
+      await OrderService.approveOrders(shopOrderIds);
+      showSuccessNotification('Duyệt đơn hàng', 'Các đơn hàng đã được duyệt thành công.');
+      return true;
+    } catch (err: any) {
+      showErrorNotification('Lỗi duyệt đơn hàng', getErrorMessage(err));
+      return false;
+    }
+  }, []);
+
   const rejectOrder = useCallback(async (orderItemId: string, reason: string) => {
     try {
       await OrderService.rejectOrder(orderItemId, reason);
@@ -211,6 +222,7 @@ export const useOrder = (options: UseOrderOptions = {}) => {
     refresh,
     reset,
     approveOrder,
+    approveOrders,
     rejectOrder,
     rejectOrders,
     rejectShopOrder,
