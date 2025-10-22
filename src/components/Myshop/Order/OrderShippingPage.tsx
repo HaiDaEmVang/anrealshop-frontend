@@ -2,7 +2,7 @@ import {
   Anchor, Box, Breadcrumbs, Container,
   Group, Paper, Text, Title
 } from '@mantine/core';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FiChevronRight, FiTruck } from 'react-icons/fi';
 import { useAppSelector } from '../../../hooks/useAppRedux';
 import { useOrder, type OrderCountType, type PreparingStatus, type SearchType, type UseOrderParams } from '../../../hooks/useOrder';
@@ -21,6 +21,7 @@ import Filter, { type SortByType } from './OrderShipping/Filter/Filter';
 import OrderShippingProductList from './OrderShipping/OrderView/OrderShippingProductList';
 import InfoPage from './OrderShipping/shopAddress/InfoPage';
 import ShippingInfoForm from './OrderShipping/shopAddress/ShippingInfoForm';
+import { ShippingService } from '../../../service/ShippingService';
 
 
 const OrderShippingPage = () => {
@@ -47,6 +48,21 @@ const OrderShippingPage = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [data, setData] = useState<OrderItemDto[]>([]);
 
+  const filterSectionRef = useRef<HTMLDivElement>(null);
+  const scrollToTop = useCallback(() => {
+    setTimeout(() => {
+      if (filterSectionRef.current) {
+        const elementPosition = filterSectionRef.current.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - 79;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+  }, []);
+
   const {
     totalCount,
     totalPages,
@@ -64,36 +80,33 @@ const OrderShippingPage = () => {
     }
   });
 
-  const loadOrders = useCallback((preparingStatus?: PreparingStatus, page?: number) => {
-    if (preparingStatus === params.preparingStatus || page === activePage) return;
-    const finalStatus = preparingStatus ?? params.preparingStatus;
-    const finalPage = page ?? activePage;
+  const loadOrders = useCallback((filterData?: UseOrderParams, page?: number) => {
+
+
+    const finalPage = page || activePage;
     updateParams({
-      page: finalPage > 1 ? finalPage : null,
-      orderType: params.orderType !== 'all' ? params.orderType : null,
-      searchType: params.searchType !== 'order_code' ? params.searchType : null,
-      search: params.search || null,
-      sortBy: params.sortBy !== 'newest' ? params.sortBy : null,
-      confirmSD: params.confirmSD || null,
-      confirmED: params.confirmED || null,
-      preparingStatus: finalStatus !== 'all' ? finalStatus : null,
+      ...filterData,
+      page: finalPage.toString(),
+      limit: itemsPerPage.toString(),
     });
+
+    setParams(prevParams => ({
+      ...prevParams,
+      ...filterData,
+    }));
 
     fetchOrders({
       page: finalPage - 1,
       limit: itemsPerPage,
       mode: 'shipping',
-      ...params
+      ...params,
+      ...filterData,
     });
   }, [activePage, params, fetchOrders, updateParams]);
 
   useEffect(() => {
     setData(orders);
   }, [orders]);
-
-  useEffect(() => {
-    loadOrders();
-  }, [params.preparingStatus]);
 
   // LOGIC SELECT ORDER
   const handleSelectAll = () => {
@@ -125,12 +138,22 @@ const OrderShippingPage = () => {
     setParams(init_params);
     setActivePage(1);
     clearParams();
+    scrollToTop();
   };
+
+  const handleActiveFilter = (filterData: UseOrderParams) => {
+    setActivePage(1);
+    loadOrders(filterData, 1);
+    scrollToTop();
+  }
 
   const handlePageChange = (page: number) => {
     setActivePage(page);
     loadOrders(undefined, page);
+    scrollToTop();
   };
+
+
 
 
   const handleSubmitShipping = async (note: string, pickupDate: string) => {
@@ -149,20 +172,24 @@ const OrderShippingPage = () => {
         setSelectedOrder([]);
       })
       .catch((error) => {
-        const err = getErrorMessage(error);
-        showErrorNotification('Lỗi khi tạo đơn giao hàng', err);
+        showErrorNotification('Lỗi khi tạo đơn giao hàng', getErrorMessage(error));
       })
       .finally(() => {
         setIsSubmitting(false);
       });
   }
 
-  const handleRejectOrder = useCallback((orderItemId: string, reason: string) => {
-    rejectOrder(orderItemId, reason)
+  const handleRejectOrder = useCallback((shippingId: string, reason: string) => {
+    ShippingService.rejectMyshopShipping(shippingId, reason)
       .then(() => {
+        showSuccessNotification('Hủy đơn hàng thành công', 'Đơn hàng đã được hủy thành công.');
         loadOrders();
+      })
+      .catch((error) => {
+        showErrorNotification('Lỗi khi hủy đơn hàng', getErrorMessage(error));
       });
   }, [rejectOrder, loadOrders]);
+
 
   const breadcrumbItems = [
     { title: 'Trang chủ', href: '/myshop' },
@@ -201,10 +228,10 @@ const OrderShippingPage = () => {
       </Paper>
 
       <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-12 lg:col-span-9">
+        <div className="col-span-12 lg:col-span-9" ref={filterSectionRef}>
           <Filter
             initialParams={params}
-            onFilterChange={setParams}
+            onFilterChange={handleActiveFilter}
             onResetFilter={handleResetFilter}
             orderCount={data.length}
           />

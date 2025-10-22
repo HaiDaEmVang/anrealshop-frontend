@@ -8,7 +8,12 @@ const getMyShopShipping = async (params?: shipParams): Promise<MyShopShippingLis
     return response.data;
 };
 
+const rejectMyshopShipping = async (shippingId: string, reason: string): Promise<void> => {
+    await axiosInstance.put(`${API_ENDPOINTS.SHIPMENT.MYSHOP_REJECT(shippingId)}`, reason);
+};
+
 
 export const ShippingService = {
     getMyShopShipping,
+    rejectMyshopShipping,
 };

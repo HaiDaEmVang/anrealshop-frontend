@@ -1,5 +1,5 @@
 import { Anchor, Box, Breadcrumbs, Card, Container, Group, Paper, Text, Title } from '@mantine/core';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FiChevronRight, FiPackage } from 'react-icons/fi';
 import { OrderStatusDefaultDataAdmin } from '../../../data/OrderData';
 import { useOrder, type PreparingStatus, type SearchType } from '../../../hooks/useOrder';
@@ -38,6 +38,20 @@ const OrderPage = () => {
   const [itemsPerPage] = useState(10);
 
   const [orderMetadataView] = useState(OrderStatusDefaultDataAdmin);
+  const filterSectionRef = useRef<HTMLDivElement>(null);
+  const scrollToTop = useCallback(() => {
+    setTimeout(() => {
+      if (filterSectionRef.current) {
+        const elementPosition = filterSectionRef.current.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - 79;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    }, 100);
+  }, []);
 
   const {
     totalCount,
@@ -114,8 +128,9 @@ const OrderPage = () => {
       setActivePage(1);
       if (orderMetadataView.find(item => item.id === status)?.count === 0) {
         reset();
-      } 
+      }
       else loadOrders(status, 1);
+      scrollToTop();
     }, [activeStatus, loadOrders]);
 
 
@@ -123,6 +138,7 @@ const OrderPage = () => {
     if (page === activePage) return;
     setActivePage(page);
     loadOrders(activeStatus, page);
+    scrollToTop();
   }, [activePage, activeStatus, loadOrders]);
 
   const handleClearAll = useCallback(() => {
@@ -146,11 +162,13 @@ const OrderPage = () => {
       mode: 'home',
       status: activeStatus
     });
+    scrollToTop();
   }, [activeStatus, fetchOrders, updateParams]);
 
   const onFetchWithParam = useCallback(() => {
     setActivePage(1);
     loadOrders();
+    scrollToTop();
   }, [loadOrders]);
 
   const handleApproveOrder = useCallback((shopOrderId: string) => {
@@ -227,6 +245,7 @@ const OrderPage = () => {
       <Paper
         radius="md"
         className="bg-white p-4"
+        ref={filterSectionRef}
       >
         <Suspense fallback={<StatusFilterSkeleton />}>
           <FilterByStatus
@@ -298,6 +317,7 @@ const OrderPage = () => {
                 onRejectOrder={handleRejectOrder}
                 onRejectOrders={handleRejectOrders}
                 onCreateShipOrder={handleCreateShipOrder}
+                currentStatus={activeStatus}
               />
 
               <Suspense fallback={<PaginationSkeleton />}>

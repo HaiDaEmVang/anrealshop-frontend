@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { getRejectReasons } from '../../../../../data/RejectData';
 import { paymentMethods } from '../../../../../data/ShippingData';
 import { useOrderStatus } from '../../../../../hooks/useOrderStatus';
-import type { OrderItemDto, OrderRejectRequest, ProductOrderItemDto } from '../../../../../types/OrderType';
+import type { OrderItemDto, OrderRejectRequest, ProductOrderItemDto, ShopOrderStatus } from '../../../../../types/OrderType';
 import { formatPrice } from '../../../../../untils/Untils';
 import RejectModal from '../../../../RejectModal/RejectOrder';
 import ModalCreateOrderShip from '../Modal/ModalCreateOrderShip';
@@ -17,13 +17,15 @@ interface OrderViewProps {
     onRejectOrders?: (orderRejectRequest: OrderRejectRequest) => void;
     onViewDetail?: (orderId: string) => void;
     onCreateShipOrder?: (orderId: string, pickupDate: string, note: string) => void;
+    currentStatus: ShopOrderStatus | 'all';
 }
 
 const OrderView = ({
     items,
     onApproveOrder,
     onRejectOrder,
-    onCreateShipOrder
+    onCreateShipOrder,
+    currentStatus
 }: OrderViewProps) => {
     const { getStatusLabel } = useOrderStatus();
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -115,7 +117,7 @@ const OrderView = ({
                                 </Group>
 
                                 <Group >
-                                    {isPendingConfirmation && (
+                                    {isPendingConfirmation && currentStatus !== 'CLOSED' && (
                                         <>
 
                                             <Button
@@ -126,7 +128,7 @@ const OrderView = ({
                                                 Duyệt đơn
                                             </Button>|</>
                                     )}
-                                    {isAvailableShip && (
+                                    {isAvailableShip && currentStatus !== 'CLOSED' && (
                                         <>
 
                                             <Button
