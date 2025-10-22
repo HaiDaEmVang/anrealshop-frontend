@@ -1,8 +1,9 @@
-import { Anchor, Box, Breadcrumbs, Card, Container, Group, Paper, Text, Title } from '@mantine/core';
+import { Anchor, Box, Breadcrumbs, Container, Group, Paper, Text, Title } from '@mantine/core';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FiChevronRight, FiPackage } from 'react-icons/fi';
 import { OrderStatusDefaultDataAdmin } from '../../../data/OrderData';
 import { useOrder, type PreparingStatus, type SearchType } from '../../../hooks/useOrder';
+import { useShipping } from '../../../hooks/useShipping';
 import { useURLParams } from '../../../hooks/useURLParams';
 import { ShipmentService } from '../../../service/ShipmentService';
 import type { OrderRejectRequest, ShopOrderStatus } from '../../../types/OrderType';
@@ -11,6 +12,7 @@ import Pagination from '../Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton, StatusFilterSkeleton } from '../Product/Managerment/Skeleton';
 import FilterByStatus from './OrderPage/Filter/FilterByStatus';
 import OrderFilter from './OrderPage/Filter/OrderFilter';
+import HeaderTable from './OrderPage/OrderView/HeaderTable';
 import NonOrderFound from './OrderPage/OrderView/NonOrderFond';
 import OrderView from './OrderPage/OrderView/OrderView';
 import SkeletonOrderView from './OrderPage/OrderView/SkeletonOrderView';
@@ -36,6 +38,8 @@ const OrderPage = () => {
     return page ? parseInt(page, 10) : 1;
   });
   const [itemsPerPage] = useState(10);
+  const [selectedOrder, setSelectedOrder] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
 
   const [orderMetadataView] = useState(OrderStatusDefaultDataAdmin);
   const filterSectionRef = useRef<HTMLDivElement>(null);
@@ -53,6 +57,8 @@ const OrderPage = () => {
     }, 100);
   }, []);
 
+  const { rejectShippingItem } = useShipping();
+
   const {
     totalCount,
     totalPages,
@@ -65,6 +71,7 @@ const OrderPage = () => {
     reset,
 
     approveOrder,
+    approveOrders,
     rejectOrder,
     rejectOrders,
   } = useOrder({
@@ -179,12 +186,29 @@ const OrderPage = () => {
       });
   }, [approveOrder, fetchOrderMetadata, loadOrders]);
 
-  const handleRejectOrder = useCallback((orderItemId: string, reason: string) => {
-    rejectOrder(orderItemId, reason)
+  const handleApproveOrders = useCallback(() => {
+    approveOrders(selectedOrder)
       .then(() => {
         fetchOrderMetadata();
         loadOrders();
+        setSelectedOrder([]);
       });
+  }, [approveOrder, fetchOrderMetadata, loadOrders, selectedOrder]);
+
+  const handleRejectOrder = useCallback((orderItemId: string, reason: string, rejectType: 'order' | 'shipping') => {
+    if (rejectType === 'order') {
+      rejectOrder(orderItemId, reason)
+        .then(() => {
+          fetchOrderMetadata();
+          loadOrders();
+        });
+    } else {
+      rejectShippingItem(orderItemId, reason)
+        .then(() => {
+          fetchOrderMetadata();
+          loadOrders();
+        })
+    }
   }, [rejectOrder, fetchOrderMetadata, loadOrders]);
 
   const handleRejectOrders = useCallback((orderRejectRequest: OrderRejectRequest) => {
@@ -206,6 +230,28 @@ const OrderPage = () => {
         loadOrders();
       });
   }, [fetchOrderMetadata, loadOrders]);
+
+  // LOGIC SELECT ORDER
+  const handleSelectAll = () => {
+    if (activeStatus === 'PENDING_CONFIRMATION') {
+      setSelectedOrder(selectAll ? [] : orders.flatMap(order => order.shopOrderId));
+      setSelectAll(!selectAll);
+    }
+  };
+
+  useEffect(() => {
+    setSelectAll(selectedOrder.length === orders.length && orders.length > 0);
+  }, [selectedOrder, orders]);
+
+  const handleSelectOrder = (orderId: string) => {
+    setSelectedOrder(prev => {
+      if (prev.includes(orderId)) {
+        return prev.filter(id => id !== orderId);
+      } else {
+        return [...prev, orderId];
+      }
+    });
+  };
 
   const breadcrumbItems = [
     { title: 'Trang chủ', href: '/myshop' },
@@ -261,47 +307,17 @@ const OrderPage = () => {
           onSearchTypeValueChange={setSearchTypeValue}
           sortBy={sortBy}
           onSortByChange={setSortBy}
-          activeTab={activeStatus}
+          currentStatus={activeStatus}
           onFetchWithParam={onFetchWithParam}
           onClearAll={handleClearAll}
           totalOrders={totalCount}
           onStatusFilterChange={setPreparingStatus}
+          selectedOrder={selectedOrder}
+          approvalOrders={handleApproveOrders}
         />
 
         <Box pt={"md"} className='min-h-[60vh]'>
-          <Card withBorder p={0} className="!bg-gray-50">
-            <Box className="px-4 py-3">
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-4">
-                  <Group gap="sm">
-                    <Text size="sm" fw={500}>
-                      Sản phẩm
-                    </Text>
-                  </Group>
-                </div>
-                <div className="col-span-2">
-                  <Text size="sm" fw={500}>
-                    Thanh toán
-                  </Text>
-                </div>
-                <div className="col-span-2">
-                  <Text size="sm" fw={500}>
-                    Trạng thái
-                  </Text>
-                </div>
-                <div className="col-span-2">
-                  <Text size="sm" fw={500}>
-                    Vận chuyển
-                  </Text>
-                </div>
-                <div className="col-span-2 text-center">
-                  <Text size="sm" fw={500}>
-                    Thao tác
-                  </Text>
-                </div>
-              </div>
-            </Box>
-          </Card>
+          <HeaderTable currentStatus={activeStatus} onSelectAll={handleSelectAll} selectAll={selectAll} />
           {isLoading ? (
             <SkeletonOrderView />
           ) : !orders || orders.length === 0 ? (
@@ -314,10 +330,13 @@ const OrderPage = () => {
               <OrderView
                 items={orders}
                 onApproveOrder={handleApproveOrder}
-                onRejectOrder={handleRejectOrder}
+                onRejectItem={handleRejectOrder}
                 onRejectOrders={handleRejectOrders}
                 onCreateShipOrder={handleCreateShipOrder}
                 currentStatus={activeStatus}
+                selectAll={selectAll}
+                onSelectOrder={handleSelectOrder}
+                selectedOrder={selectedOrder}
               />
 
               <Suspense fallback={<PaginationSkeleton />}>

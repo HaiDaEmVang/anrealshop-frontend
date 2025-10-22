@@ -6,14 +6,11 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { FiChevronRight, FiTruck } from 'react-icons/fi';
 import { useAppSelector } from '../../../hooks/useAppRedux';
 import { useOrder, type OrderCountType, type PreparingStatus, type SearchType, type UseOrderParams } from '../../../hooks/useOrder';
+import { useShipping } from '../../../hooks/useShipping';
 import { useURLParams } from '../../../hooks/useURLParams';
-import { ShipmentService } from '../../../service/ShipmentService';
 import type { OrderItemDto } from '../../../types/OrderType';
 import type { CreateShipmentRequest } from '../../../types/ShipmentType';
-import { getErrorMessage } from '../../../untils/ErrorUntils';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../../../untils/Untils';
-import showErrorNotification from '../../Toast/NotificationError';
-import showSuccessNotification from '../../Toast/NotificationSuccess';
 import Pagination from '../Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton } from '../Product/Managerment/Skeleton';
 import NonOrderFound from './OrderPage/OrderView/NonOrderFond';
@@ -21,7 +18,6 @@ import Filter, { type SortByType } from './OrderShipping/Filter/Filter';
 import OrderShippingProductList from './OrderShipping/OrderView/OrderShippingProductList';
 import InfoPage from './OrderShipping/shopAddress/InfoPage';
 import ShippingInfoForm from './OrderShipping/shopAddress/ShippingInfoForm';
-import { ShippingService } from '../../../service/ShippingService';
 
 
 const OrderShippingPage = () => {
@@ -80,9 +76,9 @@ const OrderShippingPage = () => {
     }
   });
 
+  const { createShipping, rejectShippingItem } = useShipping();
+
   const loadOrders = useCallback((filterData?: UseOrderParams, page?: number) => {
-
-
     const finalPage = page || activePage;
     updateParams({
       ...filterData,
@@ -153,9 +149,6 @@ const OrderShippingPage = () => {
     scrollToTop();
   };
 
-
-
-
   const handleSubmitShipping = async (note: string, pickupDate: string) => {
     const createShipmentRequest: CreateShipmentRequest = {
       shopOrderIds: selectedOrder,
@@ -164,30 +157,19 @@ const OrderShippingPage = () => {
       pickupDate,
     };
     setIsSubmitting(true);
-    ShipmentService.createShipments(createShipmentRequest)
+    createShipping(createShipmentRequest)
       .then(() => {
         setIsSubmitting(false);
-        showSuccessNotification('Tạo đơn giao hàng thành công', 'Đơn giao hàng đã được tạo thành công.');
         loadOrders();
         setSelectedOrder([]);
       })
-      .catch((error) => {
-        showErrorNotification('Lỗi khi tạo đơn giao hàng', getErrorMessage(error));
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
   }
 
-  const handleRejectOrder = useCallback((shippingId: string, reason: string) => {
-    ShippingService.rejectMyshopShipping(shippingId, reason)
+  const handleRejectOrder = useCallback(async (shippingId: string, reason: string) => {
+    rejectShippingItem(shippingId, reason)
       .then(() => {
-        showSuccessNotification('Hủy đơn hàng thành công', 'Đơn hàng đã được hủy thành công.');
         loadOrders();
       })
-      .catch((error) => {
-        showErrorNotification('Lỗi khi hủy đơn hàng', getErrorMessage(error));
-      });
   }, [rejectOrder, loadOrders]);
 
 

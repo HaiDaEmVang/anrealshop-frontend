@@ -3,9 +3,11 @@ import type { PreparingShippingStatus } from '../components/Myshop/Order/Data';
 import showErrorNotification from '../components/Toast/NotificationError';
 import type { TypeMode } from '../constant';
 import { ShippingService } from '../service/ShippingService';
-import type { MyShopShippingListResponse, ShippingItems } from '../types/ShipmentType';
+import type { CreateShipmentRequest, MyShopShippingListResponse, ShippingItems } from '../types/ShipmentType';
 import { getErrorMessage } from '../untils/ErrorUntils';
 import type { SearchType } from './useOrder';
+import showSuccessNotification from '../components/Toast/NotificationSuccess';
+import { ShipmentService } from '../service/ShipmentService';
 
 export type shipParams = {
     page?: number;
@@ -86,20 +88,6 @@ export const useShipping = (options: UseOptions = {}) => {
     }, []);
 
 
-
-    // const rejectOrder = useCallback(async (orderItemId: string, reason: string) => {
-    //     try {
-    //         console.log('Rejecting order:', orderItemId, 'with reason:', reason);
-    //         await OrderService.rejectOrder(orderItemId, reason);
-    //         showSuccessNotification('Từ chối đơn hàng', 'Đơn hàng đã được từ chối thành công.');
-    //         return true;
-    //     } catch (err: any) {
-    //         const errorMessage = getErrorMessage(err);
-    //         showErrorNotification('Lỗi từ chối đơn hàng', errorMessage);
-    //         return false;
-    //     }
-    // }, []);
-
     const refresh = useCallback(async (params?: shipParams) => {
         return fetchData(params || initialParams);
     }, [fetchData, initialParams]);
@@ -122,15 +110,38 @@ export const useShipping = (options: UseOptions = {}) => {
         }
     }, [autoFetch, fetchData, initialParams]);
 
+    // ACTION
+
+    const rejectShippingItem = useCallback(async(shippingId: string, reason: string) => {
+        return await ShippingService.rejectMyshopShipping(shippingId, reason)
+            .then(() => {
+                showSuccessNotification('Hủy đơn hàng thành công', 'Đơn hàng đã được hủy thành công.');
+            })
+            .catch((error) => {
+                showErrorNotification('Lỗi khi hủy đơn hàng', getErrorMessage(error));
+            });
+    }, [])
+
+    const createShipping =  useCallback(async(createShipmentRequest: CreateShipmentRequest) => {
+        return await ShipmentService.createShipments(createShipmentRequest)
+              .then(() => {
+                showSuccessNotification('Tạo đơn giao hàng thành công', 'Đơn giao hàng đã được tạo thành công.');
+              })
+              .catch((error) => {
+                showErrorNotification('Lỗi khi tạo đơn giao hàng', getErrorMessage(error));
+              })
+    }, [])
+
     return {
         // State
         ...state,
 
         // Actions
         fetchShipping: fetchData,
-        // rejectOrder,
         refresh,
         reset,
+        createShipping,
+        rejectShippingItem,
 
         // Computed values 
         hasOrders: state.data.length > 0,
