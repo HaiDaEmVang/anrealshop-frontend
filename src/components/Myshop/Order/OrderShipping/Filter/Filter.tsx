@@ -1,7 +1,7 @@
 import { Button, Card, Divider, SegmentedControl, Select, TextInput } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import '@mantine/dates/styles.css';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiCalendar, FiFilter, FiPrinter, FiRefreshCw, FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import type { OrderCountType, PreparingStatus, SearchType, UseOrderParams } from '../../../../../hooks/useOrder';
@@ -12,10 +12,10 @@ export type SortByType = 'newest' | 'oldest';
 
 interface FilterProps {
     initialParams?: UseOrderParams;
-    onFilterChange?: (filters: UseOrderParams) => void;
-    onResetFilter?: () => void;
-    orderCount?: number; 
-}  
+    onFilterChange: (filters: UseOrderParams) => void;
+    onResetFilter: () => void;
+    orderCount?: number;
+}
 
 const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }: FilterProps) => {
     const [orderType, setOrderType] = useState<OrderCountType | null>(initialParams?.orderType || 'all');
@@ -26,48 +26,44 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
         initialParams?.sortBy === 'oldest' ? 'oldest' : 'newest');
     const [preparingStatus, setPreparingStatus] = useState<PreparingStatus>(initialParams?.preparingStatus || 'all');
 
-    const dataParams = useCallback(() => {
-        if (onFilterChange) {
-            onFilterChange({
-                orderType: orderType || 'all',
-                searchType: searchTypeValue,
-                search: searchTerm,
-                sortBy: sortValue || 'newest',
-                confirmSD: formatDateForBe(value[0]),
-                confirmED: formatDateForBe(value[1]),
-                preparingStatus: preparingStatus || 'all',
-            });
-        }
-    }, [orderType, searchTypeValue, searchTerm, sortValue, value, preparingStatus, onFilterChange]);
-
-    useEffect(() => {
-        dataParams();
-    }, [preparingStatus]);
 
     const applyFilters = () => {
-        dataParams();
+        onFilterChange({
+            orderType: orderType || 'all',
+            searchType: searchTypeValue,
+            search: searchTerm,
+            sortBy: sortValue,
+            confirmSD: value[0] ? formatDateForBe(value[0]) : '',
+            confirmED: value[1] ? formatDateForBe(value[1]) : '',
+            preparingStatus: preparingStatus,
+        });
     };
 
+    useEffect(() => {
+        onFilterChange({
+            orderType: orderType || 'all',
+            searchType: searchTypeValue,
+            search: searchTerm,
+            sortBy: sortValue,
+            confirmSD: value[0] ? formatDateForBe(value[0]) : '',
+            confirmED: value[1] ? formatDateForBe(value[1]) : '',
+            preparingStatus: preparingStatus,
+        });
+    }, [preparingStatus])
+
     const resetFilters = () => {
-        setOrderType('all');
-        setValue(getDefaultDateRange_Now_Yesterday());
-        setSearchTerm('');
-        setSearchTypeValue('order_code');
-        setSortValue('newest');
-        setPreparingStatus('all');
         if (onResetFilter) {
             onResetFilter();
         }
+        setOrderType('all');
+        setSearchTypeValue('order_code');
+        setSearchTerm('');
+        setSortValue('newest');
+        setValue(getDefaultDateRange_Now_Yesterday());
+        setPreparingStatus('all');
     };
 
-    const onSearchTypeValueChange = (value: SearchType) => {
-        setSearchTypeValue(value);
-    };
 
-    const onSearchChange = (value: string) => {
-        setSearchTerm(value);
-    };
-   
 
     return (
         <Card shadow="xs" p="md" radius="md" withBorder mb="md">
@@ -107,7 +103,7 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
                         <Select
                             data={searchTypes}
                             value={searchTypeValue}
-                            onChange={(value) => onSearchTypeValueChange(value as SearchType)}
+                            onChange={(value) => setSearchTypeValue(value as SearchType)}
                             styles={{
                                 root: { minWidth: 150, maxWidth: 150 },
                                 input: {
@@ -120,7 +116,7 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
                         <TextInput
                             placeholder={getSearchPlaceholder(searchTypeValue)}
                             value={searchTerm}
-                            onChange={(e) => onSearchChange(e.currentTarget.value)}
+                            onChange={(e) => setSearchTerm(e.currentTarget.value)}
                             rightSection={<FiSearch size={16} />}
                             style={{ flex: 1 }}
                             styles={{
@@ -183,16 +179,16 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
                         {orderCount} đơn hàng
                     </div>
                     <div className="flex gap-2">
-                        { preparingStatus === 'preparing' && (
+                        {preparingStatus === 'preparing' && (
                             <Link to="/myshop/orders/printing">
-                            <Button
-                                variant="light"
-                                // onClick={applyFilters}
-                                leftSection={<FiPrinter size={14} />}
-                            >
-                                In phiếu
-                            </Button>
-                        </Link>
+                                <Button
+                                    variant="light"
+                                    // onClick={applyFilters}
+                                    leftSection={<FiPrinter size={14} />}
+                                >
+                                    In phiếu
+                                </Button>
+                            </Link>
                         )}
                         <Divider orientation="vertical" mx={"sm"} />
                         <Button

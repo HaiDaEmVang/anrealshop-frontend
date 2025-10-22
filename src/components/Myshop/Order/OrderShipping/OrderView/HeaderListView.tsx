@@ -22,7 +22,7 @@ const Header = ({ selectAll, onSelectAll }: HeaderListViewProps) => {
                             </Text>
                         </Group>
                     </div>
-                    <div className="col-span-2">
+                    <div className="col-span-3">
                         <Text size="sm" fw={500}>
                             Đơn vị vận chuyển
                         </Text>
@@ -32,17 +32,12 @@ const Header = ({ selectAll, onSelectAll }: HeaderListViewProps) => {
                             Thời gian xác nhận
                         </Text>
                     </div>
-                    <div className="col-span-2">
-                        <Text size="sm" fw={500}>
+                    <div className="col-span-2" >
+                        <Text size="sm" fw={500} ta="center">
                             Trạng thái
                         </Text>
                     </div>
 
-                    <div className="col-span-1">
-                        <Text size="sm" fw={500}>
-                            Tùy chọn
-                        </Text>
-                    </div>
                 </div>
             </Box>
         </Card>

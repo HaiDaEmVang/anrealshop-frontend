@@ -2,13 +2,13 @@ import { ActionIcon, Avatar, Badge, Box, Card, Checkbox, Group, Text, Tooltip } 
 import { useState } from 'react';
 import { FiClock, FiMessageSquare, FiTrash2, FiUser } from 'react-icons/fi';
 import { getRejectReasons } from '../../../../../data/RejectData';
+import type { PreparingStatus } from '../../../../../hooks/useOrder';
 import { useOrderStatus } from '../../../../../hooks/useOrderStatus';
 import type { OrderItemDto } from '../../../../../types/OrderType';
 import { formatDate } from '../../../../../untils/Untils';
 import RejectModal from '../../../../RejectModal/RejectOrder';
 import Header from './HeaderListView';
 import { SkeletonOrderShip } from './SkeletonOrderShip';
-import type { PreparingStatus } from '../../../../../hooks/useOrder';
 
 interface OrderShippingProductListProps {
     orders: OrderItemDto[];
@@ -43,8 +43,8 @@ const OrderShippingProductList = ({
         }
     }
 
-    const openRejectModal = (orderId: string, rejectType: 'order' | 'shipping') => {
-        setCurrentOrderId(orderId);
+    const openRejectModal = (shippingId: string, rejectType: 'order' | 'shipping') => {
+        setCurrentOrderId(shippingId);
         setCurrentRejectType(rejectType);
         setRejectModalOpen(true);
     };
@@ -101,6 +101,23 @@ const OrderShippingProductList = ({
                                                 </Group>
 
                                                 <Group>
+                                                    {order.orderStatus === 'PREPARING' && (
+                                                        <>
+                                                            <div className="col-span-1 text-center">
+                                                                <Tooltip label={"Hủy đơn vận"}>
+                                                                    <ActionIcon
+                                                                        color="red"
+                                                                        variant="subtle"
+                                                                        onClick={() => openRejectModal(order.shippingId, order.orderStatus !== 'PREPARING' ? 'shipping' : 'order')}
+                                                                    >
+                                                                        <FiTrash2 size={16} />
+                                                                    </ActionIcon>
+                                                                </Tooltip>
+                                                            </div>
+                                                            <Text size="sm" c="dimmed">|</Text>
+                                                        </>
+                                                    )}
+                                                    
                                                     <Text size="sm" c="dimmed">
                                                         Mã đơn hàng:
                                                         <Text component="span" fw={500} className='ml-1 hover:text-primary cursor-pointer !underline'>
@@ -139,13 +156,13 @@ const OrderShippingProductList = ({
                                                             </div>
                                                         </div>
 
-                                                        <div className="col-span-2">
+                                                        <div className="col-span-3">
                                                             <div className="h-full flex flex-col">
                                                                 <div className="text-sm font-medium mb-1">
                                                                     {order.shippingMethod || 'Nhanh'}
                                                                 </div>
                                                                 <div className="text-xs text-gray-500">
-                                                                    {order.shippingId && `Mã: ${order.shippingId}`}
+                                                                    {order.shippingId ? `Mã: ${order.shippingId}` : 'Lưu ý: Tạo đơn để lấy mã'}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -157,7 +174,7 @@ const OrderShippingProductList = ({
                                                             </Text>
                                                         </div>
 
-                                                        <div className="col-span-2">
+                                                        <div className="col-span-2 flex items-center justify-center" >
                                                             <Badge
                                                                 color={getStatusColor(product.orderStatus)}
                                                                 variant="light"
@@ -165,17 +182,19 @@ const OrderShippingProductList = ({
                                                                 {getStatusLabel(order.orderStatus)}
                                                             </Badge>
                                                         </div>
-                                                        <div className="col-span-1 text-center">
-                                                            <Tooltip label={product.orderStatus === 'PREPARING' ? "Hủy đơn" : "Hủy đơn vận"}>
-                                                                <ActionIcon
-                                                                    color="red"
-                                                                    variant="subtle"
-                                                                    onClick={() => openRejectModal(product.orderItemId, product.orderStatus !== 'PREPARING' ? 'shipping' : 'order')}
-                                                                >
-                                                                    <FiTrash2 size={16} />
-                                                                </ActionIcon>
-                                                            </Tooltip>
-                                                        </div>
+                                                        {/* {product.orderStatus !== "SHIPPING" && (
+                                                            <div className="col-span-1 text-center">
+                                                                <Tooltip label={product.orderStatus === 'PREPARING' ? "Hủy đơn" : "Hủy đơn vận"}>
+                                                                    <ActionIcon
+                                                                        color="red"
+                                                                        variant="subtle"
+                                                                        onClick={() => openRejectModal(product.orderItemId, product.orderStatus !== 'PREPARING' ? 'shipping' : 'order')}
+                                                                    >
+                                                                        <FiTrash2 size={16} />
+                                                                    </ActionIcon>
+                                                                </Tooltip>
+                                                            </div>
+                                                        )} */}
                                                     </div>
                                                 </Box>
                                             </Box>

@@ -76,6 +76,7 @@ export const API_ENDPOINTS = {
     GET_SHIPPING_FEE_FORCART: '/shipping/fee-for-cart',
     CREATE_SHIPMENTS: '/shipping/create-shipments',
     MYSHOP_LIST: '/shipping/my-shop',
+    MYSHOP_REJECT: (shippingId: string) => `/shipping/my-shop/reject-shipping/${shippingId}`,
   },
   
   ADDRESS: {
