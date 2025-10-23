@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import type { PreparingShippingStatus } from '../components/Myshop/Order/Data';
 import showErrorNotification from '../components/Toast/NotificationError';
 import type { TypeMode } from '../constant';
-import { ShippingService } from '../service/ShippingService';
 import type { CreateShipmentRequest, MyShopShippingListResponse, ShippingItems } from '../types/ShipmentType';
 import { getErrorMessage } from '../untils/ErrorUntils';
 import type { SearchType } from './useOrder';
@@ -55,7 +54,7 @@ export const useShipping = (options: UseOptions = {}) => {
         }));
         try {
             console.log('Fetching shipping data with params:', params);
-            const response: MyShopShippingListResponse = await ShippingService.getMyShopShipping(params);
+            const response: MyShopShippingListResponse = await ShipmentService.getMyShopShipping(params);
             const orderItems = Array.isArray(response.orderItemDtoSet) && response.orderItemDtoSet.length === 1 && response.orderItemDtoSet[0] === null ? [] : response.orderItemDtoSet;
             setState(prev => ({
                 ...prev,
@@ -113,7 +112,7 @@ export const useShipping = (options: UseOptions = {}) => {
     // ACTION
 
     const rejectShippingItem = useCallback(async(shippingId: string, reason: string) => {
-        return await ShippingService.rejectMyshopShipping(shippingId, reason)
+        return await ShipmentService.rejectMyshopShipping(shippingId, reason)
             .then(() => {
                 showSuccessNotification('Hủy đơn hàng thành công', 'Đơn hàng đã được hủy thành công.');
             })
