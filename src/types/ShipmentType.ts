@@ -1,6 +1,11 @@
 import type { CartItemDto } from "./CartType";
 import type { ShopDto } from "./ShopType";
 
+
+export type ShippingStatus = 'ORDER_CREATED' | 'WAITING_FOR_PICKUP' | 'PICKED_UP' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'DELIVERY_FAILED' | 'RETURNED';
+   
+
+
 export interface CartShippingFee {
     shopId: string;
     fee: number;
@@ -18,7 +23,7 @@ export interface CheckoutInfoDto {
     serviceName: string;
 }
 
-export type PaymentMethodId = 'cod' | 'bank_transfer' | 'zalopay' | 'momo' | 'vnpay';
+export type PaymentMethodId = 'cash_on_delivery' | 'bank_transfer' | 'zalopay' | 'momo' | 'vnpay';
 
 export interface CreateShipmentRequest {
     shopOrderIds: string[],
@@ -59,4 +64,17 @@ export type ShippingItems = {
 
   confirmationTime: string;
   isPrinted: boolean;
+}
+
+// history
+
+export type HistoryShipping = {
+    id: string;
+    status: ShippingStatus;
+    notes: HistoryShippingNote[];
+}
+
+export type HistoryShippingNote = {
+    content: string;
+    timestamp: Date|string;
 }

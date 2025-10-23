@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useMemo } from "react";
 import type { PreparingShippingStatus } from '../components/Myshop/Order/Data';
 import showErrorNotification from '../components/Toast/NotificationError';
+import showSuccessNotification from '../components/Toast/NotificationSuccess';
 import type { TypeMode } from '../constant';
+import { ShipmentService } from '../service/ShipmentService';
 import type { CreateShipmentRequest, MyShopShippingListResponse, ShippingItems } from '../types/ShipmentType';
 import { getErrorMessage } from '../untils/ErrorUntils';
 import type { SearchType } from './useOrder';
-import showSuccessNotification from '../components/Toast/NotificationSuccess';
-import { ShipmentService } from '../service/ShipmentService';
 
 export type shipParams = {
     page?: number;
@@ -111,7 +112,7 @@ export const useShipping = (options: UseOptions = {}) => {
 
     // ACTION
 
-    const rejectShippingItem = useCallback(async(shippingId: string, reason: string) => {
+    const rejectShippingItem = useCallback(async (shippingId: string, reason: string) => {
         return await ShipmentService.rejectMyshopShipping(shippingId, reason)
             .then(() => {
                 showSuccessNotification('Hủy đơn hàng thành công', 'Đơn hàng đã được hủy thành công.');
@@ -121,15 +122,17 @@ export const useShipping = (options: UseOptions = {}) => {
             });
     }, [])
 
-    const createShipping =  useCallback(async(createShipmentRequest: CreateShipmentRequest) => {
+    const createShipping = useCallback(async (createShipmentRequest: CreateShipmentRequest) => {
         return await ShipmentService.createShipments(createShipmentRequest)
-              .then(() => {
+            .then(() => {
                 showSuccessNotification('Tạo đơn giao hàng thành công', 'Đơn giao hàng đã được tạo thành công.');
-              })
-              .catch((error) => {
+            })
+            .catch((error) => {
                 showErrorNotification('Lỗi khi tạo đơn giao hàng', getErrorMessage(error));
-              })
+            })
     }, [])
+    // status
+    const { getShippingStatusLabel } = useShippingStatusLabel();
 
     return {
         // State
@@ -141,6 +144,9 @@ export const useShipping = (options: UseOptions = {}) => {
         reset,
         createShipping,
         rejectShippingItem,
+        
+        // status
+        getShippingStatusLabel,
 
         // Computed values 
         hasOrders: state.data.length > 0,
@@ -149,3 +155,36 @@ export const useShipping = (options: UseOptions = {}) => {
         hasPrevPage: state.currentPage > 1,
     };
 };
+
+
+
+
+export type ShippingStatus = 'ORDER_CREATED' | 'WAITING_FOR_PICKUP' | 'PICKED_UP' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'DELIVERY_FAILED' | 'RETURNED';
+
+export const useShippingStatusLabel = () => {
+    return useMemo(() => ({
+        getShippingStatusLabel: (statusId: string) => {
+            switch (statusId.toLowerCase()) {
+                case 'order_created':
+                    return 'Đơn hàng đã được tạo';
+                case 'waiting_for_pickup':
+                    return 'Chờ lấy hàng';
+                case 'picked_up':
+                    return 'Đã lấy hàng';
+                case 'in_transit':
+                    return 'Đang vận chuyển';
+                case 'out_for_delivery':
+                    return 'Đang giao hàng';
+                case 'delivered':
+                    return 'Đã giao hàng';
+                case 'delivery_failed':
+                    return 'Giao hàng thất bại';
+                case 'returned':
+                    return 'Đã trả hàng';
+                default:
+                    return 'Không xác định';
+            }
+        }
+    }), []);
+};
+
