@@ -2,6 +2,7 @@ import { Button, Card, Divider, Group, Radio, Select, Stack, Tabs, Text, Textare
 import { useState } from 'react';
 import { BsFileSpreadsheet } from 'react-icons/bs';
 import { FiDownload, FiFileText, FiPrinter } from 'react-icons/fi';
+import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
 interface PrintInfoFormProps {
     selectedShipping: string[];
@@ -22,7 +23,8 @@ const PrintInfoForm = ({
 
     const countOrders = selectedShipping.length;
     const handleAction = () => {
-        if (onPrint) onPrint();
+        // if (onPrint) onPrint();
+        showSuccessNotification("Thông báo hệ thống", 'Chức năng đang được phát triển!');
     };
 
     const getActionButtonText = () => {

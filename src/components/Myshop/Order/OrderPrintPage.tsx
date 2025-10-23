@@ -70,7 +70,7 @@ const OrderPrintPage = () => {
 
     useEffect(() => {
         loadShipping();
-    }, [activePage, params.preparingStatus, loadShipping]);
+    }, [activePage, params.preparingStatus]);
 
     const handleSelectAll = () => {
         setSelectedShipping(selectAll ? [] : shippingLists.flatMap(order => order.shippingId));

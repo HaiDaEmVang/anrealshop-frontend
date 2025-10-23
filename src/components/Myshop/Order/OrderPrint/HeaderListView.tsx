@@ -8,7 +8,7 @@ type HeaderListViewProps = {
 const HeaderListView = ({ selectAll, onSelectAll }: HeaderListViewProps) => {
     return (
         <Card withBorder p={0} className="!bg-gray-50 mb-3" radius="md">
-            <Box className="px-4 py-3">
+            <Box className="px-2 py-3">
                 <div className="grid grid-cols-12 gap-3">
                     <div className="col-span-3">
                         <Group gap="sm">
