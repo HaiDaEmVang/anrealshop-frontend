@@ -44,7 +44,7 @@ export const Header = () => {
         if (!isAuthenticated && !user) {
             dispatch(fetchCurrentUser());
         }
-    }, [dispatch, isAuthenticated]);
+    }, [dispatch, isAuthenticated, user]);
 
     const navItems: NavItem[] = [
         { label: 'Sản phẩm', link: '/products' },
