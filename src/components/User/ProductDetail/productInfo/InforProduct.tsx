@@ -28,7 +28,6 @@ import ProductDescription from './ProductDescription';
 import ProductPriceAndAttributes from './ProductPriceAndAttributes';
 import ProductShippingInfo from './ProductShippingInfo';
 import { ShopInfo } from './ShopInfo';
-import { useState } from 'react';
 
 
 

@@ -1,34 +1,27 @@
 import {
     ActionIcon,
-    Button,
     FileButton,
     Group,
-    Image,
     Menu,
     Paper,
-    Progress,
-    ScrollArea,
     Text,
     Textarea,
     Tooltip
 } from '@mantine/core';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     FiChevronDown,
     FiImage,
     FiMessageSquare,
     FiSend,
     FiSmile,
-    FiVideo,
-    FiX,
-    FiEye,
-    FiUploadCloud
+    FiVideo
 } from 'react-icons/fi';
 import type { Attachment, Conversation, Message } from '../../../types/MessageTypes';
+import FileReview from './FileReview';
 import MessageHeader from './MessageHeader';
 import MessageView from './MessageView';
 import ModalReview from './ModalReview';
-import FileReview from './FileReview';
 
 interface ContentMessageProps {
     selectedConversation: Conversation | null;

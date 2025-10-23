@@ -1,7 +1,8 @@
-import { useRef, useEffect, useState } from 'react';
 import { Container } from '@mantine/core';
-import { motion, AnimatePresence } from 'framer-motion';
+import type { EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
 
 interface HeroSlide {
     id: number;
@@ -51,9 +52,13 @@ export const HeroSection = () => {
         },
     ];
     const [selectedIndex, setSelectedIndex] = useState(0);
-    const [emblaRef, emblaApi] = useEmblaCarousel(
-        { loop: false, skipSnaps: false, draggable: true } // Set loop to false to detect end of slides
-    );
+    const carouselOptions: Partial<EmblaOptionsType> = {
+        loop: true,
+        skipSnaps: false,
+        dragFree: true
+    };
+
+    const [emblaRef, emblaApi] = useEmblaCarousel(carouselOptions);
     const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
     const isLastSlide = selectedIndex === heroSlides.length - 1;
     const scrollTimeout = useRef<NodeJS.Timeout | null>(null);

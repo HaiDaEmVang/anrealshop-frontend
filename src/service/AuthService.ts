@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { API_ENDPOINTS, BASE_API_URL } from '../constant';
+import { API_ENDPOINTS } from '../constant';
 import type { LoginRequest, LoginResponse } from '../types/AuthType';
 import type { RegisterRequest, UserDto } from '../types/UserType';
-import { axiosInstance, axiosNoAuthInstance } from './AxiosInstant';
+import { axiosNoAuthInstance } from './AxiosInstant';
 
 const login = async (loginRequest: LoginRequest): Promise<LoginResponse> => {
   const response = await axiosNoAuthInstance.post<LoginResponse>(

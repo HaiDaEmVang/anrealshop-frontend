@@ -1,11 +1,11 @@
 import { useForm } from '@mantine/form';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import showErrorNotification from '../components/Toast/NotificationError';
 import showSuccessNotification from '../components/Toast/NotificationSuccess';
 import { defaultProductDescriptionHtml } from '../data/InitData';
 import ProductsService from '../service/ProductsService';
 import type { ProductCreateRequest } from '../types/ProductType';
-import { useParams } from 'react-router-dom';
 
 
 const defaultInitialValues: ProductCreateRequest = {
@@ -26,7 +26,7 @@ const defaultInitialValues: ProductCreateRequest = {
     media: []
 };
 
-export const useProductForm = ( isEditMode = false ) => {
+export const useProductForm = (isEditMode = false) => {
 
     const { id } = useParams();
     const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +114,7 @@ export const useProductForm = ( isEditMode = false ) => {
         validateInputOnChange: ['name'],
     });
 
-    
+
 
     // Fetch product data if in edit mode
     useEffect(() => {
@@ -130,7 +130,7 @@ export const useProductForm = ( isEditMode = false ) => {
                     'Lỗi tải dữ liệu',
                     error.message || 'Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.'
                 );
-            } 
+            }
         }
 
         fetchProductData();
@@ -191,6 +191,7 @@ export const useProductForm = ( isEditMode = false ) => {
     return {
         form,
         handleSubmit,
+        clearForm,
         isLoading,
         isEditMode
     };

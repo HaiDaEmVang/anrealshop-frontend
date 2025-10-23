@@ -1,18 +1,16 @@
-import React from 'react';
 import {
   Box,
-  Paper,
-  SimpleGrid,
-  Text,
+  Center,
+  Group,
   LoadingOverlay,
   Pagination,
-  Group,
-  Select,
-  Center,
-  Stack
+  Paper,
+  SimpleGrid,
+  Stack,
+  Text
 } from '@mantine/core';
+import React from 'react';
 import { type Product } from '../../../data/FilterData';
-import ProductCard from '../Common/ProductCard';
 
 interface ProductListProps {
   products: Product[];
@@ -24,18 +22,18 @@ interface ProductListProps {
   onItemsPerPageChange?: (value: string | null) => void;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ 
-  products, 
+const ProductList: React.FC<ProductListProps> = ({
+  products,
   loading,
   totalProducts = 0,
   currentPage = 1,
-  onPageChange = () => {},
+  onPageChange = () => { },
   itemsPerPage = 5,
-  onItemsPerPageChange = () => {}
+  // onItemsPerPageChange = () => {}
 }) => {
   // Tính toán tổng số trang
   const totalPages = Math.ceil(totalProducts / itemsPerPage) || 1;
-  
+
   return (
     <Box pos="relative">
       <LoadingOverlay visible={loading} />
@@ -45,13 +43,14 @@ const ProductList: React.FC<ProductListProps> = ({
           {/* Danh sách sản phẩm */}
           <SimpleGrid cols={{ base: 2, sm: 3, md: 4 }} spacing="md">
             {products.map(product => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
+              // <ProductCard
+              //   key={product.id}
+              //   product={product}
+              // />
+              <div key={product.id}>fix no nghe hai </div>
             ))}
           </SimpleGrid>
-          
+
           {/* Phân trang */}
           {totalProducts > itemsPerPage && (
             <Box className="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between">
@@ -60,7 +59,7 @@ const ProductList: React.FC<ProductListProps> = ({
                   Hiển thị {Math.min((currentPage - 1) * itemsPerPage + 1, totalProducts)} - {Math.min(currentPage * itemsPerPage, totalProducts)} trong tổng số {totalProducts} sản phẩm
                 </Text>
               </Group>
-              
+
               <Center >
                 <Pagination
                   value={currentPage}

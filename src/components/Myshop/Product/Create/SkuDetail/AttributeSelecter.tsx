@@ -55,7 +55,7 @@ const AttributeSelecter = ({
         const newAttribute: ProductAttribute = {
             attributeKeyName: selectedAttr.attributeKeyName,
             attributeKeyDisplay: selectedAttr.attributeKeyDisplay,
-            values: []
+            values: new Set<string>(),
         };
 
         const updatedAttributes = [...attributes, newAttribute];
@@ -65,7 +65,7 @@ const AttributeSelecter = ({
 
     const updateAttributeValues = useCallback((attributeId: string, values: string[]) => {
         const updatedAttributes = attributes.map(attr =>
-            attr.attributeKeyName === attributeId ? { ...attr, values } : attr
+            attr.attributeKeyName === attributeId ? { ...attr, values: new Set(values) } : attr
         );
         onAttributesChange(updatedAttributes);
     }, [attributes, onAttributesChange]);
@@ -77,7 +77,7 @@ const AttributeSelecter = ({
 
     const getValueSuggestions = useCallback((classificationType: string) => {
         const attribute = attributeForSku.find(attr => attr.attributeKeyDisplay === classificationType);
-        return attribute?.values.map(value => ({ value, label: value })) || [];
+        return Array.from(attribute?.values || []).map(value => ({ value, label: value })) || [];
     }, [attributeForSku]);
 
     return (
@@ -121,7 +121,7 @@ const AttributeSelecter = ({
                         data={getValueSuggestions(attribute.attributeKeyDisplay)}
                         placeholder={`Chọn ${attribute.attributeKeyDisplay.toLowerCase()}`}
                         searchable
-                        value={attribute.values}
+                        value={Array.from(attribute.values)}
                         onChange={(values) => updateAttributeValues(attribute.attributeKeyName, values)}
                         clearable
                     />

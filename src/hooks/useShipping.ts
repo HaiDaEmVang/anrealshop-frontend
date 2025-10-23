@@ -54,7 +54,7 @@ export const useShipping = (options: UseOptions = {}) => {
             error: null
         }));
         try {
-            console.log('Fetching shipping data with params:', params);
+            console.log('Fetching shipping data with params:', mode, params);
             const response: MyShopShippingListResponse = await ShipmentService.getMyShopShipping(params);
             const orderItems = Array.isArray(response.orderItemDtoSet) && response.orderItemDtoSet.length === 1 && response.orderItemDtoSet[0] === null ? [] : response.orderItemDtoSet;
             setState(prev => ({

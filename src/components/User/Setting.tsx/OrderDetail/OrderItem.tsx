@@ -1,7 +1,5 @@
+import { Badge, Box, Divider, Group, Image, Text } from '@mantine/core';
 import React from 'react';
-import { Box, Group, Image, Text, Badge, Divider } from '@mantine/core';
-import { Link } from 'react-router-dom';
-import { formatDate, formatPrice } from '../../../../untils/Untils';
 import { useOrderStatus } from '../../../../hooks/useOrderStatus';
 import type { ShippingOrderItemDto } from '../../../../types/OrderType';
 
@@ -44,7 +42,8 @@ const OrderItem: React.FC<OrderItemProps> = ({ item }) => {
                     <Text size="sm" fw={500} mb="xs">Trạng thái vận chuyển:</Text>
                     {item.shippingHistory.map((history, idx) => (
                         <Text key={idx} size="xs" color="dimmed" mb={4}>
-                            {formatDate(history.timestamp.toString())}: {history.title}
+                            {/* {formatDate(history.timestamp.toString())}: {history.title} */}
+                            fix nhe hai {history.id}
                         </Text>
                     ))}
                 </Box>

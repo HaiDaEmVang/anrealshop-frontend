@@ -9,13 +9,13 @@ import {
   Title,
   type NumberInputProps
 } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 interface ShippingProps {
-  weightProps: NumberInputProps, 
-  heightProps: NumberInputProps,  
-  widthProps: NumberInputProps, 
+  weightProps: NumberInputProps,
+  heightProps: NumberInputProps,
+  widthProps: NumberInputProps,
   lengthProps: NumberInputProps
 }
 

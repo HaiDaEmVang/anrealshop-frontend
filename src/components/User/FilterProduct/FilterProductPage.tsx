@@ -15,7 +15,6 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { mockFeaturedProducts, type Product } from '../../../data/FilterData';
 
-import ProductCard from '../Common/ProductCard';
 import Breadcrumbs from './Breadcrumbs';
 import Filter from './Filter';
 import ModalFilter from './ModalFilter';
@@ -93,12 +92,12 @@ const fetchProductsFromAPI = async (params: ApiFilterParams): Promise<ApiRespons
             filtered.sort((a, b) => Number(b.id) - Number(a.id));
           }
       }
-      
+
       const total = filtered.length;
       const startIndex = (params.page - 1) * params.limit;
       const endIndex = startIndex + params.limit;
       const paginatedData = filtered.slice(startIndex, endIndex);
-      
+
       resolve({ data: paginatedData, total });
     }, 700);
   });
@@ -107,7 +106,7 @@ const fetchProductsFromAPI = async (params: ApiFilterParams): Promise<ApiRespons
 const FilterProductPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const productsPerPage = 12;
 
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000000]);
@@ -117,8 +116,8 @@ const FilterProductPage: React.FC = () => {
   const [selectedOrigins, setSelectedOrigins] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number | null>(null); // Added rating state
   const [sortBy, setSortBy] = useState<string>('newest');
-  
-  
+
+
   const [allFiltersOpened, setAllFiltersOpened] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -138,7 +137,7 @@ const FilterProductPage: React.FC = () => {
     if (sortBy !== 'newest') searchParams.set('sort', sortBy);
     if (currentPage > 1) searchParams.set('page', currentPage.toString());
     navigate({ search: searchParams.toString() }, { replace: true });
-  }, [ priceRange, selectedBrands, selectedColors, selectedSizes, selectedOrigins, selectedRating, sortBy, currentPage, navigate]);
+  }, [priceRange, selectedBrands, selectedColors, selectedSizes, selectedOrigins, selectedRating, sortBy, currentPage, navigate]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -164,7 +163,7 @@ const FilterProductPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [ priceRange, selectedBrands, selectedColors, selectedSizes, selectedOrigins, selectedRating, sortBy, currentPage, productsPerPage]);
+  }, [priceRange, selectedBrands, selectedColors, selectedSizes, selectedOrigins, selectedRating, sortBy, currentPage, productsPerPage]);
 
 
   useEffect(() => {
@@ -183,7 +182,7 @@ const FilterProductPage: React.FC = () => {
     setCurrentPage(Number(searchParams.get('page') || 1));
     setInitialLoadComplete(true);
   }, [location.search]);
-  
+
   useEffect(() => {
     if (initialLoadComplete) {
       fetchData();
@@ -199,7 +198,7 @@ const FilterProductPage: React.FC = () => {
       case 'openAllFilters':
         setAllFiltersOpened(true);
         return; // No page reset needed
-      
+
       case 'resetAll':
         setPriceRange([0, 5000000]);
         setSelectedBrands([]);
@@ -209,7 +208,7 @@ const FilterProductPage: React.FC = () => {
         setSelectedRating(null); // Added rating reset
         setSortBy('newest');
         break;
-        
+
       case 'addBrand':
         if (value && !selectedBrands.includes(value)) setSelectedBrands(prev => [...prev, value]);
         break;
@@ -230,7 +229,7 @@ const FilterProductPage: React.FC = () => {
         break;
       // Cases for addColor/removeColor are here if needed by generic handlers,
       // but ModalFilter uses direct state setters.
-      case 'addColor': 
+      case 'addColor':
         if (value && !selectedColors.includes(value)) setSelectedColors(prev => [...prev, value]);
         break;
       case 'removeColor':
@@ -250,14 +249,14 @@ const FilterProductPage: React.FC = () => {
 
   const openAllFilters = () => handleChangeFilters('openAllFilters');
   const resetAllFiltersAction = () => handleChangeFilters('resetAll');
-  
+
   const removeFilter = (type: string, value: string) => handleChangeFilters(`remove${type.charAt(0).toUpperCase() + type.slice(1)}`, value);
   const addFilter = (type: string, value: string) => handleChangeFilters(`add${type.charAt(0).toUpperCase() + type.slice(1)}`, value);
   const handleSortChange = (value: string) => handleChangeFilters('sort', value);
 
   return (
     <Container size="xl" className="py-6">
-      <Breadcrumbs  />
+      <Breadcrumbs />
 
       <Filter
         selectedBrands={selectedBrands}
@@ -271,18 +270,18 @@ const FilterProductPage: React.FC = () => {
         onSortChange={handleSortChange}
       />
 
-      
+
       <Box pos="relative">
         <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
         {!loading && products.length > 0 ? (
           <Box>
             <Grid gutter="md">
-                {products.map((product) => (
-                  <Grid.Col key={product.id} span={{ base: 6, sm: 4, md: 3, lg: 3 }}>
-                    <ProductCard product={product} />
-                  </Grid.Col>
-                ))}
-              </Grid>
+              {products.map((product) => (
+                <Grid.Col key={product.id} span={{ base: 6, sm: 4, md: 3, lg: 3 }}>
+                  {/* <ProductCard product={product} /> */} fix no nghe hai
+                </Grid.Col>
+              ))}
+            </Grid>
             {totalPages > 1 && (
               <Box className="flex justify-center mt-8">
                 <Pagination
@@ -316,24 +315,24 @@ const FilterProductPage: React.FC = () => {
       <ModalFilter
         opened={allFiltersOpened}
         onClose={() => setAllFiltersOpened(false)}
-        
+
         initialPriceRange={priceRange}
         initialSelectedBrands={selectedBrands}
         initialSelectedColors={selectedColors}
         initialSelectedSizes={selectedSizes}
         initialSelectedOrigins={selectedOrigins}
-        initialSelectedRating={selectedRating} 
-        
+        initialSelectedRating={selectedRating}
+
         setPriceRange={setPriceRange}
         setSelectedBrands={setSelectedBrands}
         setSelectedColors={setSelectedColors}
         setSelectedSizes={setSelectedSizes}
         setSelectedOrigins={setSelectedOrigins}
-        setSelectedRating={setSelectedRating} 
-        
+        setSelectedRating={setSelectedRating}
+
         onApplyFilters={() => {
           if (currentPage !== 1) {
-            setCurrentPage(1); 
+            setCurrentPage(1);
           }
           setAllFiltersOpened(false);
         }}

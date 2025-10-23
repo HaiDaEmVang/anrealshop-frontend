@@ -42,11 +42,11 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
                         uniqueAttributes.push({
                             attributeKeyName: attr.attributeKeyName,
                             attributeKeyDisplay: attr.attributeKeyDisplay,
-                            values: [attr.values[0]]
+                            values: new Set(attr.values),
                         });
                     } else {
-                        if (!existingAttr.values.includes(attr.values[0])) {
-                            existingAttr.values.push(attr.values[0]);
+                        if (!existingAttr.values.has(Array.from(attr.values)[0])) {
+                            existingAttr.values.add(Array.from(attr.values)[0]);
                         }
                     }
                 });
@@ -67,7 +67,7 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
     }), [form.values.name, form.values.categoryPath, form.values.price, form.values.quantity]);
 
     const generateSkuCombinations = useCallback(() => {
-        const activeAttributes = attributes.filter(attr => attr.values.length > 0);
+        const activeAttributes = attributes.filter(attr => attr.values.size > 0);
         if (activeAttributes.length === 0) return [];
 
         const keyNameToDisplayMap = new Map(
@@ -78,7 +78,7 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
         const combinations = (index = 0, current: Record<string, string> = {}): Record<string, string>[] => {
             if (index >= activeAttributes.length) return [current];
             const attr = activeAttributes[index];
-            return attr.values.flatMap(value =>
+            return Array.from(attr.values).flatMap(value =>
                 combinations(index + 1, { ...current, [attr.attributeKeyName]: value })
             );
         };
@@ -96,7 +96,7 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
             const attributesArray: ProductAttribute[] = Object.entries(combo).map(([key, value]) => ({
                 attributeKeyDisplay: keyNameToDisplayMap.get(key) || key,
                 attributeKeyName: key,
-                values: [value]
+                values: new Set([value])
             }));
             return {
                 sku: skuCode,
@@ -140,7 +140,7 @@ const SkuDetails = ({ form, attributeForSkuData, setIsShowQuantity }: SkuDetails
         const updatedSkus = form.values.productSkus.map(sku => {
             const hasMatchingAttribute = sku.attributes.some(attr =>
                 attr.attributeKeyName === attributes.find(a => a.attributeKeyDisplay === attributeName)?.attributeKeyName &&
-                attr.values[0] === attributeValue
+                attr.values.has(attributeValue)
             );
 
             if (hasMatchingAttribute) {
