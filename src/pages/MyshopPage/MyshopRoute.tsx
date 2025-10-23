@@ -6,7 +6,7 @@ import { fetchCurrentUser } from '../../store/authSlice';
 
 const ShopAdminHeader = lazy(() => import('../../components/header/ShopAdminHeader'));
 const MessagePage = lazy(() => import('../../components/Myshop/Message/MessagePage'));
-const OrderDetailComp = lazy(() => import('../../components/Myshop/Order/OrderDetailPage'));
+// const OrderDetailComp = lazy(() => import('../../components/Myshop/Order/OrderDetailPage'));
 const OrderPage = lazy(() => import('../../components/Myshop/Order/OrderPage'));
 const CreateProduct = lazy(() => import('../../components/Myshop/Product/Create/CreateProduct'));
 const ProductForm = lazy(() => import('../../components/Myshop/Product/Create/CreateProduct'));
@@ -42,7 +42,7 @@ const MyshopPage = () => {
           <Route path="products/create" element={<CreateProduct />} />
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="orders" element={<OrderPage />} />
-          <Route path="orders/:shopOrderId" element={<OrderDetailComp />} />
+          {/* <Route path="orders/:shopOrderId" element={<OrderDetailComp />} /> */}
           <Route path="orders/shipping" element={<OrderShippingPage />} />
           <Route path="orders/printing" element={<OrderPrintPage />} />
           <Route path="messages" element={<MessagePage />} />

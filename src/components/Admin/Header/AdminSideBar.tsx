@@ -1,4 +1,4 @@
-import { Box, Divider, Drawer, NavLink, ScrollArea, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
+import { Box, Divider, Drawer, NavLink, ScrollArea, Text, ThemeIcon } from '@mantine/core';
 import React, { useState } from 'react';
 import {
   FiBarChart2,
@@ -42,7 +42,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active, onClick, chi
         childrenOffset={28}
         my={4}
         onClick={onClick}
-        className='rounded-md hover:bg-gray-100 transition-colors duration-200' 
+        className='rounded-md hover:bg-gray-100 transition-colors duration-200'
       >
         {children}
       </NavLink>
@@ -57,19 +57,19 @@ interface AdminSidebarProps {
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
   const location = useLocation();
-  
+
   const navItems = [
     { icon: <FiHome size={16} />, label: 'Tổng quan', path: '/admin/dashboard' },
     { icon: <FiLayers size={16} />, label: 'Danh mục', path: '/admin/categories' },
     { icon: <FiUsers size={16} />, label: 'Người dùng', path: '/admin/users' },
-    { 
-      icon: <FiPlusCircle size={16} />, 
-      label: 'Đăng ký shop', 
+    {
+      icon: <FiPlusCircle size={16} />,
+      label: 'Đăng ký shop',
       path: '/admin/shop-registrations'
     },
-    { 
-      icon: <FiCheckSquare size={16} />, 
-      label: 'Duyệt sản phẩm', 
+    {
+      icon: <FiCheckSquare size={16} />,
+      label: 'Duyệt sản phẩm',
       path: '/admin/product-approvals'
     },
     { icon: <FiShoppingCart size={16} />, label: 'Đơn hàng', path: '/admin/orders' },
@@ -83,7 +83,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
       w={250}
       h="calc(100vh - 65px)"
       bg="white"
-      style={{ 
+      style={{
         borderRight: '1px solid #eaeaea',
         position: 'sticky',
         top: '65px',
@@ -91,7 +91,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
         zIndex: 2,
         overflow: 'hidden'
       }}
-      p="xs" 
+      p="xs"
       className="hidden md:block"
     >
       <ScrollArea h="100vh" scrollbarSize={6} offsetScrollbars>
@@ -99,14 +99,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
           <Text fw={700} size="sm" c="dimmed" mb="xs" px="md">
             QUẢN TRỊ HỆ THỐNG
           </Text>
-          
+
           {navItems.map((item) => (
             <NavItem
               key={item.path}
               icon={item.icon}
               label={item.label}
               to={item.path}
-              active={location.pathname === item.path} 
+              active={location.pathname === item.path}
             />
           ))}
         </Box>
@@ -153,16 +153,16 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ opened, onClose }) => {
           </ThemeIcon>
           Quay lại cửa hàng
         </Link>
-        <div 
+        <div
           className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100"
           onClick={onClose}
         >
           <ThemeIcon variant="light" color="red" size="sm">
             <FiLogOut size={16} />
           </ThemeIcon>
-           Đăng xuất
+          Đăng xuất
         </div>
-         
+
       </div>
     </Drawer>
   );

@@ -120,10 +120,12 @@ const OrderHistory = () => {
     }, [rejectShopOrder, loadOrders]);
 
     const handleBuyAgain = (productIds: string[]) => {
+        console.log('Buy again products:', productIds);
         showSuccessNotification("Hệ thống", "Chức năng mua lại đang được phát triển")
     };
 
     const handleReview = (productId: string) => {
+        console.log('Review product:', productId);
         showSuccessNotification("Hệ thống", "Chức năng mua lại đang được phát triển")
     };
 
@@ -161,6 +163,7 @@ const OrderHistory = () => {
                                 onCancelOrder={handleCancelOrder}
                                 onBuyAgain={handleBuyAgain}
                                 onReview={handleReview}
+                                activeStatus={activeStatus}
                             />
                         ))}
                     </Stack>

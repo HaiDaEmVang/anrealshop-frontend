@@ -1,5 +1,5 @@
 import { ActionIcon, Box, Group, Image, LoadingOverlay, ScrollArea, Stack } from '@mantine/core';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FiChevronLeft, FiChevronRight, FiX } from 'react-icons/fi';
 
@@ -11,9 +11,9 @@ interface ImageProductProps {
   setSelectedImage: (image: number) => void;
 }
 
-const ImageProduct = ({ 
-  media, 
-  thumbnailUrl, 
+const ImageProduct = ({
+  media,
+  thumbnailUrl,
   productName,
   selectedImage,
   setSelectedImage
@@ -21,18 +21,18 @@ const ImageProduct = ({
   const [loading, setLoading] = useState(true);
   const [preloadedImages, setPreloadedImages] = useState<string[]>([]);
   const [zoomedView, setZoomedView] = useState(false);
-  
+
 
   useEffect(() => {
     setLoading(true);
-    
+
     const img = new window.Image();
     img.src = media[0] || thumbnailUrl;
     img.onload = () => {
       setLoading(false);
       setPreloadedImages(prev => [...prev, img.src]);
     };
-    
+
     media.slice(1).forEach((imageUrl) => {
       const preloadImg = new window.Image();
       preloadImg.src = imageUrl;
@@ -46,7 +46,7 @@ const ImageProduct = ({
     // Only show loading if image hasn't been preloaded
     const prevIndex = selectedImage === 0 ? media.length - 1 : selectedImage - 1;
     const prevImageUrl = media[prevIndex];
-    
+
     if (!preloadedImages.includes(prevImageUrl)) {
       setLoading(true);
     }
@@ -73,49 +73,48 @@ const ImageProduct = ({
   return (
     <>
       <Box className="relative flex flex-col md:flex-row" style={{ minHeight: '440px' }}>
-      {/* Thumbnails - Vertical List on left side */}
-      <Stack 
-        className="flex-shrink-0 mr-4 hidden md:flex" 
-        gap="xs" 
-        style={{ 
-          width: '90px', 
-          maxHeight: '440px',
-          overflowY: 'auto'
-        }}
-      >
-        {media.map((imgUrl, idx) => (
-          <Box
-            key={idx}
-            className={`cursor-pointer overflow-hidden border-2 rounded-md transition-all ${
-              selectedImage === idx ? 'border-primary' : 'border-transparent hover:border-gray-300'
-            }`}
-            onClick={() => setSelectedImage(idx)}
-            style={{ 
-              height: '80px',
-              position: 'relative',
-              flexShrink: 0
-            }}
-          >
-            <Image
-              src={imgUrl}
-              height={80}
-              width={80}
-              fit="cover"
-              className="object-cover w-[80px] h-[80px] rounded"
-              alt={`${productName} - ảnh ${idx + 1}`}
-              loading="lazy"
-            />
-          </Box>
-        ))}
-      </Stack>
+        {/* Thumbnails - Vertical List on left side */}
+        <Stack
+          className="flex-shrink-0 mr-4 hidden md:flex"
+          gap="xs"
+          style={{
+            width: '90px',
+            maxHeight: '440px',
+            overflowY: 'auto'
+          }}
+        >
+          {media.map((imgUrl, idx) => (
+            <Box
+              key={idx}
+              className={`cursor-pointer overflow-hidden border-2 rounded-md transition-all ${selectedImage === idx ? 'border-primary' : 'border-transparent hover:border-gray-300'
+                }`}
+              onClick={() => setSelectedImage(idx)}
+              style={{
+                height: '80px',
+                position: 'relative',
+                flexShrink: 0
+              }}
+            >
+              <Image
+                src={imgUrl}
+                height={80}
+                width={80}
+                fit="cover"
+                className="object-cover w-[80px] h-[80px] rounded"
+                alt={`${productName} - ảnh ${idx + 1}`}
+                loading="lazy"
+              />
+            </Box>
+          ))}
+        </Stack>
 
         {/* Main Hero Image */}
-        <Box 
+        <Box
           className="relative flex-1 overflow-hidden rounded-md bg-white"
           style={{ minHeight: '400px' }}
         >
-          <Box 
-            className="relative w-full h-full" 
+          <Box
+            className="relative w-full h-full"
             style={{ minHeight: '400px', cursor: 'zoom-in' }}
             onClick={() => setZoomedView(true)}
           >
@@ -127,7 +126,7 @@ const ImageProduct = ({
               alt={productName}
               onLoad={handleImageLoad}
             />
-            
+
             {/* Image counter */}
             {media.length > 1 && (
               <Box className="absolute bottom-3 left-3 bg-black/60 text-white px-2 py-1 rounded-full text-xs">
@@ -142,9 +141,8 @@ const ImageProduct = ({
               {media.map((imgUrl, idx) => (
                 <Box
                   key={idx}
-                  className={`cursor-pointer overflow-hidden border-2 rounded-md flex-shrink-0 ${
-                    selectedImage === idx ? 'border-primary' : 'border-transparent hover:border-gray-200'
-                  }`}
+                  className={`cursor-pointer overflow-hidden border-2 rounded-md flex-shrink-0 ${selectedImage === idx ? 'border-primary' : 'border-transparent hover:border-gray-200'
+                    }`}
                   onClick={() => setSelectedImage(idx)}
                   style={{ width: '60px', height: '60px' }}
                 >
@@ -164,15 +162,15 @@ const ImageProduct = ({
           {/* Navigation Arrows */}
           {media.length > 1 && (
             <div className="absolute top-1/2 w-full flex justify-between px-2" style={{ transform: 'translateY(-50%)' }}>
-              <ActionIcon 
-                variant="filled" 
-                radius="xl" 
-                size="lg" 
+              <ActionIcon
+                variant="filled"
+                radius="xl"
+                size="lg"
                 onClick={(e) => {
                   e.stopPropagation();
                   handlePrevImage();
                 }}
-                style={{ 
+                style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.5)',
                   color: '#333',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
@@ -181,15 +179,15 @@ const ImageProduct = ({
               >
                 <FiChevronLeft size={20} />
               </ActionIcon>
-              <ActionIcon 
-                variant="filled" 
-                radius="xl" 
-                size="lg" 
+              <ActionIcon
+                variant="filled"
+                radius="xl"
+                size="lg"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleNextImage();
                 }}
-                style={{ 
+                style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.5)',
                   color: '#333',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
@@ -212,7 +210,7 @@ const ImageProduct = ({
         >
           {/* Close button */}
           <ActionIcon
-            style={{ 
+            style={{
               position: 'absolute',
               top: '16px',
               right: '16px',
@@ -227,9 +225,9 @@ const ImageProduct = ({
           >
             <FiX size={24} />
           </ActionIcon>
-          
+
           {/* Zoomed image container */}
-          <div 
+          <div
             className="relative"
             onClick={(e) => e.stopPropagation()}
             style={{
@@ -243,7 +241,7 @@ const ImageProduct = ({
               alt={`${productName} - zoomed view`}
             />
           </div>
-          
+
           {/* Navigation in zoomed view */}
           {media.length > 1 && (
             <div className="absolute top-1/2 w-full flex justify-between px-6" style={{ transform: 'translateY(-50%)' }}>
@@ -281,10 +279,10 @@ const ImageProduct = ({
               </ActionIcon>
             </div>
           )}
-          
+
           {/* Thumbnails in zoomed view */}
           {media.length > 1 && (
-            <div 
+            <div
               className="absolute left-1/2 transform -translate-x-1/2"
               style={{ bottom: '24px' }}
             >
@@ -293,17 +291,16 @@ const ImageProduct = ({
                   {media.map((imgUrl, idx) => (
                     <Box
                       key={`zoom-${idx}`}
-                      className={`cursor-pointer overflow-hidden border-2 rounded-md transition-all ${
-                        selectedImage === idx ? 'border-white' : 'border-transparent hover:border-gray-400'
-                      }`}
+                      className={`cursor-pointer overflow-hidden border-2 rounded-md transition-all ${selectedImage === idx ? 'border-white' : 'border-transparent hover:border-gray-400'
+                        }`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedImage(idx);
                       }}
-                      style={{ 
-                        width: '50px', 
-                        height: '50px', 
-                        opacity: selectedImage === idx ? 1 : 0.7 
+                      style={{
+                        width: '50px',
+                        height: '50px',
+                        opacity: selectedImage === idx ? 1 : 0.7
                       }}
                     >
                       <Image

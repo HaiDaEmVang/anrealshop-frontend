@@ -16,14 +16,12 @@ import { BiUser } from 'react-icons/bi';
 import { FaSearch } from 'react-icons/fa';
 import { FiHome, FiLogIn, FiLogOut, FiMapPin, FiPackage, FiShoppingCart, FiUser } from 'react-icons/fi';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { fetchCurrentUser, logoutUser } from '../../store/authSlice';
+import { APP_ROUTES } from '../../constant';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
-import ModalAddress from '../header/ModalAddress';
+import { fetchCurrentUser, logoutUser } from '../../store/authSlice';
 import SuggestSearch from '../header/SuggestSearch';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
-import { APP_ROUTES } from '../../constant';
-import type { SimpleAddressDto } from '../../types/AddressType';
 
 // Dữ liệu danh mục
 const POPULAR_CATEGORIES = [
@@ -38,35 +36,35 @@ const POPULAR_CATEGORIES = [
 ];
 
 // Dữ liệu địa chỉ mẫu
-const SAVED_ADDRESSES: SimpleAddressDto[] = [
-    {
-    id: '2',
-    receiverOrSenderName: 'Trần Thị Bình',
-    phoneNumber: '0912345678',
-    detailAddress: '45 Lê Văn Lương, Phường Tân Hưng, Quận 7, TP. Hồ Chí Minh',
-    isDefault: false
-  },
-  {
-    id: '3',
-    receiverOrSenderName: 'Lê Văn Cường',
-    phoneNumber: '0987654321',
-    detailAddress: '78 Nguyễn Thị Minh Khai, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-    isDefault: false
-  }
-];
+// const SAVED_ADDRESSES: SimpleAddressDto[] = [
+//     {
+//         id: '2',
+//         receiverOrSenderName: 'Trần Thị Bình',
+//         phoneNumber: '0912345678',
+//         detailAddress: '45 Lê Văn Lương, Phường Tân Hưng, Quận 7, TP. Hồ Chí Minh',
+//         isDefault: false
+//     },
+//     {
+//         id: '3',
+//         receiverOrSenderName: 'Lê Văn Cường',
+//         phoneNumber: '0987654321',
+//         detailAddress: '78 Nguyễn Thị Minh Khai, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
+//         isDefault: false
+//     }
+// ];
 
 
 const Header: React.FC = () => {
-    const { user, isAuthenticated, status, error } = useAppSelector((state) => state.auth);
+    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
     const useDispatch = useAppDispatch();
 
     const location = useLocation();
     const navigate = useNavigate();
     const [searchValue, setSearchValue] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [addressModalOpened, setAddressModalOpened] = useState(false);
-    const [selectedAddressId, setSelectedAddressId] = useState<string>('1');
-    const [currentAddress, setCurrentAddress] = useState(SAVED_ADDRESSES[0]);
+    // const [addressModalOpened, setAddressModalOpened] = useState(false);
+    // const [selectedAddressId, setSelectedAddressId] = useState<string>('1');
+    // const [currentAddress, setCurrentAddress] = useState(SAVED_ADDRESSES[0]);
 
     const searchContainerRef = useRef<HTMLDivElement>(null);
 
@@ -118,17 +116,17 @@ const Header: React.FC = () => {
         setShowSuggestions(false);
     };
 
-    const handleSelectAddress = (id: string) => {
-        setSelectedAddressId(id);
-    };
+    // const handleSelectAddress = (id: string) => {
+    //     setSelectedAddressId(id);
+    // };
 
-    const handleApplyAddress = () => {
-        const selectedAddress = SAVED_ADDRESSES.find(addr => addr.id === selectedAddressId);
-        if (selectedAddress) {
-            setCurrentAddress(selectedAddress);
-        }
-        setAddressModalOpened(false);
-    };
+    // const handleApplyAddress = () => {
+    //     const selectedAddress = SAVED_ADDRESSES.find(addr => addr.id === selectedAddressId);
+    //     if (selectedAddress) {
+    //         setCurrentAddress(selectedAddress);
+    //     }
+    //     setAddressModalOpened(false);
+    // };
 
     const handleLogout = async () => {
         await useDispatch(logoutUser()).unwrap()
@@ -143,7 +141,7 @@ const Header: React.FC = () => {
     const handleOpenCart = () => {
         if (!isAuthenticated)
             showSuccessNotification("Thông báo", "Đăng nhập để thực hiện chức năng nhé")
-        else 
+        else
             navigate(APP_ROUTES.CART);
     }
 
@@ -277,7 +275,7 @@ const Header: React.FC = () => {
                                             <Menu.Item
                                                 leftSection={<FiPackage size={16} />}
                                                 component={Link}
-                                                to="/account/orders"
+                                                to="/settings/orders"
                                             >
                                                 <Text size="sm">Đơn hàng của tôi</Text>
                                             </Menu.Item>
@@ -326,7 +324,9 @@ const Header: React.FC = () => {
                                 {isAuthenticated ? (
                                     <>
                                         <FiMapPin size={14} />
-                                        <Text size="sm">Giao đến: <Text component="span" size="sm" fw={600} onClick={() => setAddressModalOpened(true)} className="hover:text-primary cursor-pointer">{user?.address?.districtName + ", " + user?.address?.provinceName || "Nho cap nhat dia chi nhe"}</Text></Text>
+                                        <Text size="sm">Giao đến: <Text component="span" size="sm" fw={600}
+                                            // onClick={() => setAddressModalOpened(true)} 
+                                            className="hover:text-primary cursor-pointer">{user?.address?.districtName + ", " + user?.address?.provinceName || "Nho cap nhat dia chi nhe"}</Text></Text>
                                     </>
                                 ) : (
                                     <Text size="sm">Đăng nhập để xem địa chỉ...</Text>

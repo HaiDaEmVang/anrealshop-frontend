@@ -19,74 +19,52 @@ import {
 } from 'react-icons/fi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useOrderStatus } from '../../../../hooks/useOrderStatus';
+import { OrderService } from '../../../../service/OrderService';
 import type { UserOrderDetailDto } from '../../../../types/OrderType';
+import { formatPrice } from '../../../../untils/Untils';
+import { ButtonCopy } from '../../../common/ButtonCopy';
 import Action from './Action';
 import AddressInfo from './AddressInfo';
-import sampleOrderDetail from './DataSample';
 import HistoryStatus from './HistoryStatus';
 import LineStatus from './LineStatus';
 import PaymentInfo from './PaymentInfo';
 
-// Helper function to format price
-const formatPrice = (price: number): string => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
-        .format(price)
-        .replace('₫', '')
-        .trim() + '₫';
-};
 
 export const OrderDetail = () => {
     const { orderId } = useParams<{ orderId: string }>();
     const navigate = useNavigate();
     const { getStatusLabel, getStatusColor } = useOrderStatus();
     const [loading, setLoading] = useState(true);
-    const [orderDetail, setOrderDetail] = useState<UserOrderDetailDto>(sampleOrderDetail);
+    const [orderDetail, setOrderDetail] = useState<UserOrderDetailDto | null>();
     const [activeStep, setActiveStep] = useState(0);
 
-    // Convert orderHistory to history items for HistoryStatus component
-    const historyItems = orderDetail.orderHistory.map(item => ({
-        date: new Date(item.timestamp).toLocaleDateString('vi-VN'),
-        time: new Date(item.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-        status: item.status,
-        title: item.title,
-        description: item.title,
-        hasImage: item.status === 'DELIVERED'
-    }));
-
     useEffect(() => {
-        // In a real app, you would fetch the order details here
         setLoading(true);
 
-        // For demonstration, select a sample based on orderId or use default
-        let selectedSample = sampleOrderDetail;
-        // if (orderId) {
-        //     if (orderId.includes('pending')) selectedSample = orderDetailSamples.pending;
-        //     else if (orderId.includes('preparing')) selectedSample = orderDetailSamples.preparing;
-        //     else if (orderId.includes('shipping')) selectedSample = orderDetailSamples.shipping;
-        //     else if (orderId.includes('delivered')) selectedSample = orderDetailSamples.delivered;
-        //     else if (orderId.includes('reviewed')) selectedSample = orderDetailSamples.reviewed;
-        // }
-
-        setTimeout(() => {
-            setOrderDetail({
-                ...selectedSample,
-                shopOrderId: orderId || selectedSample.shopOrderId
-            });
-            setLoading(false);
-        }, 500); // Added a small delay to simulate loading
+        if (orderId) {
+            OrderService.getOrderDetail(orderId)
+                .then((data) => {
+                    console.log('Fetched order detail:', data);
+                    setOrderDetail(data);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
     }, [orderId]);
 
+
+
     useEffect(() => {
-        // Set active step based on order status
         if (orderDetail) {
             switch (orderDetail.shopOrderStatus) {
-                case 'PENDING_CONFIRMATION':
+                case 'INIT_PROCESSING':
                     setActiveStep(0);
                     break;
-                case 'PREPARING':
+                case 'PENDING_CONFIRMATION':
                     setActiveStep(1);
                     break;
-                case 'SHIPPING':
+                case 'CONFIRMED':
                 case 'IN_TRANSIT':
                     setActiveStep(2);
                     break;
@@ -110,9 +88,16 @@ export const OrderDetail = () => {
         );
     }
 
+    if (!orderDetail) {
+        return (
+            <Box>
+                <Text>Không tìm thấy chi tiết đơn hàng.</Text>
+            </Box>
+        );
+    }
+
     return (
         <Box>
-            {/* Header with back button and order ID + status */}
             <Group justify="space-between" mb="md" wrap="nowrap">
                 <Button
                     variant="subtle"
@@ -122,9 +107,12 @@ export const OrderDetail = () => {
                     Trở về
                 </Button>
                 <Group gap="md">
-                    <Title order={4} fw={400} size={"sm"} className="">
-                        Mã đơn: <span className='underline'> #{orderDetail.shopOrderId.substring(0, 13)}</span>
-                    </Title>
+                    <Group gap={5}>
+                        <Title order={4} fw={400} size={"sm"} className="">
+                            Mã đơn: <span className='underline'> #{orderDetail.shopOrderId.substring(0, 13)}</span>
+                        </Title>
+                        <ButtonCopy id={orderDetail.shopOrderId} />
+                    </Group>
                     | <Text size='sm' color={getStatusColor(orderDetail.shopOrderStatus)}>
                         {getStatusLabel(orderDetail.shopOrderStatus).toUpperCase()}
                     </Text>
@@ -133,11 +121,8 @@ export const OrderDetail = () => {
 
             <Divider my={0} />
 
-            {/* Order Progress Stepper */}
             <Box className='pt-10 pb-6'>
                 <LineStatus activeStep={activeStep} />
-
-                {/* Action Buttons Section */}
                 <Action
                     status={orderDetail.shopOrderStatus}
                     statusLabel={getStatusLabel(orderDetail.shopOrderStatus)}
@@ -146,11 +131,8 @@ export const OrderDetail = () => {
             </Box>
 
             <Divider my="lg" />
-
-            {/* Combined Address and History Section */}
             <Box>
                 <Group align="flex-start" gap="md" style={{ flexWrap: 'nowrap' }}>
-                    {/* Left Column - Delivery Address */}
                     <Box style={{ flex: '3' }}>
                         <AddressInfo
                             name={orderDetail.address.receiverOrSenderName}
@@ -158,14 +140,13 @@ export const OrderDetail = () => {
                             address={orderDetail.address.detailAddress}
                             title="Địa chỉ nhận hàng"
                             shippingCarrier="SPX Express"
-                            trackingNumber="SPXVN057427361409"
+                            trackingNumber={orderDetail.shippingId}
                         />
                     </Box>
 
-                    {/* Right Column - Order History */}
                     <Box style={{ flex: '7' }}>
                         <HistoryStatus
-                            historyItems={historyItems}
+                            historyItems={orderDetail.orderHistory}
                             title="Lịch sử đơn hàng"
                             initialCollapsed={true}
                             itemsToShowWhenCollapsed={3}
@@ -176,13 +157,12 @@ export const OrderDetail = () => {
 
             <Divider my="lg" />
 
-            {/* orderItemList */}
             <Box mb="lg">
                 <Paper withBorder p="md" radius="md">
                     <Group justify="apart" mb="md">
                         <Group>
-                            <FaStore size={18} className="text-blue-500" />
-                            <Title order={4}>{orderDetail.shopName}</Title>
+                            <FaStore size={16} className="text-primary" />
+                            <Title order={5} className='hover:underline cursor-pointer'>{orderDetail.shopName}</Title>
                         </Group>
                         <Group>
                             <Button
@@ -253,13 +233,12 @@ export const OrderDetail = () => {
 
                     <Divider my="md" />
 
-                    {/* Payment Information Table */}
                     <PaymentInfo
                         totalProductCost={orderDetail.totalProductCost}
                         shippingFee={orderDetail.shippingFee}
                         shippingDiscount={orderDetail.shippingDiscount}
                         totalCost={orderDetail.totalCost}
-                        paymentMethod="SPayLater"
+                        paymentMethod={orderDetail.paymentMethod}
                     />
                 </Paper>
             </Box>

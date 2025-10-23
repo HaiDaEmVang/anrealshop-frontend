@@ -33,7 +33,7 @@ const OrderPrintPage = () => {
 
     const [selectedShipping, setSelectedShipping] = useState<string[]>([]);
     const [selectAll, setSelectAll] = useState(false);
-    const [isPrinted, setIsPrinted] = useState(false);
+    const [isPrinted] = useState(false);  //// them set vao hai nhe
 
     const [activePage, setActivePage] = useState(parseInt(getParam('page', '1') || '1', 10));
     const [itemsPerPage] = useState(10);
@@ -43,7 +43,7 @@ const OrderPrintPage = () => {
     const {
         totalCount,
         totalPages,
-        isLoading,
+        // isLoading,
         data: shippingLists,
         fetchShipping,
     } = useShipping({

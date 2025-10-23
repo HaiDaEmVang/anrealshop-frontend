@@ -1,18 +1,18 @@
 import { Button, Container, Paper } from '@mantine/core';
 import { Suspense, lazy, useEffect, useState } from 'react';
-import { CategorySkeleton, HeroBannerSkeleton, NewsletterSkeleton, ProductGridSkeleton, PromotionBannerSkeleton, SearchTopSkeleton } from './Skeleton';
-import { useGetProduct, useProduct } from '../../../hooks/useProduct';
+import { useGetProduct } from '../../../hooks/useProduct';
 import type { UserProductDto } from '../../../types/ProductType';
+import { CategorySkeleton, HeroBannerSkeleton, NewsletterSkeleton, ProductGridSkeleton, PromotionBannerSkeleton, SearchTopSkeleton } from './Skeleton';
 
 const HeroBanner = lazy(() => import('./Banner/HeroBanner'));
 const PromotionBanner = lazy(() => import('./Banner/PromationBanner'));
 const Categories = lazy(() => import('./Category/Categories'));
 const NewsletterSignup = lazy(() => import('../Common/NewLetterSignup'));
-const FeaturedProducts = lazy(() => import('./Products/FeatureProduct'));
+// const FeaturedProducts = lazy(() => import('./Products/FeatureProduct'));
 const ListProduct = lazy(() => import('./Products/ListProduct'));
-const NewArrivals = lazy(() => import('./Products/NewArrivals'));
+// const NewArrivals = lazy(() => import('./Products/NewArrivals'));
 const SearchTop = lazy(() => import('./SearchTop'));
-const TrendingProducts = lazy(() => import('./Products/TrendingProduct'));
+// const TrendingProducts = lazy(() => import('./Products/TrendingProduct'));
 
 const HomePage = () => {
   const [recommendedProducts, setRecommendedProducts] = useState<UserProductDto[]>([]);
@@ -54,13 +54,13 @@ const HomePage = () => {
           </div>
         </Paper>
 
-        <Paper radius="md" className="mb-8 bg-white shadow-sm">
+        {/* <Paper radius="md" className="mb-8 bg-white shadow-sm">
           <div className="p-4">
             <Suspense fallback={<ProductGridSkeleton />}>
               <FeaturedProducts />
             </Suspense>
           </div>
-        </Paper>
+        </Paper> */}
 
         <Paper radius="md" className="mb-8 bg-white shadow-sm">
           <div className="p-4">
@@ -70,13 +70,13 @@ const HomePage = () => {
           </div>
         </Paper>
 
-        <Paper radius="md" className="mb-8 bg-white shadow-sm">
+        {/* <Paper radius="md" className="mb-8 bg-white shadow-sm">
           <div className="p-4">
             <Suspense fallback={<ProductGridSkeleton />}>
               <NewArrivals />
             </Suspense>
           </div>
-        </Paper>
+        </Paper> */}
 
         <Paper radius="md" className="mb-8 bg-white shadow-sm">
           <div className="p-4">
@@ -86,18 +86,18 @@ const HomePage = () => {
           </div>
         </Paper>
 
-        <Paper radius="md" className="mb-8 bg-white shadow-sm">
+        {/* <Paper radius="md" className="mb-8 bg-white shadow-sm">
           <div className="p-4">
             <Suspense fallback={<ProductGridSkeleton />}>
               <TrendingProducts />
             </Suspense>
           </div>
-        </Paper>
+        </Paper> */}
 
         <Paper radius="md" className="mb-8 bg-white shadow-sm">
           <div className="p-4">
             <Suspense fallback={<ProductGridSkeleton />}>
-              <ListProduct 
+              <ListProduct
                 products={recommendedProducts}
               />
             </Suspense>

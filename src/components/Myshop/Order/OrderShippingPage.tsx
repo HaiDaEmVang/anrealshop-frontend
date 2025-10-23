@@ -98,7 +98,7 @@ const OrderShippingPage = () => {
       ...params,
       ...filterData,
     });
-  }, [activePage, params, fetchOrders, updateParams]);
+  }, [ activePage, fetchOrders, itemsPerPage, params, updateParams]);
 
   useEffect(() => {
     setData(orders);
@@ -170,7 +170,7 @@ const OrderShippingPage = () => {
       .then(() => {
         loadOrders();
       })
-  }, [rejectOrder, loadOrders]);
+  }, [rejectOrder]);
 
 
   const breadcrumbItems = [

@@ -20,7 +20,7 @@ export const useOrderStatusIcon = () => {
                     return FiBox;
                 case 'in_transit':
                     return FiSend;
-                case 'out_for_delivery': 
+                case 'out_for_delivery':
                     return FiNavigation;
                 case 'delivered':
                     return FiCheckCircle;
@@ -131,6 +131,7 @@ export const useOrderStatusLabel = () => {
     }), []);
 };
 
+
 export const useOrderStatus = () => {
     const { getStatusIcon } = useOrderStatusIcon();
     const { getStatusColor, getStatusIconColor } = useOrderStatusColor();
@@ -163,6 +164,6 @@ export const useOrderStatus = () => {
         getStatusColor,
         getStatusIconColor,
         getStatusLabel,
-        convertStatus
+        convertStatus,
     };
 };

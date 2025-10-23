@@ -136,6 +136,7 @@ export const getCategoryData = async (slug: string): Promise<Category | null> =>
 
 // Hàm lấy sản phẩm theo danh mục
 export const getCategoryProducts = async (categoryId: string, filters: any) : Promise<Product[]> => {
+  console.log('Filters applied:', categoryId);
   // Giả lập API call
   return new Promise((resolve) => {
     setTimeout(() => {

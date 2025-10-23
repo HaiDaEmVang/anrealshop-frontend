@@ -1,18 +1,18 @@
-import { Box, Divider, Group, Table, Text, Title } from '@mantine/core';
+import { Box, Group, Table, Text, Title } from '@mantine/core';
 import React from 'react';
 import { FiPackage } from 'react-icons/fi';
 import type { ProductDetailDto } from '../../../../types/ProductType';
 
 interface ShippingTabProps {
-  product: ProductDetailDto; 
+  product: ProductDetailDto;
 }
 
 const ShippingTab: React.FC<ShippingTabProps> = ({ product }) => {
 
-  const hasPhysicalSpecs = 
-    (product.weight && product.weight > 0) || 
-    (product.height && product.height > 0) || 
-    (product.width && product.width > 0) || 
+  const hasPhysicalSpecs =
+    (product.weight && product.weight > 0) ||
+    (product.height && product.height > 0) ||
+    (product.width && product.width > 0) ||
     (product.length && product.length > 0);
 
   return (
@@ -23,7 +23,7 @@ const ShippingTab: React.FC<ShippingTabProps> = ({ product }) => {
             <FiPackage size={18} />
             <Title order={5}>Kích thước và trọng lượng</Title>
           </Group>
-          
+
           <Table striped>
             <Table.Tbody>
               {product.weight && (

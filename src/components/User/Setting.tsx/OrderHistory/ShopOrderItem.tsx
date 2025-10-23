@@ -24,9 +24,10 @@ import {
 import { Link } from 'react-router-dom';
 import { getReasonValueByKey, getRejectReasons } from '../../../../data/RejectData';
 import { useOrderStatus } from '../../../../hooks/useOrderStatus';
-import { type UserOrderItemDto } from '../../../../types/OrderType';
+import { type ShopOrderStatus, type UserOrderItemDto } from '../../../../types/OrderType';
 import { formatDate, formatPrice } from '../../../../untils/Untils';
 import RejectModal from '../../../RejectModal/RejectOrder';
+import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
 
 interface ShopOrderItemProps {
@@ -34,13 +35,15 @@ interface ShopOrderItemProps {
     onCancelOrder?: (orderId: string, reason: string) => void;
     onBuyAgain?: (productIds: string[]) => void;
     onReview?: (productId: string) => void;
+    activeStatus: ShopOrderStatus;
 }
 
 const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
     order,
     onCancelOrder,
     onBuyAgain,
-    onReview
+    onReview,
+    activeStatus,
 }) => {
     const { getStatusLabel } = useOrderStatus();
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
@@ -67,7 +70,12 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
         }
     }
 
-    const primaryStatus = order.orderStatus[0] || 'PENDING_CONFIRMATION';
+    const handleRefundOrderItem = (orderItemId: string) => {
+        console.log("Refund order item:", orderItemId);
+        showSuccessNotification("Thông báo", "Chức năng đang được phát triển")
+    }
+
+    const primaryStatus = activeStatus;
     const isPending = primaryStatus === 'PENDING_CONFIRMATION';
     const isCompleted = primaryStatus === 'DELIVERED';
 
@@ -166,6 +174,31 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                                 <Text size="sm" fw={600} color="primary" mb="xs">
                                     {formatPrice(product.price)}
                                 </Text>
+                                <Group justify="flex-end">
+                                    {!product.isReviewed && activeStatus === 'DELIVERED' && (
+                                        <Button
+                                            variant="light"
+                                            size="xs"
+                                            leftSection={<FiStar size={14} />}
+                                            onClick={() => {
+                                                handleReview(product.orderItemId);
+                                            }}
+                                        >
+                                            Đánh giá
+                                        </Button>
+                                    )}
+                                    {activeStatus === 'DELIVERED' && (
+                                        <Button
+                                            variant="light"
+                                            size="xs"
+                                            leftSection={<FiShoppingCart size={14} />}
+                                            color='red'
+                                            onClick={() => { handleRefundOrderItem(product.orderItemId); }}
+                                        >
+                                            Hoàn trả
+                                        </Button>
+                                    )}
+                                </Group>
                             </div>
                         </Group>
                     </React.Fragment>
@@ -173,7 +206,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
             </Stack>
 
             {/* Order summary */}
-            <Box className="bg-gray-50 p-2 rounded-md">
+            <Box className="bg-gray-100 p-2 rounded-md">
                 <Group justify="space-between">
                     <Text size='sm' fw={500}>Tổng thanh toán:</Text>
                     <Text size="sm" fw={700} color="primary">
@@ -204,21 +237,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                         >
                             Mua lại
                         </Button>
-                        {order.productOrderItemDtoSet.some(p => !p.isReviewed) && (
-                            <Button
-                                variant="filled"
-                                size="xs"
-                                leftSection={<FiStar size={14} />}
-                                onClick={() => {
-                                    const nonReviewedProduct = order.productOrderItemDtoSet.find(p => !p.isReviewed);
-                                    if (nonReviewedProduct) {
-                                        handleReview(nonReviewedProduct.productId);
-                                    }
-                                }}
-                            >
-                                Đánh giá
-                            </Button>
-                        )}
                     </>
                 )}
 

@@ -26,7 +26,7 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
                 {
                     attributeKeyName,
                     attributeKeyDisplay,
-                    values: valuess,
+                    values: new Set(valuess),
                 }
             );
         }
@@ -45,7 +45,7 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
         return (
             <MultiSelectCreatable
                 options={values}
-                value={currentValue}
+                value={Array.from(currentValue)}
                 onChange={handleMultiChange}
                 placeholder={`Chọn ${attributeKeyDisplay.toLowerCase()}`}
                 canCreate={!isDefault}
@@ -61,7 +61,7 @@ const AttributeField = memo(({ attribute, formAttributes, onAttributesChange }: 
             data={values.map(val => ({ value: val, label: val }))}
             searchable
             clearable
-            value={currentValue[0] || null}
+            value={Array.from(currentValue)[0] || null}
             onChange={handleSingleChange}
         />
     );

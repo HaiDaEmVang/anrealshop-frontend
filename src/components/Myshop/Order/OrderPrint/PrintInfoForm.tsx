@@ -13,7 +13,7 @@ interface PrintInfoFormProps {
 const PrintInfoForm = ({
     selectedShipping,
     isPrinting,
-    onPrint
+    // onPrint
 }: PrintInfoFormProps) => {
     const [printType, setPrintType] = useState('shipping');
     const [paperSize, setPaperSize] = useState('a4');

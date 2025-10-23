@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Table, Text } from '@mantine/core';
 import { formatPrice } from '../../../../untils/Untils';
+import { convertToTextPaymentMethod } from '../../../../hooks/usePayment';
+import type { PaymentMethodId } from '../../../../types/ShipmentType';
 
 interface PaymentInfoProps {
     totalProductCost: number;
@@ -8,16 +10,16 @@ interface PaymentInfoProps {
     shippingDiscount: number;
     voucherDiscount?: number;
     totalCost: number;
-    paymentMethod?: string;
+    paymentMethod: PaymentMethodId;
 }
 
 const PaymentInfo: React.FC<PaymentInfoProps> = ({
     totalProductCost,
     shippingFee,
     shippingDiscount,
-    voucherDiscount = 135189, // Default value if not provided
+    voucherDiscount = 0, 
     totalCost,
-    paymentMethod = 'SPayLater' // Default value if not provided
+    paymentMethod,
 }) => {
     return (
         <Box>
@@ -82,7 +84,7 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                             border: 'none',
                             padding: '8px 0'
                         }}>
-                            <Text size="sm" color="green">{formatPrice(shippingDiscount)}</Text>
+                            <Text size="sm" color="green">-{formatPrice(shippingDiscount)}</Text>
                         </Table.Td>
                     </Table.Tr>
 
@@ -143,9 +145,10 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
                             width: '20vh',
                             textAlign: 'right',
                             border: 'none',
-                            paddingTop: '16px'
+                            paddingTop: '16px',
+                            paddingRight: '0',
                         }}>
-                            <Text size="sm">{paymentMethod}</Text>
+                            <Text size="sm">{convertToTextPaymentMethod(paymentMethod)}</Text>
                         </Table.Td>
                     </Table.Tr>
                 </Table.Tbody>

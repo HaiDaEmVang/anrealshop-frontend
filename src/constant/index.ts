@@ -1,5 +1,5 @@
-export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL
-export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL
+export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:4141/api'
+export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL || 'http://localhost:4141'
 export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE 
 export const BASE_FE_URL = import.meta.env.VITE_BASE_FE_URL
 export const GOOGLE_LOGIN_URL = `${BASE_BE_URL}/oauth2/authorization/google`
@@ -116,7 +116,8 @@ export const API_ENDPOINTS = {
     MYSHOP_REJECTS: '/my-shop/orders/reject-ids',
 
     USER_ORDERS: '/user/orders',
-    USER_REJECT_ORDER: (shopOrderId: string) => `/user/orders/reject/${shopOrderId}`,
+    USER_ORDER_DETAILS: (orderId: string) => `/user/orders/${orderId}`,
+    USER_REJECT_ORDER: (orderId: string) => `/user/orders/reject/${orderId}`,
   }
 };
 

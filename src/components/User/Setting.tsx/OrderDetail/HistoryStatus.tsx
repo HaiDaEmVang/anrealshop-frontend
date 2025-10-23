@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
 import { Button, Paper, Text, Timeline, Title } from '@mantine/core';
+import React, { useState } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { useShipping } from '../../../../hooks/useShipping';
+import type { HistoryShipping } from '../../../../types/ShipmentType';
+import { formatDate } from '../../../../untils/Untils';
 
-interface HistoryItem {
-    date: string;
-    time: string;
-    status: string;
-    description: string;
-    title?: string;
-    hasImage?: boolean;
-}
 
 interface HistoryStatusProps {
-    historyItems: HistoryItem[];
+    historyItems: HistoryShipping[];
     title?: string;
     collapsible?: boolean;
     initialCollapsed?: boolean;
     itemsToShowWhenCollapsed?: number;
 }
+
 
 const HistoryStatus: React.FC<HistoryStatusProps> = ({
     historyItems,
@@ -27,8 +23,8 @@ const HistoryStatus: React.FC<HistoryStatusProps> = ({
     itemsToShowWhenCollapsed = 4
 }) => {
     const [isCollapsed, setIsCollapsed] = useState(initialCollapsed);
+    const { getShippingStatusLabel } = useShipping();
 
-    // Determine which items to show based on collapsed state
     const displayedItems = isCollapsed && collapsible
         ? historyItems.slice(0, itemsToShowWhenCollapsed)
         : historyItems;
@@ -44,12 +40,18 @@ const HistoryStatus: React.FC<HistoryStatusProps> = ({
             <Timeline active={displayedItems.length} bulletSize={20} lineWidth={2}>
                 {displayedItems.map((item, index) => (
                     <Timeline.Item
-                        key={index}
-                        title={item.title ? <Text size="sm" fw={500}>{item.title}</Text> : undefined}
+                        key={item.id || index}
+                        title={<Text size="sm" fw={500}>{getShippingStatusLabel(item.status)}</Text>}
                         lineVariant={historyItems.length >= index ? 'solid' : 'dashed'}
                     >
-                        <Text size="xs" color="dimmed">{item.time} {item.date}</Text>
-                        <Text size="xs">{item.description}</Text>
+                        {item.notes && item.notes.map((note, noteIdx) => {
+                            return (
+                                <div key={noteIdx} style={{ marginBottom: noteIdx < item.notes.length - 1 ? 8 : 0 }}>
+                                    <Text size="xs" color="dimmed">{formatDate(note.timestamp.toString())}</Text>
+                                    <Text size="xs">{note.content}</Text>
+                                </div>
+                            );
+                        })}
                     </Timeline.Item>
                 ))}
             </Timeline>

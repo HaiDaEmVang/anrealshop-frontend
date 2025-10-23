@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
 import {
+    Button,
     Container,
-    Tabs,
     LoadingOverlay,
     Paper,
-    Title,
+    Tabs,
     Text,
-    Button
+    Title
 } from '@mantine/core';
+import React, { useEffect, useState } from 'react';
 import {
+    FiMapPin,
     FiShoppingCart,
-    FiStar,
-    FiMapPin
+    FiStar
 } from 'react-icons/fi';
-import { useParams, Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ShopInfoComponent from './ShopInfo';
-import ProductList from './ProductList';
+// import ProductList from './ProductList';
+import { mockShopReviews, mockShops, type Review, type ShopInfo } from '../../../data/UserData';
 import ShopContact from './ShopContact';
-import { mockShops, mockShopProducts, mockShopReviews, type ShopInfo, type ShopProduct, type Review } from '../../../data/UserData';
 import ShopReviews from './ShopReview';
 
 const ShopPage: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const [activeTab, setActiveTab] = useState<string | null>('products');
     const [shopInfo, setShopInfo] = useState<ShopInfo | null>(null);
-    const [products, setProducts] = useState<ShopProduct[]>([]);
+    // const [products, setProducts] = useState<ShopProduct[]>([]);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [isFollowing, setIsFollowing] = useState(false);
@@ -33,18 +33,18 @@ const ShopPage: React.FC = () => {
         const fetchShopData = async () => {
             setLoading(true);
             await new Promise(resolve => setTimeout(resolve, 1500));
-            
+
             const foundShop = slug ? mockShops[slug] : null;
-            
+
             if (foundShop) {
                 setShopInfo(foundShop);
-                setProducts(mockShopProducts);
+                // setProducts(mockShopProducts);
                 setReviews(mockShopReviews);
                 setIsFollowing(foundShop.isFollowing);
             } else {
                 setShopInfo(null);
             }
-            
+
             setLoading(false);
         };
 
@@ -75,13 +75,13 @@ const ShopPage: React.FC = () => {
     return (
         <Container size="xl" py="xl" className="relative min-h-screen">
             {/* Loading Overlay */}
-           
+
             <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
 
             {shopInfo && (
                 <>
                     {/* Shop Info */}
-                    <ShopInfoComponent 
+                    <ShopInfoComponent
                         shopInfo={shopInfo}
                         isFollowing={isFollowing}
                         onFollowToggle={handleFollow}
@@ -102,10 +102,11 @@ const ShopPage: React.FC = () => {
                         </Tabs.List>
 
                         <Tabs.Panel value="products" pt="md">
-                            <ProductList 
+                            sua hai nhe
+                            {/* <ProductList 
                                 products={products}
                                 shopName={shopInfo.name}
-                            />
+                            /> */}
                         </Tabs.Panel>
 
                         <Tabs.Panel value="reviews" pt="md">
