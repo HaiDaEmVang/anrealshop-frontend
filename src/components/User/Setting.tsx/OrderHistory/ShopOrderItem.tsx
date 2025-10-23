@@ -106,7 +106,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                                         .filter(p => p.cancelReason)
                                         .map((p, idx) => (
                                             <Text size="xs" key={idx}>
-                                                • <b>{p.productName}</b>: {getReasonValueByKey(p.cancelReason)}
+                                                • <b>{p.productName}</b>: {getReasonValueByKey(p.cancelReason) || p.cancelReason || 'Unknown reason'}
                                             </Text>
                                         ))}
                                 </div>
