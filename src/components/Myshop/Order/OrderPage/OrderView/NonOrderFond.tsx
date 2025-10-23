@@ -18,7 +18,7 @@ const NonOrderFound = ({
     <>
 
       <Card withBorder p={0} className="!bg-white mt-2">
-        <div className="text-center py-10 min-h-[50vh] " style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="text-center py-10 min-h-[80vh] " style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <FiPackage size={48} className="mx-auto text-gray-300 mb-4" />
           <Text size="lg" fw={500} c="dimmed">{message}</Text>
           <Text size="sm" c="dimmed" mt="xs">

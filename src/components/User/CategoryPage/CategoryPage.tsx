@@ -69,7 +69,7 @@ const CategoryPage = () => {
     if (!slug) return;
 
     setLoading(true);
-    getCategoryData(slug)
+    getCategoryData(slug) 
       .then(data => {
         setCategory(data);
         loadProducts(data ? data.id : '');

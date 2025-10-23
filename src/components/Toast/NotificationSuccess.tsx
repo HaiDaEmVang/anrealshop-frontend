@@ -1,24 +1,34 @@
 import { notifications } from '@mantine/notifications';
 import { FaCheckCircle } from 'react-icons/fa';
 
-export const showSuccessNotification = (title = 'Thành công', message : string) => {
+export const showSuccessNotification = (title = 'Thành công', message: string) => {
   return notifications.show({
     title,
     message,
-    color: 'primary', // Sử dụng màu primary thay vì màu green mặc định
+    color: 'primary',
     icon: <FaCheckCircle size={20} className='text-primary' />,
     withBorder: true,
     styles: (theme) => ({
       root: {
-        backgroundColor: theme.white,
-        borderColor: theme.colors.blue[6], // Sử dụng màu primary cho viền
-        '&::before': { backgroundColor: theme.colors.blue[6] },
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        borderColor: theme.colors.blue[4],
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.08)',
+        '&::before': { backgroundColor: theme.colors.blue[5] },
       },
-      title: { color: theme.colors.blue[6] },
-      description: { color: theme.colors.gray[7] },
+      title: {
+        color: theme.colors.blue[7],
+        fontWeight: 600
+      },
+      description: {
+        color: theme.colors.gray[7]
+      },
       closeButton: {
-        color: theme.colors.gray[7],
-        '&:hover': { backgroundColor: theme.colors.gray[0] },
+        color: theme.colors.gray[6],
+        '&:hover': {
+          backgroundColor: 'rgba(0, 0, 0, 0.05)'
+        },
       },
     }),
   });

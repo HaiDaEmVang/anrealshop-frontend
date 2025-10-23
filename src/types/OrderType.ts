@@ -1,6 +1,8 @@
+import type { SimpleAddressDto } from "./AddressType";
+
 export type OrderStatus = 'ALL'| 'COMPLETED' | 'PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'AWAITING_SHIPMENT' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'REFUND' | 'CANCELED';
 
-export type ShopOrderStatus = 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'SHIPPING' | 'DELIVERED' | 'CLOSED';
+export type ShopOrderStatus = 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'CONFIRMED' | 'PREPARING' | 'SHIPPING' | 'DELIVERED' | 'CLOSED';
 
 export interface OrderStatusDto {
   id: string;
@@ -27,7 +29,7 @@ export interface ProductOrderItemDto {
 
 export interface OrderItemDto {
   shopOrderId: string;
-  orderStatus: ShopOrderStatus[];
+  orderStatus: ShopOrderStatus;
   paymentMethod: string;
   customerName: string;
   customerImage: string;
@@ -36,13 +38,14 @@ export interface OrderItemDto {
 
   productOrderItemDtoSet: ProductOrderItemDto[];
 
+
 }
 
 
 
 export interface MyShopOrderListResponse {
     totalCount: number;
-    totalPages: number;
+    totalPages: number; 
     currentPage: number;
     orderItemDtoSet: OrderItemDto[];
 }
@@ -56,12 +59,11 @@ export interface OrderRejectRequest {
 
 
 // orderDetails
-
 export interface HistoryTrackDto {
   id: string;
   status: OrderStatus;
   title: string;
-  timestamp: Date;
+  timestamp: Date|string;
 }
 
 
@@ -106,4 +108,65 @@ export interface OrderDetailDto {
 
   isReviewed: boolean;
 
+}
+
+
+
+// ------------------- cho maays thang cha giau co hay di mua sam -------------------
+
+export interface UserProductOrderItemDto {
+    productId: string;
+    productSkuId: string;
+    productName: string;
+    productImage: string;
+    variant: string;
+    quantity: number;
+    price: number;
+    orderStatus: string;
+ 
+    cancelReason: string;
+    isReviewed: boolean;
+} 
+
+export interface UserOrderItemDto {
+  shopOrderId: string;
+  shopOrderName: string;
+  shopOrderImage: string;
+  orderStatus: ShopOrderStatus[];
+  paymentMethod: string;
+  totalPrice: number;
+  updateAt: string;
+
+  productOrderItemDtoSet: UserProductOrderItemDto[];
+
+} 
+
+export interface UserOrderListResponse {
+    totalCount: number;
+    totalPages: number; 
+    currentPage: number;
+    orderItemDtoSet: UserOrderItemDto[];
+}
+
+export interface UserOrderDetailDto {
+  shopOrderId: string;
+  shopOrderStatus: OrderStatus;
+
+  shopId: string;
+  shopName: string;
+  shopImage: string;
+
+  orderHistory: HistoryTrackDto[];
+  productItems: ProductOrderItemDto[];
+
+  totalProductCost: number;
+  totalShippingCost: number;
+  shippingFee: number;
+  shippingDiscount: number;
+
+  totalCost: number;
+
+  isReviewed: boolean;
+
+  address: SimpleAddressDto;
 }

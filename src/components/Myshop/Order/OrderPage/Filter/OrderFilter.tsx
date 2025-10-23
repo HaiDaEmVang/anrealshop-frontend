@@ -15,11 +15,14 @@ interface OrderFilterProps {
   onSearchTypeValueChange: (value: SearchType) => void;
   sortBy: string | null;
   onSortByChange: (value: string | null) => void;
-  activeTab: ShopOrderStatus | "all";
+  currentStatus: ShopOrderStatus | "all";
   totalOrders?: number;
   onStatusFilterChange?: (value: PreparingStatus) => void;
   onFetchWithParam: () => void;
   onClearAll: () => void;
+
+  selectedOrder: string[];
+  approvalOrders: () => void;
 }
 
 const OrderFilter = ({
@@ -29,11 +32,13 @@ const OrderFilter = ({
   onSearchTypeValueChange,
   sortBy,
   onSortByChange,
-  activeTab = 'all',
+  currentStatus = 'all',
   totalOrders = 0,
   onStatusFilterChange,
   onFetchWithParam,
-  onClearAll
+  onClearAll,
+  selectedOrder,
+  approvalOrders
 }: OrderFilterProps) => {
   const [exportModalOpened, setExportModalOpened] = useState(false);
   const [historyModalOpened, setHistoryModalOpened] = useState(false);
@@ -68,9 +73,9 @@ const OrderFilter = ({
 
   return (
     <>
-      <Card p="md" pb={0}>
+      <Card  px={0} pb={0}>
 
-        {activeTab === 'PREPARING' &&
+        {currentStatus === 'PREPARING' &&
           <Group mb="md">
             <Text size="sm" fw={500}>Trạng thái xử lý:</Text>
             <SegmentedControl
@@ -78,8 +83,8 @@ const OrderFilter = ({
               onChange={handleStatusFilterChange}
               data={[
                 { label: 'Tất cả', value: 'all' },
-                { label: 'Chưa xử lý', value: 'preparing' },
-                { label: 'Đã xử lý', value: 'wait_shipment' },
+                { label: 'Chưa xử lý', value: 'confirmed' },
+                { label: 'Đã xử lý', value: 'preparing' },
               ]}
               size="sm"
               radius="md"
@@ -173,7 +178,7 @@ const OrderFilter = ({
             <Text size="sm" fw={700}>{totalOrders}</Text>
           </Group>
           <Group>
-            {activeTab === 'PREPARING' && (
+            {currentStatus === 'PREPARING' && (
               <Link to="/myshop/orders/shipping">
                 <Button
                   color="blue"
@@ -184,6 +189,19 @@ const OrderFilter = ({
                   Giao hàng loạt
                 </Button>
               </Link>
+            )}
+
+            {currentStatus === 'PENDING_CONFIRMATION' && (
+              <Button
+                  color="blue"
+                  leftSection={<FiCheck size={14} />}
+                  variant="filled"
+                  size='xs'
+                  disabled={selectedOrder.length === 0}
+                  onClick={() => {approvalOrders()}}
+                >
+                  Duyệt đơn
+                </Button>
             )}
 
             <Menu shadow="md" width={200} position="bottom-end">

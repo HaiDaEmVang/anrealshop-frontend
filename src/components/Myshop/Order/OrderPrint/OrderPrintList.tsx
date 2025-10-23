@@ -1,8 +1,8 @@
-import { Badge, Card, Checkbox, Group, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Card, Checkbox, Group, Text, Tooltip } from '@mantine/core';
 import { FiCheck, FiClock, FiX } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../../../../untils/Untils';
 import type { ShippingItems } from '../../../../types/ShipmentType';
+import { formatDate } from '../../../../untils/Untils';
 
 interface OrderPrintListProps {
     shippingData: ShippingItems[];
@@ -123,23 +123,19 @@ const OrderPrintList = ({
 
                         <div className="col-span-1 flex flex-col items-center justify-center">
                             {item.isPrinted ? (
-                                <Badge
+                                <ActionIcon
                                     size="sm"
                                     color="green"
                                     variant="outline"
-                                    leftSection={<FiCheck size={10} />}
-                                >
-                                    Đã in
-                                </Badge>
+                                ><FiCheck size={10} />
+                                </ActionIcon>
                             ) : (
-                                <Badge
+                                <ActionIcon
                                     size="sm"
                                     color="gray"
                                     variant="outline"
-                                    leftSection={<FiX size={10} />}
-                                >
-                                    Chưa in
-                                </Badge>
+                                ><FiX size={10} />
+                                </ActionIcon>
                             )}
                         </div>
                     </div>

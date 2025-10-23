@@ -1,6 +1,6 @@
 export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL
-export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE
+export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE 
 export const BASE_FE_URL = import.meta.env.VITE_BASE_FE_URL
 export const GOOGLE_LOGIN_URL = `${BASE_BE_URL}/oauth2/authorization/google`
 export const CLOUNDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
@@ -76,6 +76,7 @@ export const API_ENDPOINTS = {
     GET_SHIPPING_FEE_FORCART: '/shipping/fee-for-cart',
     CREATE_SHIPMENTS: '/shipping/create-shipments',
     MYSHOP_LIST: '/shipping/my-shop',
+    MYSHOP_REJECT: (shippingId: string) => `/shipping/my-shop/reject-shipping/${shippingId}`,
   },
   
   ADDRESS: {
@@ -109,9 +110,13 @@ export const API_ENDPOINTS = {
     BASE: '/orders',
     MYSHOP_META_DATA: '/my-shop/orders/meta-data',
     MYSHOP_ORDERS: '/my-shop/orders',
+    MYSHOP_APPROVALS: '/my-shop/orders/approvals',
     MYSHOP_APPROVAL: (shopOrderId: string) => `/my-shop/orders/approve/${shopOrderId}`,
     MYSHOP_REJECT: (orderItemId: string) => `/my-shop/orders/reject-id/${orderItemId}`,
     MYSHOP_REJECTS: '/my-shop/orders/reject-ids',
+
+    USER_ORDERS: '/user/orders',
+    USER_REJECT_ORDER: (shopOrderId: string) => `/user/orders/reject/${shopOrderId}`,
   }
 };
 

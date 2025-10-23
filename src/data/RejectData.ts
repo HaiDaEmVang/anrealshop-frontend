@@ -1,4 +1,4 @@
-export type RejectType = 'order' | 'shipping';
+export type RejectType = 'order' | 'shipping' | 'order-user';
 
 export interface ItemList {
   key: string;
@@ -21,6 +21,36 @@ export const defaultRejectShippingReasons: ItemList[] = [
   { key: 'other', value: 'Lý do khác' }
 ];
 
+export const userCancelOrderReasons: ItemList[] = [
+  { key: 'changed_mind', value: 'Tôi đổi ý, không muốn mua nữa' },
+  { key: 'found_better_price', value: 'Tìm thấy giá tốt hơn ở nơi khác' },
+  { key: 'ordered_by_mistake', value: 'Đặt nhầm sản phẩm' },
+  { key: 'wrong_size_color', value: 'Chọn sai size/màu/phiên bản' },
+  { key: 'payment_issues', value: 'Vấn đề thanh toán' },
+  { key: 'other', value: 'Lý do khác' }
+];
+
 export const getRejectReasons = (type: RejectType): ItemList[] => {
-  return type === 'order' ? defaultRejectOrderReasons : defaultRejectShippingReasons;
+  switch (type) {
+    case 'order':
+      return defaultRejectOrderReasons;
+    case 'shipping':
+      return defaultRejectShippingReasons;
+    case 'order-user':
+      return userCancelOrderReasons;
+    default:
+      return defaultRejectOrderReasons;
+  }
+};
+
+
+export const getReasonValueByKey = (key: string): string | undefined => {
+  const allReasons = [
+    ...defaultRejectOrderReasons,
+    ...defaultRejectShippingReasons,
+    ...userCancelOrderReasons
+  ];
+  
+  const foundItem = allReasons.find(item => item.key === key);
+  return foundItem?.value;
 };
