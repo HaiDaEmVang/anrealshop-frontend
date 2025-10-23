@@ -1,8 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios';
-import showErrorNotification from '../components/Toast/NotificationError';
-import { APP_ROUTES_PUBLIC, BASE_API_URL } from '../constant';
-import { logout } from '../store/authSlice';
-import { store } from '../store/store';
+import { BASE_API_URL } from '../constant';
 import type { ErrorResponseDto } from '../types/CommonType';
 import authService from './AuthService';
 
@@ -74,7 +71,7 @@ axiosInstance.interceptors.response.use(
       } catch {
         processQueue(null, false);
         redirectToLoginWithDelay();
-        return Promise.resolve({data: null});
+        return Promise.resolve({ data: null });
       } finally {
         isRefreshing = false;
       }
@@ -82,7 +79,7 @@ axiosInstance.interceptors.response.use(
 
     if (statusCode === 401) {
       redirectToLoginWithDelay();
-      return Promise.resolve({data: null});
+      return Promise.resolve({ data: null });
     }
 
     if (errorResponseData) {

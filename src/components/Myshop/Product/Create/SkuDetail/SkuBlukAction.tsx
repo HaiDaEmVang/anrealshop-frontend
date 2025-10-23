@@ -39,7 +39,7 @@ const SkuBulkAction = ({ attributes, skus, onApplyBulk, onApplyToGroup }: SkuBul
 
     const attributeValueOptions = useMemo(() => {
         const attribute = attributes.find(attr => attr.attributeKeyDisplay === selectedAttribute);
-        return attribute?.values.map(value => ({ value, label: value })) || [];
+        return Array.from(attribute?.values || []).map(value => ({ value, label: value })) || [];
     }, [selectedAttribute, attributes]);
 
     const getGroupCount = useCallback(() => {
@@ -49,7 +49,7 @@ const SkuBulkAction = ({ attributes, skus, onApplyBulk, onApplyToGroup }: SkuBul
         const count = skus.filter(sku => 
             sku.attributes.some(attr => 
                 attr.attributeKeyName === attributeKey && 
-                attr.values[0] === selectedAttributeValue
+                Array.from(attr.values)[0] === selectedAttributeValue
             )
         ).length;
         return count;

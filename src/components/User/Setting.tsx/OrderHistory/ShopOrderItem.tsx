@@ -71,6 +71,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
     }
 
     const handleRefundOrderItem = (orderItemId: string) => {
+        console.log("Refund order item:", orderItemId);
         showSuccessNotification("Thông báo", "Chức năng đang được phát triển")
     }
 

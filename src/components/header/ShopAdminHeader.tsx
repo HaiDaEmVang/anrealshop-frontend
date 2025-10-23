@@ -73,9 +73,9 @@ export function ShopAdminHeader() {
     { label: 'Quay lại cửa hàng', icon: <FiHome size={14} />, onClick: () => console.log('Go to shop') },
   ];
 
-  const isUnderPath = (parentPath: string) => {
-    return location.pathname.startsWith(parentPath);
-  };
+  // const isUnderPath = (parentPath: string) => {
+  //   return location.pathname.startsWith(parentPath);
+  // };
 
   const isMenuActive = (item: any) => {
     if (item.children) {

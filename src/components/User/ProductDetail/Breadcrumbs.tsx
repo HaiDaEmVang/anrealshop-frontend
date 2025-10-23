@@ -24,7 +24,7 @@ const Breadcrumbs = ({ productName, categoryId, categoryName }: BreadcrumbsProps
             {formatStringView(categoryName)}
           </Anchor>
         )}
-        <Text className="!text-gray-900 text-ellipsis w-1/1" ml={1}>{formatStringView(productName)}</Text>
+        <Text className="!text-gray-900 text-ellipsis w-1/1 !max-w-[400px] overflow-hidden" ml={1}>{formatStringView(productName)}</Text>
       </MantineBreadcrumbs>
     // </div>
   );

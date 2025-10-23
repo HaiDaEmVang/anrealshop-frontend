@@ -35,6 +35,7 @@ const ModalAddress: React.FC<ModalAddressProps> = ({
     const [addresses, setAddresses] = useState<AddressDto[]>([])
     const handleClick = () => {
         showSuccessNotification('Thông báo', "Chức năng thêm địa chỉ mới chưa được triển khai");
+        setAddresses([...addresses]);   // fix  no nhe 
     }
 
     const selectedAddressId = selectedAddress.id;

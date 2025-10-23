@@ -174,10 +174,10 @@ const createSlug = (name: string): string => {
     if (!name) return '';
     return slugify(name, {
         lower: true,
-        replacement: '-', 
-        locale: 'vi', 
+        replacement: '-',
+        locale: 'vi',
         strict: true,
-        trim: true       
+        trim: true
     });
 };
 
@@ -193,7 +193,7 @@ const buildCategoryTree = (list: Category[], parentId: string | null = null): Ca
 
 const flattenCategoryTree = (categoriesToFlatten: Category[], level = 0): Omit<Category, 'children'>[] => {
     let result: Omit<Category, 'children'>[] = [];
-    for (const category of categoriesToFlatten.sort((a,b) => a.order - b.order)) {
+    for (const category of categoriesToFlatten.sort((a, b) => a.order - b.order)) {
         const { children, ...categoryWithoutChildren } = category;
         result.push({ ...categoryWithoutChildren, level });
         if (children && children.length > 0) {
@@ -321,16 +321,14 @@ const CategoryManagement: React.FC = () => {
                         };
                     }
                     return category;
-                }).sort((a,b) => a.order - b.order);
+                }).sort((a, b) => a.order - b.order);
             };
             setCategories(prev => updateCategoryInTree(prev));
-            showSuccessNotification({
-                message: `Đã cập nhật danh mục ${newCategoryData.name}`,
-            });
+            showSuccessNotification("thoong bao", `Đã cập nhật danh mục ${newCategoryData.name}`);
         } else {
             const categoryToAdd = { ...newCategoryData };
             if (newCategoryData.parentId === null) {
-                setCategories(prev => [...prev, categoryToAdd].sort((a,b)=>a.order-b.order));
+                setCategories(prev => [...prev, categoryToAdd].sort((a, b) => a.order - b.order));
             } else {
                 const addChildToCategory = (list: Category[]): Category[] => {
                     return list.map(category => {
@@ -348,16 +346,14 @@ const CategoryManagement: React.FC = () => {
                             };
                         }
                         return category;
-                    }).sort((a,b) => a.order - b.order);
+                    }).sort((a, b) => a.order - b.order);
                 };
                 setCategories(prev => addChildToCategory(prev));
                 if (newCategoryData.parentId && !expandedCategories.includes(newCategoryData.parentId)) {
                     setExpandedCategories(prev => [...prev, newCategoryData.parentId!]);
                 }
             }
-            showSuccessNotification({
-                message: `Đã thêm danh mục ${newCategoryData.name}`,
-            });
+            showSuccessNotification("thoong bao", `Đã thêm danh mục ${newCategoryData.name}`);
         }
         setLoading(false);
         closeModal();
@@ -383,9 +379,7 @@ const CategoryManagement: React.FC = () => {
         setLoading(true);
         const idsToDelete = new Set([currentCategory.id, ...getDescendantIds(currentCategory.id)]);
         setCategories(prev => deleteCategoryInTree(prev, idsToDelete));
-        showSuccessNotification({
-            message: `Đã xóa danh mục ${currentCategory.name} và các danh mục con`,
-        });
+        showSuccessNotification("thoong bao", `Đã xóa danh mục ${currentCategory.name} và các danh mục con`);
         setLoading(false);
         closeDeleteModal();
     }, [currentCategory, getDescendantIds, closeDeleteModal, deleteCategoryInTree]);
@@ -402,15 +396,15 @@ const CategoryManagement: React.FC = () => {
         [newSiblings[index], newSiblings[swapIndex]] = [newSiblings[swapIndex], newSiblings[index]];
         return newSiblings.map((cat, idx) => ({ ...cat, order: idx + 1 }));
     };
-    
+
     const moveCategoryRecursive = useCallback((list: Category[], categoryId: string, direction: 'up' | 'down', parentIdToFind: string | null): { updatedList: Category[], foundAndMoved: boolean } => {
         let foundAndMovedOverall = false;
-    
+
         if (parentIdToFind === null) { // Operating on root items
             const itemParentId = list.find(c => c.id === categoryId)?.parentId;
             if (itemParentId === null) { // Item is a root item
                 const updatedRootList = reorderAndRenumberSiblings(list.filter(c => c.parentId === null), categoryId, direction);
-                const nonRootItems = list.filter(c => c.parentId !== null); 
+                // const nonRootItems = list.filter(c => c.parentId !== null); 
                 const updatedRootMap = new Map(updatedRootList.map(item => [item.id, item]));
                 const newCategoriesList = list.map(item => {
                     if (item.parentId === null) {
@@ -422,10 +416,10 @@ const CategoryManagement: React.FC = () => {
                 return { updatedList: newCategoriesList, foundAndMoved: true };
             }
         }
-    
+
         const processedList = list.map(cat => {
-            if (foundAndMovedOverall) return cat; 
-    
+            if (foundAndMovedOverall) return cat;
+
             if (cat.id === parentIdToFind) { // Found the parent of the item to move (for non-root items)
                 if (cat.children && cat.children.find(child => child.id === categoryId)) {
                     const updatedChildren = reorderAndRenumberSiblings(cat.children, categoryId, direction);
@@ -453,11 +447,11 @@ const CategoryManagement: React.FC = () => {
             setLoading(false);
             return;
         }
-    
+
         setCategories(prevCategories => {
             const result = moveCategoryRecursive(prevCategories, categoryId, direction, categoryToMove.parentId);
             if (result.foundAndMoved) {
-                showSuccessNotification({ message: `Đã thay đổi vị trí danh mục` });
+                showSuccessNotification("thong bao", `Đã thay đổi vị trí danh mục ${categoryToMove.name}`);
                 return result.updatedList;
             }
             return prevCategories; // Should not happen if categoryToMove was found
@@ -485,9 +479,7 @@ const CategoryManagement: React.FC = () => {
         };
 
         setCategories(prevCategories => updateCategoryActiveStateInTree(prevCategories));
-        showSuccessNotification({
-            message: `Đã ${!currentActiveState ? 'hiện' : 'ẩn'} ${categoryName}`,
-        });
+        showSuccessNotification("thong bao", `Đã ${!currentActiveState ? 'hiện' : 'ẩn'} ${categoryName}`);
     }, [flatCategories]);
 
 

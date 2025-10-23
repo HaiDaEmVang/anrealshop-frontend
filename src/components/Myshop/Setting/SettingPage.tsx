@@ -5,15 +5,10 @@ import {
     Button,
     Container,
     Divider,
-    FileInput,
     Group,
-    Image,
     Paper,
-    Stack,
     Tabs,
     Text,
-    Textarea,
-    TextInput,
     Title,
     useMantineTheme
 } from '@mantine/core';
@@ -24,12 +19,11 @@ import {
     FiChevronRight,
     FiHome,
     FiSave,
-    FiShoppingBag,
-    FiUpload
+    FiShoppingBag
 } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 import About from './About'; // Import component thông tin cá nhân
 import TabControll from './TabControll';
-import { Link } from 'react-router-dom';
 
 interface SettingsProps {
     // Thêm các props nếu cần thiết
@@ -43,18 +37,18 @@ interface ProfileData {
     bio: string;
 }
 
-interface ShopSettings {
-    shopName: string;
-    shopDescription: string;
-    shopLogo: File | null;
-    shopBanner: File | null;
-    shopColors: {
-        primary: string;
-        secondary: string;
-    };
-    categories: string[];
-    paymentMethods: string[];
-}
+// interface ShopSettings {
+//     shopName: string;
+//     shopDescription: string;
+//     shopLogo: File | null;
+//     shopBanner: File | null;
+//     shopColors: {
+//         primary: string;
+//         secondary: string;
+//     };
+//     categories: string[];
+//     paymentMethods: string[];
+// }
 
 
 const Setting: React.FC<SettingsProps> = () => {
@@ -76,22 +70,22 @@ const Setting: React.FC<SettingsProps> = () => {
     const [avatarPreview, setAvatarPreview] = useState<string | null>('https://i.pravatar.cc/150?img=12');
 
     // Shop settings
-    const [shopSettings, setShopSettings] = useState<ShopSettings>({
-        shopName: 'AnrealShop',
-        shopDescription: 'Shop thời trang chất lượng cao với giá cả hợp lý.',
-        shopLogo: null,
-        shopBanner: null,
-        shopColors: {
-            primary: '#3b82f6',
-            secondary: '#f43f5e',
-        },
-        categories: ['clothing', 'accessories'],
-        paymentMethods: ['momo', 'cod', 'banking'],
-    });
+    // const [shopSettings, setShopSettings] = useState<ShopSettings>({
+    //     shopName: 'AnrealShop',
+    //     shopDescription: 'Shop thời trang chất lượng cao với giá cả hợp lý.',
+    //     shopLogo: null,
+    //     shopBanner: null,
+    //     shopColors: {
+    //         primary: '#3b82f6',
+    //         secondary: '#f43f5e',
+    //     },
+    //     categories: ['clothing', 'accessories'],
+    //     paymentMethods: ['momo', 'cod', 'banking'],
+    // });
 
     // Shop logo and banner previews
-    const [shopLogoPreview, setShopLogoPreview] = useState<string | null>('https://placehold.co/100x100/3b82f6/white?text=A');
-    const [shopBannerPreview, setShopBannerPreview] = useState<string | null>('https://placehold.co/800x200/f43f5e/white?text=AnrealShop');
+    // const [shopLogoPreview, setShopLogoPreview] = useState<string | null>('https://placehold.co/100x100/3b82f6/white?text=A');
+    // const [shopBannerPreview, setShopBannerPreview] = useState<string | null>('https://placehold.co/800x200/f43f5e/white?text=AnrealShop');
 
     // Handle profile data changes
     const handleProfileChange = (field: keyof ProfileData, value: any) => {
@@ -113,23 +107,23 @@ const Setting: React.FC<SettingsProps> = () => {
 
 
     // Handle shop settings change
-    const handleShopChange = <K extends keyof ShopSettings>(field: K, value: ShopSettings[K]) => {
-        setShopSettings(prev => ({ ...prev, [field]: value }));
-    };
+    // const handleShopChange = <K extends keyof ShopSettings>(field: K, value: ShopSettings[K]) => {
+    //     setShopSettings(prev => ({ ...prev, [field]: value }));
+    // };
 
 
 
     // Handle shop logo change
-    const handleShopLogoChange = (file: File | null) => {
-        handleShopChange('shopLogo', file);
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setShopLogoPreview(e.target?.result as string);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+    // const handleShopLogoChange = (file: File | null) => {
+    //     handleShopChange('shopLogo', file);
+    //     if (file) {
+    //         const reader = new FileReader();
+    //         reader.onload = (e) => {
+    //             setShopLogoPreview(e.target?.result as string);
+    //         };
+    //         reader.readAsDataURL(file);
+    //     }
+    // };
 
 
     // Save settings

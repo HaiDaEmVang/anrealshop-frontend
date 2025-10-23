@@ -121,7 +121,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                 <Box key={index}>
                   <Text size="xs" fw={500}>{attribute.attributeKeyDisplay}:</Text>
                   <Group gap={5} mt={2}>
-                    {attribute.values.map((value, idx) => (
+                    {Array.from(attribute.values).map((value, idx) => (
                       <Badge key={idx} size="sm" variant="light" color="blue">
                         {value}
                       </Badge>
