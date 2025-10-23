@@ -57,7 +57,7 @@ const SAVED_ADDRESSES: SimpleAddressDto[] = [
 
 
 const Header: React.FC = () => {
-    const { user, isAuthenticated, status, error } = useAppSelector((state) => state.auth);
+    const { user, isAuthenticated } = useAppSelector((state) => state.auth);
     const useDispatch = useAppDispatch();
 
     const location = useLocation();
@@ -277,7 +277,7 @@ const Header: React.FC = () => {
                                             <Menu.Item
                                                 leftSection={<FiPackage size={16} />}
                                                 component={Link}
-                                                to="/account/orders"
+                                                to="/settings/orders"
                                             >
                                                 <Text size="sm">Đơn hàng của tôi</Text>
                                             </Menu.Item>

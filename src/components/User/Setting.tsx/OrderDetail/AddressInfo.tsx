@@ -1,6 +1,7 @@
-import React from 'react';
 import { Box, Divider, Group, Paper, Text, Title } from '@mantine/core';
-import { FiUser, FiPhone, FiMapPin } from 'react-icons/fi';
+import React from 'react';
+import { FiMapPin, FiPhone, FiUser } from 'react-icons/fi';
+import { ButtonCopy } from '../../../common/ButtonCopy';
 
 interface AddressInfoProps {
     name: string;
@@ -29,17 +30,17 @@ const AddressInfo: React.FC<AddressInfoProps> = ({
                     <Text size="sm" fw={500}>{name}</Text>
                 </Group>
 
-                <Group gap="xs" mb="xs">
+                <Group gap="xs" mb="xs" >
                     <FiPhone size={16} className="text-gray-500" />
                     <Text size="sm">{phone}</Text>
                 </Group>
 
-                <div className='flex flex-nowrap gap-3'>
-                    <FiMapPin size={60} className="text-gray-500 -mt-5 self-start" />
+                <Group className='!flex !flex-nowrap gap-3' >
+                    <FiMapPin size={20} className="text-gray-500 self-start" />
                     <Text size="sm">
                         {address}
                     </Text>
-                </div>
+                </Group>
             </Box>
 
             {(shippingCarrier || trackingNumber) && (
@@ -55,9 +56,12 @@ const AddressInfo: React.FC<AddressInfoProps> = ({
                         )}
 
                         {trackingNumber && (
-                            <Group>
-                                <Text size="sm" fw={500}>Mã vận đơn:</Text>
-                                <Text size="sm">{trackingNumber}</Text>
+                            <Group >
+                                <Group>
+                                    <Text size="sm" fw={500}>Mã vận đơn:</Text>
+                                    <ButtonCopy id={trackingNumber} />
+                                </Group>
+                                <Text size="sm" className='hover:underline cursor-pointer'>{trackingNumber}</Text>
                             </Group>
                         )}
                     </Box>

@@ -1,6 +1,9 @@
 import type { SimpleAddressDto } from "./AddressType";
+import type { HistoryShipping, PaymentMethodId } from "./ShipmentType";
 
-export type OrderStatus = 'ALL'| 'COMPLETED' | 'PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'AWAITING_SHIPMENT' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'REFUND' | 'CANCELED';
+// export type OrderStatus = 'ALL'| 'COMPLETED' | 'PROCESSING' | 'PENDING_CONFIRMATION' | 'PREPARING' | 'AWAITING_SHIPMENT' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'REFUND' | 'CANCELED';
+export type OrderStatus = 'ALL'| 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'CONFIRMED' | 'PREPARING' | 'SHIPPING' | 'IN_TRANSIT' | 'DELIVERED' | 'CLOSED';
+
 
 export type ShopOrderStatus = 'INIT_PROCESSING' | 'PENDING_CONFIRMATION' | 'CONFIRMED' | 'PREPARING' | 'SHIPPING' | 'DELIVERED' | 'CLOSED';
 
@@ -62,7 +65,11 @@ export interface OrderRejectRequest {
 export interface HistoryTrackDto {
   id: string;
   status: OrderStatus;
-  title: string;
+  notes: HistoryTrackNote[];
+}
+
+export interface HistoryTrackNote {
+  content: string;
   timestamp: Date|string;
 }
 
@@ -126,6 +133,8 @@ export interface UserProductOrderItemDto {
  
     cancelReason: string;
     isReviewed: boolean;
+
+    orderItemId: string;
 } 
 
 export interface UserOrderItemDto {
@@ -156,13 +165,15 @@ export interface UserOrderDetailDto {
   shopName: string;
   shopImage: string;
 
-  orderHistory: HistoryTrackDto[];
+  orderHistory: HistoryShipping[];
   productItems: ProductOrderItemDto[];
 
   totalProductCost: number;
   totalShippingCost: number;
+  shippingId?: string;
   shippingFee: number;
   shippingDiscount: number;
+  paymentMethod: PaymentMethodId;
 
   totalCost: number;
 

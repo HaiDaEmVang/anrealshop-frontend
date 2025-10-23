@@ -161,6 +161,7 @@ const OrderHistory = () => {
                                 onCancelOrder={handleCancelOrder}
                                 onBuyAgain={handleBuyAgain}
                                 onReview={handleReview}
+                                activeStatus={activeStatus}
                             />
                         ))}
                     </Stack>

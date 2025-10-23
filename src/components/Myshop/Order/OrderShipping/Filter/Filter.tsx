@@ -49,7 +49,7 @@ const Filter = ({ initialParams, onFilterChange, onResetFilter, orderCount = 0 }
             confirmED: value[1] ? formatDateForBe(value[1]) : '',
             preparingStatus: preparingStatus,
         });
-    }, [onFilterChange, orderType, searchTypeValue, searchTerm, sortValue, value, preparingStatus])
+    }, [preparingStatus])
 
     const resetFilters = () => {
         if (onResetFilter) {
