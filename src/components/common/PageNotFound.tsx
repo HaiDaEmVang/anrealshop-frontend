@@ -14,14 +14,15 @@ interface PageNotFoundProps {
 const PageNotFound: React.FC<PageNotFoundProps> = ({
     title = 'Trang không tồn tại',
     description = 'Xin lỗi, chúng tôi không thể tìm thấy trang bạn đang tìm kiếm.',
-    redirectLink = APP_ROUTES.HOME,
+    redirectLink,
     redirectLabel = 'Về trang chủ',
     imageUrl = '/images/404.png'
 }) => {
     const navigate = useNavigate();
 
     const handleRedirect = () => {
-        navigate(redirectLink);
+        if (redirectLink) 
+            navigate(redirectLink);
     };
 
     return (
@@ -41,13 +42,13 @@ const PageNotFound: React.FC<PageNotFoundProps> = ({
                 <Text size="lg" className="text-gray-600 max-w-md">
                     {description}
                 </Text>
-                <Button
+                {redirectLink && <Button
                     size="sm"
                     className="bg-primary hover:bg-primary/90 mt-2"
                     onClick={handleRedirect}
                 >
                     {redirectLabel}
-                </Button>
+                </Button>}
             </Stack>
         </Container>
     );

@@ -3,6 +3,7 @@ import {
   Grid
 } from '@mantine/core';
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 import { paymentMethodsDataDefault } from '../../../data/CheckoutData';
 import { useAppSelector } from '../../../hooks/useAppRedux';
@@ -18,9 +19,11 @@ import CheckoutReview from './CheckoutReview';
 import ListProduct from './ListProductForShop';
 import PaymentMethod from './PaymentMethod';
 import Address from './address/Address';
+import PageNotFound from '../../common/PageNotFound';
 
 
 const CheckoutPage = () => {
+  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
 
   const [itemCheckoutInfo, setItemCheckoutInfo] = useState<CheckoutInfoDto[]>([]);
@@ -35,14 +38,24 @@ const CheckoutPage = () => {
   const idItems: ItemsCheckoutRequest = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS) || '{}');
 
   useEffect(() => {
+    if (!idItems || !idItems.length) {
+      showErrorNotification("Lỗi truy xuất", "Không tìm thấy đơn hàng nào để thanh toán");
+      const timer = setTimeout(() => {
+        navigate(APP_ROUTES.HOME);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  useEffect(() => {
     if (user?.address) {
       setSelectedAddress(user.address);
     }
   }, [user?.address]);
 
   useEffect(() => {
-    if (!idItems) {
-      showErrorNotification("Lỗi thanh toán", "Không tìm thấy sản phẩm nào để thanh toán");
+
+    if (!idItems || !idItems.length) {
       return;
     }
     setItemLoading(true);
@@ -105,6 +118,12 @@ const CheckoutPage = () => {
       });
   };
 
+  if (!idItems || !idItems.length) {
+    return <PageNotFound 
+      title='Không tìm thấy đơn hàng để thanh toán'
+      description='Bạn sẽ được chuyển hướng về trang chủ để thêm đơn hàng.'
+    />;
+  }
 
   return (
     <Container size="xl" className="py-6">
