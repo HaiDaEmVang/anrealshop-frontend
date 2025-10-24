@@ -142,12 +142,6 @@ const ProductDetailPage = () => {
     }
   }, [product, selectedAttributes, getOrderImageActive]);
 
-  useEffect(() => {
-    console.log('Selected Attributes:', selectedAttributes);
-    console.log('Selected SKU:', selectedSku);
-  }, [selectedAttributes, selectedSku]);
-
-
   if (isLoading) {
     return (
       <Container size="xl" className="py-8">
