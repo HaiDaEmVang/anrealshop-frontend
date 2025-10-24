@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import type { PaymentResultData } from '../../../types/PaymentResultType';
 import { formatPrice } from '../../../untils/Untils';
 import { getPaymentMethodIcon, getPaymentMethodName } from './utils';
+import { ButtonCopy } from '../../common/ButtonCopy';
 
 interface PaymentPendingProps {
   paymentResult: PaymentResultData;
@@ -20,12 +21,12 @@ interface PaymentPendingProps {
 
 const PaymentPendingView = ({ paymentResult }: PaymentPendingProps) => {
   return (
-    <Container size="md" className="py-12">
+    <Container size="md" className="py-8">
       <Paper radius="md" shadow="md" p="xl">
-        <Box className="text-center mb-8">
-          <FiClock size={64} className="mx-auto mb-4 text-amber-500" />
-          <Title order={2} className="text-amber-600">Đơn hàng đang xử lý!</Title>
-          <Text size="lg" className="mt-2 text-slate-600">
+        <Box className="text-center mb-6">
+          <FiClock size={40} className="mx-auto mb-4 text-amber-500" />
+          <Title order={3} className="text-amber-600">Đơn hàng đang xử lý!</Title>
+          <Text size="md" className="mt-2 text-slate-600">
             Đơn hàng của bạn đã được tiếp nhận và sẽ được thanh toán khi nhận hàng
           </Text>
         </Box>
@@ -36,7 +37,10 @@ const PaymentPendingView = ({ paymentResult }: PaymentPendingProps) => {
           <Grid gutter="md">
             <Grid.Col span={{ base: 12, sm: 6 }}>
               <Text fw={500} className="text-slate-700">Mã đơn hàng:</Text>
-              <Text className="text-slate-600">{paymentResult.orderId.substring(0, 8)}...</Text>
+              <Group gap="xs">
+                <Text className="text-slate-600 underline">{paymentResult.orderId.substring(0, 18)}...</Text>
+                <ButtonCopy id={paymentResult.orderId} />
+              </Group>
 
               <Text fw={500} className="text-slate-700 mt-3">Ngày đặt hàng:</Text>
               <Text className="text-slate-600">{new Date(paymentResult.orderDate).toLocaleString('vi-VN')}</Text>
@@ -56,7 +60,7 @@ const PaymentPendingView = ({ paymentResult }: PaymentPendingProps) => {
         </Paper>
 
         <Box className="bg-amber-50 p-4 rounded-md border border-amber-200 mb-6">
-          <Group align="flex-start" gap="sm">
+          <Group align="space-between"  wrap='nowrap' gap="sm">
             <FiClock size={20} className="text-amber-500 mt-0.5" />
             <Box>
               <Text fw={600} className="text-amber-800">Thanh toán khi nhận hàng</Text>
@@ -84,7 +88,7 @@ const PaymentPendingView = ({ paymentResult }: PaymentPendingProps) => {
             </Button>
             <Button 
               component={Link} 
-              to="/settings/orders"
+              to={`/settings/orders`}
               leftSection={<FiPackage size={16} />}
               color="blue" 
               className="bg-primary"

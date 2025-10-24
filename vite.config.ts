@@ -5,10 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     // allowedHosts: [
-    //   'shop.haiemdavang.id.vn', 
+    //   'local.haiemdavang.id.vn', 
     // ],
     // hmr: {
-    //     host: 'shop.haiemdavang.id.vn',
+    //     host: 'local.haiemdavang.id.vn',
     //     // clientPort: 80,
     // },
   }

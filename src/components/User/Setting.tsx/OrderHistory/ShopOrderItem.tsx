@@ -29,7 +29,7 @@ import { formatDate, formatPrice } from '../../../../untils/Untils';
 import RejectModal from '../../../RejectModal/RejectOrder';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
-
+ 
 interface ShopOrderItemProps {
     order: UserOrderItemDto;
     onCancelOrder?: (orderId: string, reason: string) => void;
@@ -47,10 +47,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
 }) => {
     const { getStatusLabel } = useOrderStatus();
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
-    const handleCancelOrder = () => {
-        setRejectModalOpen(true);
-    };
-
     const handleBuyAgain = () => {
         if (onBuyAgain) {
             const productIds = order.productOrderItemDtoSet.map(product => product.productId);
@@ -81,7 +77,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
 
     return (
         <Paper withBorder p="md" radius="md">
-            {/* Shop info and order status */}
             <Group justify="space-between" mb="sm">
                 <Group gap="sm">
                     <Text size="sm" fw={600}>{order.shopOrderName}</Text>
@@ -104,7 +99,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                     </Button>
                 </Group>
                 <Group gap={"xs"}>
-                    <Text size='sm'>{getStatusLabel(primaryStatus)}</Text>
+                    <Text size='sm'>{getStatusLabel(order.orderStatus[0])}</Text>
                     {order.productOrderItemDtoSet.some(p => p.cancelReason) && (
                         <Tooltip
                             label={
@@ -133,7 +128,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
 
             </Group>
 
-            {/* Products */}
             <Stack gap="sm" mb="md">
                 {order.productOrderItemDtoSet.map((product, index) => (
                     <React.Fragment key={index}>
@@ -205,7 +199,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                 ))}
             </Stack>
 
-            {/* Order summary */}
             <Box className="bg-gray-100 p-2 rounded-md">
                 <Group justify="space-between">
                     <Text size='sm' fw={500}>Tổng thanh toán:</Text>
@@ -215,7 +208,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                 </Group>
             </Box>
 
-            {/* Action buttons */}
             <Group justify='flex-end' mt="sm">
                 <Button
                     variant="light"
@@ -246,7 +238,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                         color="red"
                         size="xs"
                         leftSection={<FiX size={14} />}
-                        onClick={handleCancelOrder}
+                        onClick={() => setRejectModalOpen(true)}
                     >
                         Hủy đơn
                     </Button>

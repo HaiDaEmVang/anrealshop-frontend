@@ -1,35 +1,30 @@
 import {
-  Button,
   Container,
   Grid,
   Group,
   Paper,
-  Skeleton,
-  Text,
-  Title
+  Skeleton
 } from '@mantine/core';
+import { motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FiAlertTriangle } from 'react-icons/fi';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import { APP_ROUTES } from '../../../constant';
-import { addToCart } from '../../../store/authSlice';
-import { useAppDispatch } from '../../../hooks/useAppRedux';
 import { useGetProduct } from '../../../hooks/useProduct';
-import { CartService } from '../../../service/CartService';
+import { useURLParams } from '../../../hooks/useURLParams';
 import type { ProductAttribute } from '../../../types/AttributeType';
-import type { CartAddItemDto } from '../../../types/CartType';
 import type { MyShopProductSkuDto, ProductDetailDto } from '../../../types/ProductType';
-import { getErrorMessage } from '../../../untils/ErrorUntils';
-import showErrorNotification from '../../Toast/NotificationError';
-import showSuccessNotification from '../../Toast/NotificationSuccess';
+import PageNotFound from '../../common/PageNotFound';
 import Breadcrumbs from './Breadcrumbs';
 import ImageProduct from './ImageProduct';
 import InforProduct from './productInfo/InforProduct';
 
+
+
 const ProductDetailPage = () => {
-  
+
   const { slug } = useParams<{ slug: string }>();
+  const { getParam, updateParams } = useURLParams();
   const [product, setProduct] = useState<ProductDetailDto | null>(null);
   const [media, setMedia] = useState<string[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
@@ -38,7 +33,42 @@ const ProductDetailPage = () => {
 
   const { isLoading, getProductById } = useGetProduct();
 
-  const dispatch = useAppDispatch();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [slug]);
+
+  useEffect(() => {
+    if (slug) {
+      getProductById(slug)
+        .then(productData => {
+          setProduct(productData);
+          const medias = new Set<string>();
+          productData.medias?.forEach(media => {
+            if (media.url) {
+              medias.add(media.url);
+            }
+          });
+          productData.productSkus?.forEach(sku => {
+            if (sku.imageUrl) {
+              medias.add(sku.imageUrl);
+            }
+          });
+          setMedia(Array.from(medias));
+
+          const attributesFromURL: Record<string, string> = {};
+          productData.productSkus?.[0]?.attributeForSku?.forEach(attr => {
+            const paramValue = getParam(attr.attributeKeyName);
+            if (paramValue) {
+              attributesFromURL[attr.attributeKeyName] = paramValue;
+            }
+          });
+
+          if (Object.keys(attributesFromURL).length > 0) {
+            setSelectedAttributes(attributesFromURL);
+          }
+        })
+    }
+  }, [slug, getProductById]);
 
   const getOrderImageActive = useCallback((url: string) => {
     if (!url) return 0;
@@ -78,6 +108,8 @@ const ProductDetailPage = () => {
     };
     setSelectedAttributes(newSelectedAttributes);
 
+    updateParams(newSelectedAttributes);
+
     if (product?.productSkus) {
       const matchingSku = product.productSkus.find(sku => {
         if (!sku.attributeForSku) return false;
@@ -92,76 +124,31 @@ const ProductDetailPage = () => {
     }
   };
 
-
-
-  const handleAddToCart = (quantity: number) => {
-    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
-      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
-      return ;
-    }
-    if (quantity < 1 || quantity > selectedSku.quantity) {
-      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
-      return ;
-    }
-
-    const cartItemDto: CartAddItemDto = {
-      productSkuId: selectedSku.id,
-      quantity: quantity,
-    }
-
-    CartService.addItemToCart(cartItemDto)
-      .then((data) => {
-        showSuccessNotification("Thông báo", "Sản phẩm đã được thêm vào giỏ hàng thành công.");
-        if (data.isNew)
-          dispatch(addToCart());
-      })
-      .catch((error) => {
-        showErrorNotification("Lỗi", getErrorMessage(error));
-      });
-  }
-
-  const handleBuyNow = (quantity: number) => {
-    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
-      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
-      return ;
-    }
-    if (quantity < 1 || quantity > selectedSku.quantity) {
-      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
-      return ;
-    }
-    localStorage.setItem('orderItemIds', JSON.stringify({ [selectedSku.id]: quantity }));
-
-    window.location.href = APP_ROUTES.CHECKOUT;
-  }
-
   useEffect(() => {
-    if (slug) {
-      getProductById(slug)
-        .then(productData => {
-          setProduct(productData);
-          const medias = new Set<string>();
-          productData.medias?.forEach(media => {
-            if (media.url) {
-              medias.add(media.url);
-            }
-          });
-          productData.productSkus?.forEach(sku => {
-            if (sku.imageUrl) {
-              medias.add(sku.imageUrl);
-            }
-          });
-          setMedia(Array.from(medias));
-        })
+    if (product?.productSkus && Object.keys(selectedAttributes).length > 0) {
+      const matchingSku = product.productSkus.find(sku => {
+        if (!sku.attributeForSku) return false;
+        if (sku.attributeForSku.length !== Object.keys(selectedAttributes).length) return false;
+        return sku.attributeForSku.every(attr => {
+          const attrKey = attr.attributeKeyName;
+          return !selectedAttributes[attrKey] || selectedAttributes[attrKey] === attr.values;
+        });
+      });
+
+      if (matchingSku) {
+        setSelectedSku(matchingSku);
+        setSelectedImage(getOrderImageActive(matchingSku?.imageUrl || product.thumbnailUrl));
+      }
     }
-  }, [slug, getProductById]);
-  // Loading skeleton
+  }, [product, selectedAttributes, getOrderImageActive]);
+
   if (isLoading) {
     return (
       <Container size="xl" className="py-8">
         <Skeleton height={30} width="60%" className="mb-8" />
 
         <Grid gutter="xl">
-          <Grid.Col span={{ base: 12, md: 5 }}>
+          <Grid.Col span={{ base: 12, md: 4.5 }}>
             <Skeleton height={400} className="mb-4" />
             <Group>
               {[1, 2, 3, 4].map(i => (
@@ -169,7 +156,7 @@ const ProductDetailPage = () => {
               ))}
             </Group>
           </Grid.Col>
-          <Grid.Col span={{ base: 12, md: 7 }}>
+          <Grid.Col span={{ base: 12, md: 7.5 }}>
             <Skeleton height={50} className="mb-4" />
             <Skeleton height={30} width="40%" className="mb-3" />
             <Skeleton height={40} width="30%" className="mb-4" />
@@ -187,36 +174,31 @@ const ProductDetailPage = () => {
 
   if (!product) {
     return (
-      <Container size="xl" className="py-8">
-        <Paper withBorder p="xl" className="text-center">
-          <FiAlertTriangle size={48} className="text-yellow-500 mb-4 mx-auto" />
-          <Title order={3} className="mb-2">Sản phẩm không tồn tại</Title>
-          <Text className="mb-4">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</Text>
-          <Button
-            component={Link}
-            to="/products"
-            variant="filled"
-            color="blue"
-            className="bg-primary hover:bg-primary-dark"
-          >
-            Quay lại danh sách sản phẩm
-          </Button>
-        </Paper>
-      </Container>
+      <PageNotFound
+        title="Sản phẩm không tồn tại"
+        description="Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa."
+        redirectLink={APP_ROUTES.HOME}
+        redirectLabel="Xem sản phẩm khác"
+      />
     );
   }
 
   return (
     <Container size="xl" className="py-4">
-      {/* Sử dụng component Breadcrumbs */}
-      <Breadcrumbs
-        productName={product.name}
-        categoryId={product.categoryId}
-        categoryName={product.categoryPath?.split(" > ").pop() || "Danh mục"}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Breadcrumbs
+          productName={product.name}
+          categoryId={product.categoryId}
+          categoryName={product.categoryPath?.split(" > ").pop() || "Danh mục"}
+        />
+      </motion.div>
+
       <Grid gutter="md">
-        {/* Phần ảnh sản phẩm - sử dụng component ImageProduct */}
-        <Grid.Col span={{ base: 12, md: 4.6 }} className=''>
+        <Grid.Col span={{ base: 12, md: 4.6 }}>
           <Paper radius="md" className="!mb-8 bg-white shadow-sm sticky top-4">
             <div className="p-4">
               <ImageProduct
@@ -230,7 +212,6 @@ const ProductDetailPage = () => {
           </Paper>
         </Grid.Col>
 
-        {/* Thông tin sản phẩm - sử dụng component InforProduct */}
         <Grid.Col span={{ base: 12, md: 7.4 }}>
           <Paper radius="md" className="!mb-8 !bg-white !shadow-sm">
             <div className="p-4">
@@ -239,8 +220,6 @@ const ProductDetailPage = () => {
                 selectedAttributes={selectedAttributes}
                 selectedSku={selectedSku}
                 onAttributeSelect={handleAttributeSelect}
-                onAddToCart={handleAddToCart}
-                onBuyNow={handleBuyNow}
                 groupedAttributes={groupedAttributes}
               />
             </div>

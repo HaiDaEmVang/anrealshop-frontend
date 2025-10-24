@@ -3,8 +3,8 @@ import {
   Grid
 } from '@mantine/core';
 import { useCallback, useEffect, useState } from 'react';
-
-// Import Address component
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 import { paymentMethodsDataDefault } from '../../../data/CheckoutData';
 import { useAppSelector } from '../../../hooks/useAppRedux';
 import { CheckoutService, type ItemsCheckoutRequest } from '../../../service/CheckoutService';
@@ -19,10 +19,11 @@ import CheckoutReview from './CheckoutReview';
 import ListProduct from './ListProductForShop';
 import PaymentMethod from './PaymentMethod';
 import Address from './address/Address';
-import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
+import PageNotFound from '../../common/PageNotFound';
 
 
 const CheckoutPage = () => {
+  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
 
   const [itemCheckoutInfo, setItemCheckoutInfo] = useState<CheckoutInfoDto[]>([]);
@@ -37,17 +38,33 @@ const CheckoutPage = () => {
   const idItems: ItemsCheckoutRequest = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS) || '{}');
 
   useEffect(() => {
-    if (!idItems) {
-      showErrorNotification("Lỗi thanh toán", "Không tìm thấy sản phẩm nào để thanh toán");
+    if (!idItems || !idItems.length) {
+      showErrorNotification("Lỗi truy xuất", "Không tìm thấy đơn hàng nào để thanh toán");
+      const timer = setTimeout(() => {
+        navigate(APP_ROUTES.HOME);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user?.address) {
+      setSelectedAddress(user.address);
+    }
+  }, [user?.address]);
+
+  useEffect(() => {
+
+    if (!idItems || !idItems.length) {
       return;
     }
     setItemLoading(true);
     CheckoutService.getCheckoutInfo(idItems)
-    .then(data => {
-      setItemCheckoutInfo(data);
-    })
-    .catch(error => showErrorNotification("Tải danh sách sản phẩm thất bại", getErrorMessage(error)))
-    .finally(() => setItemLoading(false));
+      .then(data => {
+        setItemCheckoutInfo(data);
+      })
+      .catch(error => showErrorNotification("Tải danh sách sản phẩm thất bại", getErrorMessage(error)))
+      .finally(() => setItemLoading(false));
   }, [])
 
   const getAllIdItem = useCallback(() => {
@@ -68,13 +85,13 @@ const CheckoutPage = () => {
   useEffect(() => {
     refreshFee();
   }, [selectedAddress]);
-  
+
   const handlePlaceOrder = () => {
     if (!selectedAddress) {
       showErrorNotification("Lỗi đặt hàng", "Vui lòng chọn địa chỉ giao hàng");
       return;
     }
-    
+
     setLoading(true);
     const request: CheckoutRequestDto = {
       addressId: selectedAddress.id,
@@ -87,20 +104,26 @@ const CheckoutPage = () => {
     }
 
     CheckoutService.createCheckout(request)
-    .then((data: CheckoutResponseDto) => {
-      if (data.bankTransfer) {
-        window.location.href = data.urlRedirect;
-      }else {
-        window.location.href = APP_ROUTES.PAYMENT_RESULT(data.orderId);
-      }
-      setLoading(false);
-    })
-    .catch(error => {
-      setLoading(false);
-      showErrorNotification("Lỗi đặt hàng", getErrorMessage(error));
-    });
+      .then((data: CheckoutResponseDto) => {
+        if (data.bankTransfer) {
+          window.location.href = data.urlRedirect;
+        } else {
+          window.location.href = APP_ROUTES.PAYMENT_RESULT(data.orderId);
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        setLoading(false);
+        showErrorNotification("Lỗi đặt hàng", getErrorMessage(error));
+      });
   };
 
+  if (!idItems || !idItems.length) {
+    return <PageNotFound 
+      title='Không tìm thấy đơn hàng để thanh toán'
+      description='Bạn sẽ được chuyển hướng về trang chủ để thêm đơn hàng.'
+    />;
+  }
 
   return (
     <Container size="xl" className="py-6">
@@ -109,39 +132,39 @@ const CheckoutPage = () => {
         <Grid.Col span={{ base: 12, md: 8 }}>
 
           <Address
-            selectedAddress={selectedAddress }
+            selectedAddress={selectedAddress}
             setSelectedAddress={setSelectedAddress}
           />
 
-          <ListProduct 
-            cartItems={itemCheckoutInfo} 
-            feeUpdate={feeUpdated} 
+          <ListProduct
+            cartItems={itemCheckoutInfo}
+            feeUpdate={feeUpdated}
             feeLoading={feeLoading}
-            isLoading={itemLoading} 
+            isLoading={itemLoading}
           />
 
-          
-        <PaymentMethod
-          paymentMethods={paymentMethodsDataDefault}
-          selectedPaymentMethod={selectedPaymentMethod}
-          setSelectedPaymentMethod={setSelectedPaymentMethod}
-        />
+
+          <PaymentMethod
+            paymentMethods={paymentMethodsDataDefault}
+            selectedPaymentMethod={selectedPaymentMethod}
+            setSelectedPaymentMethod={setSelectedPaymentMethod}
+          />
 
 
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
-        <div className="sticky top-4">
-          <CheckoutReview
-            itemCheckoutInfo={itemCheckoutInfo}
-            feeUpdated={feeUpdated}
-            feeLoading={feeLoading}
-            onPlaceOrder={handlePlaceOrder}
-            loading={loading}
-            isLoading={itemLoading}
-          />
-        </div>
-      </Grid.Col>
+          <div className="sticky top-4">
+            <CheckoutReview
+              itemCheckoutInfo={itemCheckoutInfo}
+              feeUpdated={feeUpdated}
+              feeLoading={feeLoading}
+              onPlaceOrder={handlePlaceOrder}
+              loading={loading}
+              isLoading={itemLoading}
+            />
+          </div>
+        </Grid.Col>
       </Grid>
     </Container>
   );
