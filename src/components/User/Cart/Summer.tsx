@@ -16,6 +16,7 @@ import type { CartDto } from '../../../types/CartType';
 import type { CartShippingFee } from '../../../types/ShipmentType';
 import { formatPrice } from '../../../untils/Untils';
 import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
+import showErrorNotification from '../../Toast/NotificationError';
 
 interface SummerProps {
   cartItems: CartDto[];
@@ -48,6 +49,7 @@ const Summer: React.FC<SummerProps> = ({
 
   const handlePayment = () => {
     if (!hasSelectedItems) {
+      showErrorNotification('Thông báo','Vui lòng chọn sản phẩm để tiến hành thanh toán');
       return;
     }
     const idItemsSelected: ItemsCheckoutRequest = cartItems
@@ -65,12 +67,10 @@ const Summer: React.FC<SummerProps> = ({
 
   return (
     <Paper radius="md" shadow="sm" p="md" className="bg-white mb-6">
-      {/* Tiêu đề */}
       <Title order={4} className="mb-4 text-slate-800">
         Tóm tắt đơn hàng
       </Title>
 
-      {/* Thông tin thanh toán - luôn hiển thị, ngay cả khi chưa chọn sản phẩm */}
       <Box className="space-y-3 mb-3">
         <Group justify="space-between">
           <Text size="sm" className="text-contentText">Tạm tính ({selectedItemsCount} sản phẩm):</Text>
@@ -106,7 +106,6 @@ const Summer: React.FC<SummerProps> = ({
         </Group>
       </Box>
 
-      {/* Thông báo miễn phí vận chuyển - chỉ hiển thị khi có sản phẩm được chọn */}
       {hasSelectedItems && subtotal < freeShippingThreshold && subtotal > 0 && (
         <Alert className="mb-4 bg-amber-50 border-amber-100 text-amber-900" p="xs">
           <Group gap={6}>
@@ -118,7 +117,6 @@ const Summer: React.FC<SummerProps> = ({
         </Alert>
       )}
 
-      {/* Thông báo khi chưa chọn sản phẩm */}
       {!hasSelectedItems && (
         <Alert className="mb-4 bg-blue-50 border-blue-100 text-blue-800" p="xs">
           <Group gap={6}>
@@ -132,16 +130,12 @@ const Summer: React.FC<SummerProps> = ({
 
       <Divider className="my-4" />
 
-      {/* Tổng cộng - luôn hiển thị */}
       <Group justify="space-between" className="mb-6">
         <Text fw={600} className="text-slate-900">Tổng cộng:</Text>
         <Text fw={700} size="lg" className="text-primary">{total.toLocaleString()}₫</Text>
       </Group>
 
-      {/* Nút thanh toán - vô hiệu hóa khi chưa chọn sản phẩm */}
       <Button
-        // component={Link}
-        // to={hasSelectedItems ? "/checkout" : "#"}
         size="md"
         color="blue"
         radius="md"

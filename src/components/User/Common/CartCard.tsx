@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Box, Group, Text, Image, NumberInput, Button, Badge, Tooltip, Checkbox } from '@mantine/core';
+import { Badge, Box, Button, Checkbox, Group, Image, NumberInput, Text, Tooltip } from '@mantine/core';
+import React from 'react';
 import { FiTrash2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import type { CartItemDto } from '../../../types/CartType';
