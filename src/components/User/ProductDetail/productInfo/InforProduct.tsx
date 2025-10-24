@@ -11,6 +11,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
+import { motion } from 'framer-motion';
 import {
   FiHeart,
   FiPackage,
@@ -19,9 +20,17 @@ import {
   FiShield,
   FiTruck
 } from 'react-icons/fi';
+import { APP_ROUTES } from '../../../../constant';
+import { useAppDispatch } from '../../../../hooks/useAppRedux';
+import { CartService } from '../../../../service/CartService';
+import { addToCart } from '../../../../store/authSlice';
 import type { ProductAttribute } from '../../../../types/AttributeType';
+import type { CartAddItemDto } from '../../../../types/CartType';
 import type { MyShopProductSkuDto, ProductDetailDto } from '../../../../types/ProductType';
+import { getErrorMessage } from '../../../../untils/ErrorUntils';
 import { formatStringView } from '../../../../untils/Untils';
+import showErrorNotification from '../../../Toast/NotificationError';
+import showSuccessNotification from '../../../Toast/NotificationSuccess';
 import { AttributeInfor } from './AttributeInfor';
 import ProductActions from './ProductActions';
 import ProductDescription from './ProductDescription';
@@ -36,156 +45,213 @@ interface InforProductProps {
   selectedAttributes: Record<string, string>;
   selectedSku: MyShopProductSkuDto | null;
   onAttributeSelect: (keyId: string, value: string) => void;
-  onAddToCart: (quantity: number) => void;
-  onBuyNow: (quantity: number) => void;
   groupedAttributes: ProductAttribute[];
 }
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.3 }
+};
+
+const staggerContainer = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.08
+    }
+  }
+};
 
 const InforProduct = ({
   product,
   selectedAttributes,
   selectedSku,
   onAttributeSelect,
-  onAddToCart,
-  onBuyNow,
   groupedAttributes,
 }: InforProductProps) => {
   const availableQuantity = selectedSku?.quantity || product.quantity;
+  const dispatch = useAppDispatch();
+
+  const handleAddToCart = (quantity: number) => {
+    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
+      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
+      return;
+    }
+    if (quantity < 1 || quantity > selectedSku.quantity) {
+      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
+      return;
+    }
+
+    const cartItemDto: CartAddItemDto = {
+      productSkuId: selectedSku.id,
+      quantity: quantity,
+    }
+
+    CartService.addItemToCart(cartItemDto)
+      .then((data) => {
+        showSuccessNotification("Thông báo", "Sản phẩm đã được thêm vào giỏ hàng thành công.");
+        if (data.isNew)
+          dispatch(addToCart());
+      })
+      .catch((error) => {
+        showErrorNotification("Lỗi", getErrorMessage(error));
+      });
+  }
+
+
+  const handleBuyNow = (quantity: number) => {
+    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
+      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
+      return;
+    }
+    if (quantity < 1 || quantity > selectedSku.quantity) {
+      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
+      return;
+    }
+    localStorage.setItem('orderItemIds', JSON.stringify({ [selectedSku.id]: quantity }));
+
+    window.location.href = APP_ROUTES.CHECKOUT;
+  }
+
 
   return (
-    <div>
-      <Group justify="space-between" align="flex-start" wrap='nowrap' className="mb-4">
-        <Title order={2} className="mb-3 text-slate-900">{formatStringView(product.name)}</Title>
+    <motion.div
+      variants={staggerContainer}
+      initial="initial"
+      whileInView="animate"
+    >
+      <motion.div variants={fadeInUp}>
+        <Group justify="space-between" align="flex-start" wrap='nowrap' className="mb-4">
+          <Title order={2} className="mb-3 text-slate-900">{formatStringView(product.name)}</Title>
 
-        <Group justify="space-between" wrap="nowrap">
-          {product.quantity < 10 && (
-            <Badge color="orange">Sắp hết hàng</Badge>
-          )}
           <Group justify="space-between" wrap="nowrap">
-            <ActionIcon variant="subtle" color="gray" radius="xl">
-              <FiShare2 size={20} />
-            </ActionIcon>
-            <ActionIcon variant="subtle" color="pink" radius="xl">
-              <FiHeart size={20} />
-            </ActionIcon>
+            {product.quantity < 10 && (
+              <Badge color="orange">Sắp hết hàng</Badge>
+            )}
+            <Group justify="space-between" wrap="nowrap">
+              <ActionIcon variant="subtle" color="gray" radius="xl">
+                <FiShare2 size={20} />
+              </ActionIcon>
+              <ActionIcon variant="subtle" color="pink" radius="xl">
+                <FiHeart size={20} />
+              </ActionIcon>
+            </Group>
           </Group>
         </Group>
-      </Group>
+      </motion.div>
 
-      <Group className="mb-4">
-        {product.totalReviews && product.totalReviews > 0 && (
-          <Rating value={product.averageRating} fractions={2} readOnly size="sm" />
-        )}
-        <Text size="sm" className="text-gray-500">
-          {product.totalReviews === 0 ? 'Chưa có' : product.totalReviews} đánh giá
-        </Text>
-        <Text size="sm" className="text-gray-500">·</Text>
-        <Text size="sm" className="text-gray-500">Đã bán: {product.sold}</Text>
-        <Text size="sm" className="text-gray-500">·</Text>
-        <Text size="sm" className="text-gray-500">Còn lại: {availableQuantity}</Text>
-      </Group>
-
-      {/* Chi tiết sản phẩm - Thông tin quan trọng */}
-      {/* <Box className="mb-4 bg-gray-50 p-3 rounded">
-        <Group className="mb-2">
-          <FiInfo size={16} className="text-primary" />
-          <Text fw={600} size="sm">Thông tin chính</Text>
+      <motion.div variants={fadeInUp}>
+        <Group className="mb-4">
+          {product.totalReviews && product.totalReviews > 0 && (
+            <Rating value={product.averageRating} fractions={2} readOnly size="sm" />
+          )}
+          <Text size="sm" className="text-gray-500">
+            {product.totalReviews === 0 ? 'Chưa có' : product.totalReviews} đánh giá
+          </Text>
+          <Text size="sm" className="text-gray-500">·</Text>
+          <Text size="sm" className="text-gray-500">Đã bán: {product.sold}</Text>
+          <Text size="sm" className="text-gray-500">·</Text>
+          <Text size="sm" className="text-gray-500">Còn lại: {availableQuantity}</Text>
         </Group>
-        <SimpleGrid cols={{ base: 1, xs: 2 }} className="pl-6">
-          {origin && (
-            <Group gap="xs" className="flex-nowrap">
-              <FiMapPin size={14} className="text-gray-500 flex-shrink-0" />
-              <Text size="sm" span>Xuất xứ: <b>{origin}</b></Text>
-            </Group>
-          )}
-          {material && (
-            <Group gap="xs" className="flex-nowrap">
-              <FiInfo size={14} className="text-gray-500 flex-shrink-0" />
-              <Text size="sm" span>Chất liệu: <b>{material}</b></Text>
-            </Group>
-          )}
-        </SimpleGrid>
-      </Box> */}
+      </motion.div>
 
-      <ProductPriceAndAttributes price={product.price} selectedSku={selectedSku} />
+      <motion.div variants={fadeInUp}>
+        <ProductPriceAndAttributes price={product.price} selectedSku={selectedSku} />
+      </motion.div>
 
       <Divider className="mb-4" />
 
       {groupedAttributes.length > 0 && (
-        <Box className="mb-6">
-          {groupedAttributes.map((group, idx) => (
-            <div key={idx} className="mb-2">
-              <Text fw={500} className="mb-2 ">{group.attributeKeyDisplay}:</Text>
-              <Group>
-                {Array.from(group.values).map((attr, valIdx) => (
-                  <Button
-                    key={valIdx}
-                    variant={selectedAttributes[group.attributeKeyName] === attr ? 'filled' : 'outline'}
-                    size="xs"
-                    onClick={() => onAttributeSelect(group.attributeKeyName, attr)}
-                    className={selectedAttributes[group.attributeKeyName] === attr ? '!bg-primary' : '!border-gray-300'}
-                    style={{
-                      position: 'relative',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {attr}
-                  </Button>
-                ))}
-              </Group>
-            </div>
-          ))}
-        </Box>
+        <motion.div variants={fadeInUp}>
+          <Box className="mb-6">
+            {groupedAttributes.map((group, idx) => (
+              <div key={idx} className="mb-2">
+                <Text fw={500} className="mb-2 ">{group.attributeKeyDisplay}:</Text>
+                <Group>
+                  {Array.from(group.values).map((attr, valIdx) => (
+                    <motion.div
+                      key={valIdx}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: valIdx * 0.05 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button
+                        variant={selectedAttributes[group.attributeKeyName] === attr ? 'filled' : 'outline'}
+                        size="xs"
+                        onClick={() => onAttributeSelect(group.attributeKeyName, attr)}
+                        className={selectedAttributes[group.attributeKeyName] === attr ? '!bg-primary' : '!border-gray-300'}
+                        style={{
+                          position: 'relative',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {attr}
+                      </Button>
+                    </motion.div>
+                  ))}
+                </Group>
+              </div>
+            ))}
+          </Box>
+        </motion.div>
       )}
 
-      <ProductActions
-        availableQuantity={availableQuantity}
-        onAddToCart={onAddToCart}
-        onBuyNow={onBuyNow}
-      />
+      <motion.div variants={fadeInUp}>
+        <ProductActions
+          availableQuantity={availableQuantity}
+          onAddToCart={handleAddToCart}
+          onBuyNow={handleBuyNow}
+        />
+      </motion.div>
 
       <Divider className="mb-4" />
 
-      {/* Thông tin về shop */}
-      <ShopInfo
-        id={product.baseShopDto?.id || ''}
-        url={product.baseShopDto?.avatarUrl || ''}
-        name={product.baseShopDto?.name || 'Shop không rõ'}
-      />
+      <motion.div variants={fadeInUp}>
+        <ShopInfo
+          id={product.baseShopDto?.id || ''}
+          url={product.baseShopDto?.avatarUrl || ''}
+          name={product.baseShopDto?.name || 'Shop không rõ'}
+        />
+      </motion.div>
 
-      {/* Cam kết */}
-      <SimpleGrid cols={{ base: 2, md: 4 }} className="mb-6">
-        <Paper withBorder p="md" radius="md" className="!flex !items-center !flex-nowrap">
-          <FiTruck size={20} className="text-primary mr-3" />
-          <Text size="sm">Giao hàng nhanh</Text>
-        </Paper>
-        <Paper withBorder p="md" radius="md" className="!flex !items-center !flex-nowrap">
-          <FiShield size={20} className="text-primary mr-3" />
-          <Text size="sm">Bảo hành chính hãng</Text>
-        </Paper>
-        <Paper withBorder p="md" radius="md" className="!flex !items-center !flex-nowrap">
-          <FiPackage size={20} className="text-primary mr-3" />
-          <Text size="sm">Đổi trả trong 7 ngày</Text>
-        </Paper>
-        <Paper withBorder p="md" radius="md" className="!flex !items-center !flex-nowrap">
-          <FiRefreshCw size={20} className="text-primary mr-3" />
-          <Text size="sm">Hoàn tiền 100%</Text>
-        </Paper>
-      </SimpleGrid>
+      <motion.div variants={fadeInUp}>
+        <SimpleGrid cols={{ base: 2, md: 4 }} className="mb-6">
+          {[
+            { icon: FiTruck, text: 'Giao hàng nhanh' },
+            { icon: FiShield, text: 'Bảo hành chính hãng' },
+            { icon: FiPackage, text: 'Đổi trả trong 7 ngày' },
+            { icon: FiRefreshCw, text: 'Hoàn tiền 100%' }
+          ].map((item, idx) => (
+            <Paper key={idx} withBorder p="md" radius="md" className="!flex !items-center !flex-nowrap">
+              <item.icon size={20} className="text-primary mr-3" />
+              <Text size="sm">{item.text}</Text>
+            </Paper>
+          ))}
+        </SimpleGrid>
+      </motion.div>
 
-      <ProductShippingInfo weight={product.weight || 0} />
+      <motion.div variants={fadeInUp}>
+        <ProductShippingInfo weight={product.weight || 0} />
+      </motion.div>
 
-      <AttributeInfor
-        attributes={product.attributes || []}
-        selectedAttributes={selectedAttributes}
-        groupedAttributes={groupedAttributes}
-      />
+      <motion.div variants={fadeInUp}>
+        <AttributeInfor
+          attributes={product.attributes || []}
+          selectedAttributes={selectedAttributes}
+          groupedAttributes={groupedAttributes}
+        />
+      </motion.div>
 
-      <ProductDescription
-        description={product.description || ''}
-        sortDescription={product.sortDescription || ''}
-      />
-    </div>
+      <motion.div variants={fadeInUp}>
+        <ProductDescription
+          description={product.description || ''}
+          sortDescription={product.sortDescription || ''}
+        />
+      </motion.div>
+    </motion.div>
   );
 };
 
