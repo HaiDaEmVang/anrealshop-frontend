@@ -100,6 +100,7 @@ export const useOrderStatusLabel = () => {
                 case 'delivered':
                     return 'Đã giao';
                 case 'canceled':
+                    return 'Đã hủy';
                 case 'closed':
                     return 'Hủy/Hoàn/Trả';
                 default:
