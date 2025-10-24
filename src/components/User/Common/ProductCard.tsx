@@ -24,9 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
         border: '1px solid #f1f3f4'
       }}
     >
-      {/* Card Wrapper */}
       <div className="flex flex-col h-full">
-        {/* Image Section */}
         <div className="relative overflow-hidden">
           <Link to={`/products/${product.urlSlug}`} className="block no-underline">
             <div className="overflow-hidden bg-gray-50 " style={{ aspectRatio: '4/5' }}>
@@ -43,7 +41,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
             </div>
           </Link>
 
-          {/* Badges positioned on the image */}
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
             {/* {product.isNew && (
               <Badge
@@ -67,7 +64,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
             )}
           </div>
 
-          {/* Action buttons on hover */}
           <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <ActionIcon
               variant="filled"
@@ -80,14 +76,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
             </ActionIcon>
           </div>
 
-          {/* Quick add to cart button */}
           <div className="absolute bottom-3 left-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
             <Button
               fullWidth
               size="sm"
               radius="md"
               leftSection={<FiShoppingCart size={14} />}
-              className="bg-slate-900 hover:bg-slate-800 text-white shadow-lg"
+              className=" text-white shadow-lg"
             >
               Thêm vào giỏ
             </Button>

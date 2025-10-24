@@ -1,6 +1,7 @@
 import {
     Avatar,
     Badge,
+    Box,
     Button,
     Group,
     Paper,
@@ -8,6 +9,9 @@ import {
 } from '@mantine/core';
 import { FaShopify } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { FiMessageCircle, FiShoppingBag } from 'react-icons/fi';
+import { APP_ROUTES } from '../../../../constant';
 
 interface ShopInfoProps {
     id: string;
@@ -17,29 +21,56 @@ interface ShopInfoProps {
 
 export const ShopInfo = ({ id, url, name }: ShopInfoProps) => {
     return (
-        <Paper withBorder p="md" radius="md" className="mb-6">
-            <Group>
-                <Avatar src={url} radius="xl" size="lg">
-                    {name.substring(0, 2)?.toUpperCase()}
-                </Avatar>
-                <div>
-                    <Text fw={700}>{name}</Text>
-                    <Group gap="xs">
-                        <Badge color="blue" variant="light">Chính hãng</Badge>
-                        <Badge color="green" variant="light">Phản hồi: N/A</Badge>
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+        >
+            <Paper withBorder p="md" radius="md" className="mb-6">
+                <Group justify="space-between" wrap="nowrap">
+                    <Group wrap="nowrap">
+                        <motion.div
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                            transition={{ type: 'spring', stiffness: 300 }}
+                        >
+                            <Avatar src={url} size="lg" radius="md" />
+                        </motion.div>
+                        <Box>
+                            <Text fw={600} size="sm">{name}</Text>
+                            <Text size="xs" c="dimmed">Online 2 giờ trước</Text>
+                        </Box>
                     </Group>
-                </div>
-                <Group className="ml-auto" gap="xs">
-                    <Link to={`/shop/${id}`}>
-                        <Button variant="outline" color="blue" size="sm">
-                            <FaShopify size={16} className="mr-2" /> Xem shop
-                        </Button>
-                    </Link>
-                    <Button variant="outline" color="blue" size="sm">
-                        Chat
-                    </Button>
+
+                    <Group gap="xs">
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <Button
+                                component={Link}
+                                to={`${APP_ROUTES.SHOP}/${id}`}
+                                variant="outline"
+                                size="xs"
+                                leftSection={<FiShoppingBag size={14} />}
+                            >
+                                Xem Shop
+                            </Button>
+                        </motion.div>
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <Button
+                                variant="outline"
+                                size="xs"
+                                leftSection={<FiMessageCircle size={14} />}
+                            >
+                                Chat
+                            </Button>
+                        </motion.div>
+                    </Group>
                 </Group>
-            </Group>
-        </Paper>
+            </Paper>
+        </motion.div>
     )
 }
