@@ -1,6 +1,6 @@
 import { Avatar, Box, Button, Checkbox, Divider, Group, Loader, Text, Title } from '@mantine/core';
 import React from 'react';
-import { FiChevronLeft, FiClock, FiShoppingBag, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
+import { FiClock, FiShoppingBag, FiShoppingCart, FiTrash2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import type { CartDto } from '../../../types/CartType';
 import type { CartShippingFee } from '../../../types/ShipmentType';
@@ -15,7 +15,7 @@ interface ListProductProps {
   onRemoveItem: (itemId: string) => void;
   onRemoveSelected: () => void;
   shippingFees: CartShippingFee[];
-  loadingShopIds: string[]; 
+  loadingShopIds: string[];
 }
 
 const ListProduct: React.FC<ListProductProps> = ({
