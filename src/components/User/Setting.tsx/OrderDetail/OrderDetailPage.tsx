@@ -11,7 +11,7 @@ import {
     Text,
     Title
 } from '@mantine/core';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FaStore } from 'react-icons/fa';
 import {
     FiArrowLeft,
@@ -23,6 +23,7 @@ import { OrderService } from '../../../../service/OrderService';
 import type { UserOrderDetailDto } from '../../../../types/OrderType';
 import { formatPrice } from '../../../../untils/Untils';
 import { ButtonCopy } from '../../../common/ButtonCopy';
+import PageNotFound from '../../../common/PageNotFound';
 import Action from './Action';
 import AddressInfo from './AddressInfo';
 import HistoryStatus from './HistoryStatus';
@@ -38,13 +39,14 @@ export const OrderDetail = () => {
     const [orderDetail, setOrderDetail] = useState<UserOrderDetailDto | null>();
     const [activeStep, setActiveStep] = useState(0);
 
-    useEffect(() => {
+    const { rejectShopOrder } = OrderService;
+
+    const handleLoadOrders = useCallback(() => {
         setLoading(true);
 
         if (orderId) {
             OrderService.getOrderDetail(orderId)
                 .then((data) => {
-                    console.log('Fetched order detail:', data);
                     setOrderDetail(data);
                 })
                 .finally(() => {
@@ -53,9 +55,19 @@ export const OrderDetail = () => {
         }
     }, [orderId]);
 
+    useEffect(() => {
+        handleLoadOrders();
+    }, [orderId]);
 
+    const handleCancelOrder = useCallback((orderItemId: string, reason: string) => {
+        rejectShopOrder(orderItemId, reason)
+            .then(() => {
+                handleLoadOrders();
+            });
+    }, [rejectShopOrder, handleLoadOrders]);
 
     useEffect(() => {
+        console.log('orderDetail', orderDetail);
         if (orderDetail) {
             switch (orderDetail.shopOrderStatus) {
                 case 'INIT_PROCESSING':
@@ -70,6 +82,9 @@ export const OrderDetail = () => {
                     break;
                 case 'DELIVERED':
                     setActiveStep(orderDetail.isReviewed ? 4 : 3);
+                    break;
+                case 'CLOSED':
+                    setActiveStep(5);
                     break;
                 default:
                     setActiveStep(0);
@@ -90,9 +105,12 @@ export const OrderDetail = () => {
 
     if (!orderDetail) {
         return (
-            <Box>
-                <Text>Không tìm thấy chi tiết đơn hàng.</Text>
-            </Box>
+            <PageNotFound
+                title="Không tìm thấy đơn hàng"
+                description="Đơn hàng bạn đang tìm kiếm không tồn tại."
+                redirectLink="/settings/orders"
+                redirectLabel="Quay lại danh sách đơn hàng"
+            />
         );
     }
 
@@ -127,6 +145,8 @@ export const OrderDetail = () => {
                     status={orderDetail.shopOrderStatus}
                     statusLabel={getStatusLabel(orderDetail.shopOrderStatus)}
                     isReviewed={orderDetail.isReviewed}
+                    handleCancelOrder={handleCancelOrder}
+                    orderDetail={orderDetail}
                 />
             </Box>
 
@@ -147,7 +167,7 @@ export const OrderDetail = () => {
                     <Box style={{ flex: '7' }}>
                         <HistoryStatus
                             historyItems={orderDetail.orderHistory}
-                            title="Lịch sử đơn hàng"
+                            title="Lịch sử vận chuyển"
                             initialCollapsed={true}
                             itemsToShowWhenCollapsed={3}
                         />

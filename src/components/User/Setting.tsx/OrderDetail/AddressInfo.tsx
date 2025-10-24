@@ -21,7 +21,7 @@ const AddressInfo: React.FC<AddressInfoProps> = ({
     trackingNumber
 }) => {
     return (
-        <Paper withBorder p="md" radius="md">
+        <Paper withBorder p="md" radius="md" className='min-h-[276px]'>
             <Title order={4} mb="md">{title}</Title>
 
             <Box mb="md">
@@ -43,11 +43,9 @@ const AddressInfo: React.FC<AddressInfoProps> = ({
                 </Group>
             </Box>
 
-            {(shippingCarrier || trackingNumber) && (
-                <>
-                    <Divider my="md" />
-
-                    <Box>
+            <Divider my="md" />
+            {trackingNumber ? (
+                <Box>
                         {shippingCarrier && (
                             <Group mb="sm">
                                 <Text size="sm" fw={500}>Đơn vị vận chuyển:</Text>
@@ -65,7 +63,8 @@ const AddressInfo: React.FC<AddressInfoProps> = ({
                             </Group>
                         )}
                     </Box>
-                </>
+            ) : (
+                <Text size="sm" color="dimmed">Chưa có thông tin vận đơn.</Text>
             )}
         </Paper>
     );

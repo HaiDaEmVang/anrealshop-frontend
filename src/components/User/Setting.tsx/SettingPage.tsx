@@ -22,8 +22,8 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-
 import Breadcrumbs from './Breadcrumbs';
 import Infor from './Infor';
 import Notification from './Notification';
-import { OrderDetail } from './OrderDetail/OrderDetail';
-import OrderHistory from './OrderHistory/OrderHistory';
+import { OrderDetail } from './OrderDetail/OrderDetailPage';
+import OrderHistory from './OrderHistory/OrderHistoryPage';
 import Preferences from './Preferences';
 import Security from './Security';
 

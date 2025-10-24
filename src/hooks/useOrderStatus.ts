@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { FiBox, FiCheckCircle, FiClock, FiDollarSign, FiNavigation, FiPackage, FiSend, FiX } from 'react-icons/fi';
+import { FiBox, FiCheckCircle, FiClock, FiPackage, FiTruck, FiX } from 'react-icons/fi';
 import type { OrderStatus } from '../types/OrderType';
 
 export const useOrderStatusIcon = () => {
@@ -8,25 +8,20 @@ export const useOrderStatusIcon = () => {
             switch (statusId.toLowerCase()) {
                 case 'all':
                     return FiPackage;
-                case 'completed':
-                    return FiCheckCircle;
-                case 'processing':
+                case 'init_processing':
                     return FiBox;
                 case 'pending_confirmation':
                     return FiClock;
+                case 'confirmed':
+                    return FiCheckCircle;
                 case 'preparing':
                     return FiPackage;
-                case 'awaiting_shipment':
-                    return FiBox;
-                case 'in_transit':
-                    return FiSend;
-                case 'out_for_delivery':
-                    return FiNavigation;
+                case 'shipping':
+                    return FiTruck;
                 case 'delivered':
                     return FiCheckCircle;
-                case 'refund':
-                    return FiDollarSign;
                 case 'canceled':
+                case 'closed':
                     return FiX;
                 default:
                     return FiPackage;
@@ -41,25 +36,20 @@ export const useOrderStatusColor = () => {
             switch (statusId.toLowerCase()) {
                 case 'all':
                     return 'gray';
-                case 'completed':
-                    return 'green';
-                case 'processing':
+                case 'init_processing':
                     return 'blue';
                 case 'pending_confirmation':
                     return 'yellow';
-                case 'preparing':
+                case 'confirmed':
                     return 'cyan';
-                case 'await_shipment':
+                case 'preparing':
                     return 'teal';
-                case 'in_transit':
+                case 'shipping':
                     return 'indigo';
-                case 'out_for_delivery':
-                    return 'violet';
                 case 'delivered':
                     return 'green';
-                case 'refund':
-                    return 'orange';
                 case 'canceled':
+                case 'closed':
                     return 'red';
                 default:
                     return 'gray';
@@ -69,25 +59,20 @@ export const useOrderStatusColor = () => {
             switch (statusId.toLowerCase()) {
                 case 'all':
                     return '#6b7280'; // gray
-                case 'completed':
-                    return '#22c55e'; // green
-                case 'processing':
+                case 'init_processing':
                     return '#3b82f6'; // blue
                 case 'pending_confirmation':
                     return '#eab308'; // yellow
-                case 'preparing':
+                case 'confirmed':
                     return '#06b6d4'; // cyan
-                case 'awaiting_shipment':
+                case 'preparing':
                     return '#14b8a6'; // teal
-                case 'in_transit':
+                case 'shipping':
                     return '#4f46e5'; // indigo
-                case 'out_for_delivery':
-                    return '#7c3aed'; // violet
                 case 'delivered':
                     return '#22c55e'; // green
-                case 'refund':
-                    return '#f97316'; // orange
                 case 'canceled':
+                case 'closed':
                     return '#ef4444'; // red
                 default:
                     return '#6b7280'; // gray
@@ -102,28 +87,21 @@ export const useOrderStatusLabel = () => {
             switch (statusId.toLowerCase()) {
                 case 'all':
                     return 'Tất cả';
-                case 'completed':
-                    return 'Thành công';
-                case 'processing':
+                case 'init_processing':
                     return 'Đang xử lý';
                 case 'pending_confirmation':
                     return 'Chờ xác nhận';
                 case 'confirmed':
-                    return 'Chưa xử lý';
+                    return 'Đã xác nhận';
                 case 'preparing':
                     return 'Chờ lấy hàng';
-                case 'wait_shipment':
-                    return 'Chờ giao';
-                case 'in_transit':
-                    return 'Đang vận chuyển';
-                case 'out_for_delivery':
+                case 'shipping':
                     return 'Đang giao';
                 case 'delivered':
                     return 'Đã giao';
-                case 'refund':
-                    return 'Đã hoàn tiền';
                 case 'canceled':
-                    return 'Đã hủy';
+                case 'closed':
+                    return 'Hủy/Hoàn/Trả';
                 default:
                     return 'Không xác định';
             }
@@ -142,17 +120,14 @@ export const useOrderStatus = () => {
 
         switch (normalizedStatus) {
             case 'ALL':
-            case 'COMPLETED':
-            case 'PROCESSING':
+            case 'INIT_PROCESSING':
             case 'PENDING_CONFIRMATION':
             case 'CONFIRMED':
             case 'PREPARING':
-            case 'AWAITING_SHIPMENT':
-            case 'IN_TRANSIT':
-            case 'OUT_FOR_DELIVERY':
+            case 'SHIPPING':
             case 'DELIVERED':
-            case 'REFUND':
             case 'CANCELED':
+            case 'CLOSED':
                 return normalizedStatus as OrderStatus;
             default:
                 return 'ALL';

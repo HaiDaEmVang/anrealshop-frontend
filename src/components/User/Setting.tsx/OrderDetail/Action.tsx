@@ -1,16 +1,28 @@
-import React from 'react';
 import { Box, Button, Group, Text } from '@mantine/core';
+import React, { useState } from 'react';
 import { FiShoppingBag, FiStar } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { getRejectReasons } from '../../../../data/RejectData';
+import RejectModal from '../../../RejectModal/RejectOrder';
+import type { UserOrderDetailDto } from '../../../../types/OrderType';
 
 interface ActionProps {
     status: string;
     statusLabel: string;
     isReviewed: boolean;
+    handleCancelOrder: (orderItemId: string, reason: string) => void;
+    orderDetail: UserOrderDetailDto | null;
 }
 
-const Action: React.FC<ActionProps> = ({ status, statusLabel, isReviewed }) => {
+const Action: React.FC<ActionProps> = ({ status, statusLabel, isReviewed, handleCancelOrder, orderDetail }) => {
     const navigate = useNavigate();
+    const [rejectModalOpen, setRejectModalOpen] = useState(false);
+
+    const handleRejectConfirm = (reason: string) => {
+        if (handleCancelOrder && orderDetail) {
+            handleCancelOrder(orderDetail?.shopOrderId || '', reason);
+        }
+    }
 
     const getStatusDescription = () => {
         switch (status) {
@@ -42,7 +54,6 @@ const Action: React.FC<ActionProps> = ({ status, statusLabel, isReviewed }) => {
                     </Group>
                 </div>
                 <Group>
-                    {/* Contact seller button - always visible */}
                     <Button
                         variant="light"
                         size="sm"
@@ -80,12 +91,20 @@ const Action: React.FC<ActionProps> = ({ status, statusLabel, isReviewed }) => {
                             variant="outline"
                             color="red"
                             size="sm"
+                            onClick={() => setRejectModalOpen(true)}
                         >
                             Hủy đơn hàng
                         </Button>
                     )}
                 </Group>
             </Group>
+            <RejectModal
+                data={getRejectReasons('order-user')}
+                opened={rejectModalOpen}
+                onClose={() => setRejectModalOpen(false)}
+                onConfirm={handleRejectConfirm}
+                orderId={orderDetail?.shopOrderId || ''}
+            />
         </Box>
     );
 };
