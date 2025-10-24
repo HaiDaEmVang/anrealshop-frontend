@@ -1,7 +1,6 @@
 import { Button, Container, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { APP_ROUTES } from '../../constant';
 
 interface PageNotFoundProps {
     title?: string;
@@ -21,7 +20,7 @@ const PageNotFound: React.FC<PageNotFoundProps> = ({
     const navigate = useNavigate();
 
     const handleRedirect = () => {
-        if (redirectLink) 
+        if (redirectLink)
             navigate(redirectLink);
     };
 

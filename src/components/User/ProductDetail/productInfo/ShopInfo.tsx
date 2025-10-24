@@ -1,16 +1,14 @@
 import {
     Avatar,
-    Badge,
     Box,
     Button,
     Group,
     Paper,
     Text
 } from '@mantine/core';
-import { FaShopify } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiMessageCircle, FiShoppingBag } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 import { APP_ROUTES } from '../../../../constant';
 
 interface ShopInfoProps {
