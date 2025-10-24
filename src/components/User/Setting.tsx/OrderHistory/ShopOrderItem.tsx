@@ -77,7 +77,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
 
     return (
         <Paper withBorder p="md" radius="md">
-            {/* Shop info and order status */}
             <Group justify="space-between" mb="sm">
                 <Group gap="sm">
                     <Text size="sm" fw={600}>{order.shopOrderName}</Text>
@@ -100,7 +99,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                     </Button>
                 </Group>
                 <Group gap={"xs"}>
-                    <Text size='sm'>{getStatusLabel(primaryStatus)}</Text>
+                    <Text size='sm'>{getStatusLabel(order.orderStatus[0])}</Text>
                     {order.productOrderItemDtoSet.some(p => p.cancelReason) && (
                         <Tooltip
                             label={
@@ -129,7 +128,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
 
             </Group>
 
-            {/* Products */}
             <Stack gap="sm" mb="md">
                 {order.productOrderItemDtoSet.map((product, index) => (
                     <React.Fragment key={index}>
@@ -201,7 +199,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                 ))}
             </Stack>
 
-            {/* Order summary */}
             <Box className="bg-gray-100 p-2 rounded-md">
                 <Group justify="space-between">
                     <Text size='sm' fw={500}>Tổng thanh toán:</Text>
@@ -211,7 +208,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                 </Group>
             </Box>
 
-            {/* Action buttons */}
             <Group justify='flex-end' mt="sm">
                 <Button
                     variant="light"
