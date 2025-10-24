@@ -43,8 +43,8 @@ const ListProduct: React.FC<ListProductProps> = ({
 
   if (isEmpty) {
     return (
-      <Box className="text-x'center py-28">
-        <FiShoppingCart size={64} className="text-gray-300 mx-auto mb-4" />
+      <Box className="text-center py-28">
+        <FiShoppingCart size={64} className="text-gray-300 mx-auto mb-8" />
         <Title order={4} className="text-slate-800 mb-3">Giỏ hàng của bạn đang trống</Title>
         <Text color="dimmed" mb={4}>
           Bạn chưa thêm sản phẩm nào vào giỏ hàng.
@@ -53,8 +53,7 @@ const ListProduct: React.FC<ListProductProps> = ({
           component={Link}
           to="/"
           size="sm"
-          className="bg-primary hover:bg-picton-blue-600"
-          leftSection={<FiChevronLeft size={18} />}
+          className="bg-primary hover:bg-picton-blue-600 mt-2"
         >
           Tiếp tục mua sắm
         </Button>
