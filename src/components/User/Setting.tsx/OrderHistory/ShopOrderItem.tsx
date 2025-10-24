@@ -29,7 +29,7 @@ import { formatDate, formatPrice } from '../../../../untils/Untils';
 import RejectModal from '../../../RejectModal/RejectOrder';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
-
+ 
 interface ShopOrderItemProps {
     order: UserOrderItemDto;
     onCancelOrder?: (orderId: string, reason: string) => void;
@@ -47,10 +47,6 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
 }) => {
     const { getStatusLabel } = useOrderStatus();
     const [rejectModalOpen, setRejectModalOpen] = useState(false);
-    const handleCancelOrder = () => {
-        setRejectModalOpen(true);
-    };
-
     const handleBuyAgain = () => {
         if (onBuyAgain) {
             const productIds = order.productOrderItemDtoSet.map(product => product.productId);
@@ -246,7 +242,7 @@ const ShopOrderItem: React.FC<ShopOrderItemProps> = ({
                         color="red"
                         size="xs"
                         leftSection={<FiX size={14} />}
-                        onClick={handleCancelOrder}
+                        onClick={() => setRejectModalOpen(true)}
                     >
                         Hủy đơn
                     </Button>
