@@ -46,8 +46,10 @@ const Address: React.FC<AddressProps> = ({
   }, [])
 
   useEffect(() => {
-    fetchAddresses();
-  }, []);
+    if (showAddressSelection && addressList.length === 0) {
+      fetchAddresses();
+    }
+  }, [showAddressSelection]);
 
   const addressComponentRef = useRef<HTMLDivElement>(null);
 
@@ -106,7 +108,6 @@ const Address: React.FC<AddressProps> = ({
           </Text>
 
           <Group gap="xs">
-            {/* Nút hiển thị/ẩn danh sách địa chỉ */}
             {!showAddressSelection && (
               <Button
                 variant="subtle"
@@ -119,7 +120,6 @@ const Address: React.FC<AddressProps> = ({
               </Button>
             )}
 
-            {/* Nút thêm địa chỉ mới */}
             <Button
               variant="outline"
               color="blue"
@@ -128,12 +128,10 @@ const Address: React.FC<AddressProps> = ({
               className="hover:bg-picton-blue-50"
               leftSection={<FiPlus size={14} />}
             >Thêm mới
-              {/* <FiPlus size={14} />  */}
             </Button>
           </Group>
         </Group>
 
-        {/* Địa chỉ đã chọn - chỉ hiển thị khi không ở chế độ chọn địa chỉ */}
         {!showAddressSelection && (
           <Stack gap="md" className="mb-1">
             {selectedAddress && (
@@ -148,7 +146,6 @@ const Address: React.FC<AddressProps> = ({
           </Stack>
         )}
 
-        {/* Khu vực chọn địa chỉ - hiển thị khi ở chế độ chọn địa chỉ */}
         <Collapse in={showAddressSelection}>
           <Box className="p-0 rounded-lg">
             <Stack gap="md" className="mb-4">
@@ -192,14 +189,12 @@ const Address: React.FC<AddressProps> = ({
         </Collapse>
       </Paper>
 
-      {/* Modal thêm địa chỉ mới */}
       <ModalFormAddress
         opened={newAddressModalOpened}
         onClose={() => setNewAddressModalOpened(false)}
         handleRefreshAll={handleRefresh}
       />
 
-      {/* Modal chỉnh sửa địa chỉ */}
       <ModalFormAddress
         opened={editAddressModalOpened}
         onClose={() => setEditAddressModalOpened(false)}

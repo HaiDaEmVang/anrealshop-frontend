@@ -18,18 +18,16 @@ const ImageProduct = ({
   selectedImage,
   setSelectedImage
 }: ImageProductProps) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [preloadedImages, setPreloadedImages] = useState<string[]>([]);
   const [zoomedView, setZoomedView] = useState(false);
 
 
   useEffect(() => {
-    setLoading(true);
 
     const img = new window.Image();
     img.src = media[0] || thumbnailUrl;
     img.onload = () => {
-      setLoading(false);
       setPreloadedImages(prev => [...prev, img.src]);
     };
 
@@ -43,7 +41,6 @@ const ImageProduct = ({
   }, [media, thumbnailUrl]);
 
   const handlePrevImage = () => {
-    // Only show loading if image hasn't been preloaded
     const prevIndex = selectedImage === 0 ? media.length - 1 : selectedImage - 1;
     const prevImageUrl = media[prevIndex];
 
@@ -73,12 +70,11 @@ const ImageProduct = ({
   return (
     <>
       <Box className="relative flex flex-col md:flex-row" style={{ minHeight: '440px' }}>
-        {/* Thumbnails - Vertical List on left side */}
         <Stack
           className="flex-shrink-0 mr-4 hidden md:flex"
           gap="xs"
           style={{
-            width: '90px',
+            // width: '90px',
             maxHeight: '440px',
             overflowY: 'auto'
           }}
@@ -108,7 +104,6 @@ const ImageProduct = ({
           ))}
         </Stack>
 
-        {/* Main Hero Image */}
         <Box
           className="relative flex-1 overflow-hidden rounded-md bg-white"
           style={{ minHeight: '400px' }}
@@ -122,20 +117,18 @@ const ImageProduct = ({
             <Image
               src={media[selectedImage] || thumbnailUrl}
               height={500}
-              className="w-full h-full object-contain bg-white transition-opacity duration-300"
+              className="w-full h-full object-cover bg-white transition-opacity duration-300"
               alt={productName}
               onLoad={handleImageLoad}
             />
 
-            {/* Image counter */}
             {media.length > 1 && (
               <Box className="absolute bottom-3 left-3 bg-black/60 text-white px-2 py-1 rounded-full text-xs">
                 {selectedImage + 1}/{media.length}
               </Box>
             )}
           </Box>
-
-          {/* Mobile Thumbnails - Horizontal Row at bottom */}
+          
           <ScrollArea className="mt-2 md:hidden">
             <Group className="gap-2 justify-center">
               {media.map((imgUrl, idx) => (

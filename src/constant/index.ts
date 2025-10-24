@@ -139,6 +139,8 @@ export const APP_ROUTES = {
   CATEGORY_PAGE: (slug: string) => `/category/${slug}`,
   SHOP_PAGE: (slug: string) => `/shop/${slug}`,
 
+  SHOP: '/shop',
+
   // MyShop Routes
   MYSHOP: {
     BASE: '/myshop/*',
