@@ -69,7 +69,7 @@ const Header: React.FC = () => {
     const searchContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        console.log(isAuthenticated)
+        // console.log(isAuthenticated)
         if (!isAuthenticated && !user) {
             useDispatch(fetchCurrentUser());
         }

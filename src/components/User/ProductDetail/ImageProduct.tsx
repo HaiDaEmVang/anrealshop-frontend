@@ -18,18 +18,16 @@ const ImageProduct = ({
   selectedImage,
   setSelectedImage
 }: ImageProductProps) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [preloadedImages, setPreloadedImages] = useState<string[]>([]);
   const [zoomedView, setZoomedView] = useState(false);
 
 
   useEffect(() => {
-    setLoading(true);
 
     const img = new window.Image();
     img.src = media[0] || thumbnailUrl;
     img.onload = () => {
-      setLoading(false);
       setPreloadedImages(prev => [...prev, img.src]);
     };
 
@@ -76,7 +74,7 @@ const ImageProduct = ({
           className="flex-shrink-0 mr-4 hidden md:flex"
           gap="xs"
           style={{
-            width: '90px',
+            // width: '90px',
             maxHeight: '440px',
             overflowY: 'auto'
           }}
@@ -115,7 +113,7 @@ const ImageProduct = ({
             style={{ minHeight: '400px', cursor: 'zoom-in' }}
             onClick={() => setZoomedView(true)}
           >
-            {/* <LoadingOverlay visible={loading} /> */}
+            <LoadingOverlay visible={loading} />
             <Image
               src={media[selectedImage] || thumbnailUrl}
               height={500}

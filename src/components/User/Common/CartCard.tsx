@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Group, Text, Image, NumberInput, Button, Badge, Tooltip, Checkbox } from '@mantine/core';
 import { FiTrash2 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
@@ -15,9 +15,8 @@ export interface CartCardProps {
 const CartCard: React.FC<CartCardProps> = ({ item, onSelect, onUpdateQuantity, onRemove }) => {
 	const inStock = item.quantity !== undefined ? item.quantity : true; // preserve original logic
 	const maxQuantity = item.maxQuantity || 100;
-
 	return (
-		<Box className="mb-4">
+		<Box className="my-4">
 			<Group wrap="nowrap" align="flex-start">
 				<Box className="flex items-center h-full pt-2">
 					{inStock ? (
