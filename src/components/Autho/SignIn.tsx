@@ -36,7 +36,7 @@ export function SignIn() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnUrl = searchParams.get('urlReturn') || '/';
-  
+
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
   const isLoading = status === 'loading';
@@ -46,8 +46,8 @@ export function SignIn() {
 
   const form = useForm<SignInFormValues>({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'botgiatv2@gmail.com',
+      password: 'Abc@123456',
       rememberMe: false,
     },
     validate: {

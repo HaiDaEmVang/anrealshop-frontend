@@ -1,7 +1,9 @@
 import { Suspense, lazy, useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import showErrorNotification from '../../components/Toast/NotificationError';
+import { APP_ROUTES } from '../../constant';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
-import { fetchCurrentUser } from '../../store/authSlice';
+import { fetchCurrentShop } from '../../store/authSlice';
 
 
 const ShopAdminHeader = lazy(() => import('../../components/header/ShopAdminHeader'));
@@ -16,14 +18,19 @@ const OrderShippingPage = lazy(() => import('../../components/Myshop/Order/Order
 const OrderPrintPage = lazy(() => import('../../components/Myshop/Order/OrderPrintPage'));
 
 const MyshopPage = () => {
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-  const useDispatch = useAppDispatch();
+  const { shop, isAuthenticated } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   useEffect(() => {
-    console.log(isAuthenticated)
-    if (!isAuthenticated && !user) {
-      useDispatch(fetchCurrentUser());
+    if (!isAuthenticated) {
+      dispatch(fetchCurrentShop());
     }
-  }, [useDispatch, isAuthenticated]);
+    if (isAuthenticated && !shop) {
+      navigate(APP_ROUTES.SHOP_REGISTER);
+      showErrorNotification("Thông báo", "Bạn cần đăng ký cửa hàng trước khi truy cập.");
+    }
+
+  }, [dispatch, isAuthenticated]);
 
 
   return (

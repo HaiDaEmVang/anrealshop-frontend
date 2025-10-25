@@ -143,13 +143,13 @@ const CartPage: React.FC = () => {
           setLoadingShopIds(prev => prev.includes(shopId) ? prev : [...prev, shopId]);
           fetchFee(idsToFetch);
         } else {
-            if (itemIds.filter(id => id !== itemId).length === 0) {
-              setShippingFees(prev => prev.filter(f => f.shopId !== shopId));
-            } else {
-              const remainingIds = itemIds.filter(id => id !== itemId);
-              setLoadingShopIds(prev => prev.includes(shopId) ? prev : [...prev, shopId]);
-              fetchFee(remainingIds);
-            }
+          if (itemIds.filter(id => id !== itemId).length === 0) {
+            setShippingFees(prev => prev.filter(f => f.shopId !== shopId));
+          } else {
+            const remainingIds = itemIds.filter(id => id !== itemId);
+            setLoadingShopIds(prev => prev.includes(shopId) ? prev : [...prev, shopId]);
+            fetchFee(remainingIds);
+          }
         }
       })
       .catch(error => {
