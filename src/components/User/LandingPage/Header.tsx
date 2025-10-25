@@ -150,7 +150,7 @@ export const Header = () => {
                                 aria-label="Search"
                             >
                                 <FaSearch size={18} />
-                            </button>
+                            </button> 
 
                             <Transition
                                 mounted={showSearch}

@@ -1,6 +1,6 @@
 import type { ProductAttribute, ProductAttributeSingleValue } from "./AttributeType";
 import type { MediaDto } from "./CommonType";
-import type { ShopDto } from "./ShopType";
+import type { BaseShopDto } from "./ShopType";
 
 export interface ProductCreateRequest {
   name: string;
@@ -42,7 +42,7 @@ export interface MyShopProductDto {
   thumbnailUrl: string;
   urlSlug: string;
   categoryId: string;
-  categoryPath? : string;
+  categoryPath?: string;
   discountPrice: number;
   quantity: number;
   sold: number;
@@ -51,10 +51,10 @@ export interface MyShopProductDto {
   createdAt: string;
 
   restrictedReason?: string;
-  restricted?: boolean; 
+  restricted?: boolean;
 
   productSkus?: MyShopProductSkuDto[];
-  baseShopDto?: ShopDto;
+  baseShopDto?: BaseShopDto;
 }
 
 export type ProductStatus = 'ALL' | 'ACTIVE' | 'VIOLATION' | 'PENDING' | 'HIDDEN';
@@ -62,7 +62,7 @@ export type ProductStatus = 'ALL' | 'ACTIVE' | 'VIOLATION' | 'PENDING' | 'HIDDEN
 export interface ProductStatusDto {
   id: string;
   name: string;
-  count: number; 
+  count: number;
 }
 
 export interface MyShopProductSkuDto {
@@ -95,14 +95,14 @@ export interface ProductDetailDto {
   sold: number;
   status: ProductStatus;
   visible: boolean;
-  
+
   createdAt: string;
   updatedAt?: string;
-  
+
   restrictedReason?: string;
   isRestricted?: boolean;
   restrictStatus?: string;
-  
+
   averageRating?: number;
   totalReviews?: number;
 
@@ -110,8 +110,8 @@ export interface ProductDetailDto {
   height?: number;
   length?: number;
   weight?: number;
-  
-  baseShopDto?: ShopDto;
+
+  baseShopDto?: BaseShopDto;
   medias?: MediaDto[];
   attributes?: ProductAttribute[];
   productSkus?: MyShopProductSkuDto[];

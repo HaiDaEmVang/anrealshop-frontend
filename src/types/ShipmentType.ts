@@ -1,9 +1,9 @@
 import type { CartItemDto } from "./CartType";
-import type { ShopDto } from "./ShopType";
+import type { BaseShopDto } from "./ShopType";
 
 
 export type ShippingStatus = 'ORDER_CREATED' | 'WAITING_FOR_PICKUP' | 'PICKED_UP' | 'IN_TRANSIT' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'DELIVERY_FAILED' | 'RETURNED';
-   
+
 
 
 export interface CartShippingFee {
@@ -15,7 +15,7 @@ export interface CartShippingFee {
 }
 
 export interface CheckoutInfoDto {
-    shop: ShopDto;
+    shop: BaseShopDto;
     items: CartItemDto[];
     fee: number;
     leadTime: string;
@@ -49,21 +49,21 @@ export interface MyShopShippingListResponse {
 
 
 export type ShippingItems = {
-  shopOrderId: string;
-  countOrderItems: number;
-  createdAt?: string;
+    shopOrderId: string;
+    countOrderItems: number;
+    createdAt?: string;
 
-  customerId: string;
-  customerName: string;
-  customerPhone: string;
+    customerId: string;
+    customerName: string;
+    customerPhone: string;
 
-  shippingId: string;
-  shippingMethod: string;
-  shippingStatus: string;
-  dayPickup?: string;
+    shippingId: string;
+    shippingMethod: string;
+    shippingStatus: string;
+    dayPickup?: string;
 
-  confirmationTime: string;
-  isPrinted: boolean;
+    confirmationTime: string;
+    isPrinted: boolean;
 }
 
 // history
@@ -76,5 +76,5 @@ export type HistoryShipping = {
 
 export type HistoryShippingNote = {
     content: string;
-    timestamp: Date|string;
+    timestamp: Date | string;
 }

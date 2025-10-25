@@ -1,10 +1,11 @@
-// src/features/auth/authSlice.ts
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { API_ENDPOINTS } from '../constant';
 import authService from '../service/AuthService';
+import type { AddressDto } from '../types/AddressType';
 import type { LoginRequest, LoginResponse } from '../types/AuthType';
 import type { ErrorResponseDto } from '../types/CommonType';
 import type { RegisterRequest, UserDto } from '../types/UserType';
-import type { AddressDto } from '../types/AddressType';
+import type { ShopDto } from '../types/ShopType';
 
 interface AuthError {
   message: string;
@@ -16,6 +17,7 @@ interface AuthError {
 
 interface AuthState {
   user: UserDto | null;
+  shop: ShopDto | null;
   isAuthenticated: boolean;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: AuthError | null;
@@ -23,13 +25,14 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
+  shop: null,
   isAuthenticated: false,
   status: 'idle',
   error: null,
 };
 
 export const loginUser = createAsyncThunk(
-  'auth/login',
+  API_ENDPOINTS.AUTH.LOGIN,
   async (loginData: LoginRequest, { rejectWithValue }) => {
     try {
       const response: LoginResponse = await authService.login(loginData);
@@ -67,6 +70,27 @@ export const fetchCurrentUser = createAsyncThunk(
   }
 );
 
+export const fetchCurrentShop = createAsyncThunk(
+    'shopAuth/fetchCurrentShop',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response : ShopDto = await authService.getShopInfo();
+            console.log('Fetched shop info:', response);
+            return response;
+        } catch (error: any) {
+            const shopAuthError: AuthError = {
+                message: error.message || 'Không thể xác thực cửa hàng.',
+                code: error.code,
+                statusCode: error.statusCode,
+                details: error.details,
+                traceId: error.traceId,
+            };
+            return rejectWithValue(shopAuthError);
+        }
+    }
+);
+
+
 // export const updateUserProfile = createAsyncThunk(
 //   'auth/updateUserProfile',
 //   async (profileData: ProfileRequest, { rejectWithValue }) => {
@@ -87,7 +111,7 @@ export const fetchCurrentUser = createAsyncThunk(
 // );
 
 export const logoutUser = createAsyncThunk(
-  'auth/logout',
+  API_ENDPOINTS.AUTH.LOGOUT,
   async (_, { rejectWithValue }) => {
     try {
       await authService.logout();
@@ -106,7 +130,7 @@ export const logoutUser = createAsyncThunk(
 );
 
 export const registerUser = createAsyncThunk(
-  'auth/register',
+  API_ENDPOINTS.USERS.REGISTER,
   async (registerData: RegisterRequest, { rejectWithValue }) => {
     try {
       const response: string = await authService.register(registerData);
@@ -124,8 +148,8 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({
-  name: 'auth',
+const userAuthSlice = createSlice({
+  name: 'userAuth',
   initialState,
   reducers: {
     addToCart: (state) => {
@@ -194,6 +218,21 @@ const authSlice = createSlice({
         state.user = null;
         state.error = null;
       })
+      .addCase(fetchCurrentShop.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchCurrentShop.fulfilled, (state, action: PayloadAction<ShopDto>) => {
+        state.status = 'succeeded';
+        state.shop = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchCurrentShop.rejected, (state) => {
+        state.status = 'idle';
+        state.isAuthenticated = false;
+        state.user = null;
+        state.error = null;
+      })
       // .addCase(updateUserProfile.pending, (state) => {
       //   state.status = 'loading';
       //   state.error = null;
@@ -232,5 +271,5 @@ const authSlice = createSlice({
   },
 });
 
-export default authSlice.reducer;
-export const { addToCart, removeFromCart, updateCartCount, clearCart, logout } = authSlice.actions;
+export default userAuthSlice.reducer;
+export const { addToCart, removeFromCart, updateCartCount, clearCart, logout } = userAuthSlice.actions;
