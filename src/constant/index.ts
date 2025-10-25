@@ -34,7 +34,7 @@ export const API_ENDPOINTS = {
   },
   SHOPS: {
     INFO: '/shops',
-    // REGISTER: '/shops/register',
+    REGISTER: '/shops/register',
     // APPROVE_SHOP: (shopId: string) => `/shops/approve/${shopId}`,
     // REJECT_SHOP: (shopId: string) => `/shops/reject/${shopId}`,
     // SHOP_REGISTRATIONS: '/shops/registrations',
