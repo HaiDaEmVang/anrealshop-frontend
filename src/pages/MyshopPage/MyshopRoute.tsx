@@ -42,6 +42,10 @@ const MyshopPage = () => {
     }, 2000);
   }, [navigate, isAuthenticated]);
 
+  if (!isAuthenticated || !shop) {
+    return <OverlayLoading visible={true} />
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Suspense fallback={<div></div>}>
@@ -49,10 +53,9 @@ const MyshopPage = () => {
       </Suspense>
 
       <div className="flex-1 bg-gray-50">
-        {isAuthenticated && shop ? (
-          <Routes>
-            <Route index element={<Navigate to="/myshop/dashboard" replace />} />
-            <Route path="dashboard" element={<div>Dashboard Content</div>} />
+        <Routes>
+            <Route index element={<Navigate to={APP_ROUTES.MYSHOP.DASHBOARD} replace />} />
+            <Route path={APP_ROUTES.MYSHOP.DASHBOARD} element={<div>Dashboard Content</div>} />
             <Route path="sale" element={<div>Sales Overview</div>} />
             <Route path="products" element={<ProductPage />} />
             <Route path="products/create" element={<CreateProduct />} />
@@ -63,10 +66,9 @@ const MyshopPage = () => {
             <Route path="orders/printing" element={<OrderPrintPage />} />
             <Route path="messages" element={<MessagePage />} />
             <Route path="settings" element={<Setting />} />
+
+            <Route path="*" element={<Navigate to={APP_ROUTES.MYSHOP.DASHBOARD} replace />} />
           </Routes>
-        ) : (
-          <OverlayLoading visible={true} />
-        )}
       </div>
     </div>
   );
