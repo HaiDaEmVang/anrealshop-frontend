@@ -8,3 +8,7 @@ export interface BaseShopDto {
 export interface ShopDto extends BaseShopDto {
   shopUrl: string;
 }
+
+export interface ShopCreateRequest {
+  name: string;
+}

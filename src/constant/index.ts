@@ -156,7 +156,7 @@ export const APP_ROUTES = {
   // MyShop Routes
   MYSHOP: {
     BASE: '/myshop/*',
-
+    
     DASHBOARD: '/myshop/dashboard',
     SALE: '/myshop/sale',
     PRODUCTS: '/myshop/products',

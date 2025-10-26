@@ -35,7 +35,7 @@ export function SignIn() {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const returnUrl = searchParams.get('urlReturn') || '/';
+  const returnUrl = searchParams.get('redirect') || '/';
 
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
@@ -67,6 +67,7 @@ export function SignIn() {
       const user: UserDto = resultAction.user;
 
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
+      console.log('Navigating to returnUrl:', returnUrl);
       navigate(returnUrl);
     } catch (err: any) {
       let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';

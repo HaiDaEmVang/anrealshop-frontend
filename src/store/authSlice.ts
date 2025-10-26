@@ -6,6 +6,7 @@ import type { LoginRequest, LoginResponse } from '../types/AuthType';
 import type { ErrorResponseDto } from '../types/CommonType';
 import type { RegisterRequest, UserDto } from '../types/UserType';
 import type { ShopDto } from '../types/ShopType';
+import { create } from 'domain';
 
 interface AuthError {
   message: string;
@@ -74,8 +75,8 @@ export const fetchCurrentShop = createAsyncThunk(
     'shopAuth/fetchCurrentShop',
     async (_, { rejectWithValue }) => {
         try {
+            console.log("fetchCurrentShop called");
             const response : ShopDto = await authService.getShopInfo();
-            console.log('Fetched shop info:', response);
             return response;
         } catch (error: any) {
             const shopAuthError: AuthError = {
@@ -183,6 +184,13 @@ const userAuthSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
     },
+
+    createShopForUser: (state, action: PayloadAction<ShopDto>) => {
+      state.shop = action.payload;
+      if (state.user) {
+        state.user.hasShop = true;
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -225,6 +233,8 @@ const userAuthSlice = createSlice({
       .addCase(fetchCurrentShop.fulfilled, (state, action: PayloadAction<ShopDto>) => {
         state.status = 'succeeded';
         state.shop = action.payload;
+        state.isAuthenticated = true;
+        state.user = action.payload && state.user ? { ...state.user, hasShop: true } : { ...state.user, hasShop: false } as UserDto;
         state.error = null;
       })
       .addCase(fetchCurrentShop.rejected, (state) => {
@@ -272,4 +282,4 @@ const userAuthSlice = createSlice({
 });
 
 export default userAuthSlice.reducer;
-export const { addToCart, removeFromCart, updateCartCount, clearCart, logout } = userAuthSlice.actions;
+export const { addToCart, removeFromCart, updateCartCount, clearCart, logout, createShopForUser } = userAuthSlice.actions;

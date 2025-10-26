@@ -4,6 +4,7 @@ import showErrorNotification from '../../components/Toast/NotificationError';
 import { APP_ROUTES } from '../../constant';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
 import { fetchCurrentShop } from '../../store/authSlice';
+import OverlayLoading from '../../components/common/OverlayLoading';
 
 
 const ShopAdminHeader = lazy(() => import('../../components/header/ShopAdminHeader'));
@@ -18,20 +19,28 @@ const OrderShippingPage = lazy(() => import('../../components/Myshop/Order/Order
 const OrderPrintPage = lazy(() => import('../../components/Myshop/Order/OrderPrintPage'));
 
 const MyshopPage = () => {
-  const { shop, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, shop, user, status } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+
   useEffect(() => {
-    if (!isAuthenticated) {
-      dispatch(fetchCurrentShop());
-    }
-    if (isAuthenticated && !shop) {
-      navigate(APP_ROUTES.SHOP_REGISTER);
-      showErrorNotification("Thông báo", "Bạn cần đăng ký cửa hàng trước khi truy cập.");
-    }
+    setTimeout(() => {
+      if (!shop) {
+        dispatch(fetchCurrentShop());
+      }
+    }, 1000);
+  }, []);
 
-  }, [dispatch, isAuthenticated]);
-
+  useEffect(() => {
+    setTimeout(() => {
+      if (isAuthenticated && !shop && status === 'succeeded') {
+        if (!user?.hasShop) {
+          navigate(APP_ROUTES.SHOP_REGISTER);
+          showErrorNotification("Thông báo", "Bạn cần đăng ký cửa hàng trước khi truy cập.");
+        }
+      }
+    }, 2000);
+  }, [navigate, isAuthenticated]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -40,23 +49,24 @@ const MyshopPage = () => {
       </Suspense>
 
       <div className="flex-1 bg-gray-50">
-        {/* <Suspense fallback={<div>Loading...</div>}> */}
-        <Routes>
-          <Route index element={<Navigate to="/myshop/dashboard" replace />} />
-          <Route path="dashboard" element={<div>Dashboard Content</div>} />
-          <Route path="sale" element={<div>Sales Overview</div>} />
-          <Route path="products" element={<ProductPage />} />
-          <Route path="products/create" element={<CreateProduct />} />
-          <Route path="products/edit/:id" element={<ProductForm />} />
-          <Route path="orders" element={<OrderPage />} />
-          {/* <Route path="orders/:shopOrderId" element={<OrderDetailComp />} /> */}
-          <Route path="orders/shipping" element={<OrderShippingPage />} />
-          <Route path="orders/printing" element={<OrderPrintPage />} />
-          <Route path="messages" element={<MessagePage />} />
-          <Route path="settings" element={<Setting />} />
-          <Route path="*" element={<div>Page not found</div>} />
-        </Routes>
-        {/* </Suspense> */}
+        {isAuthenticated && shop ? (
+          <Routes>
+            <Route index element={<Navigate to="/myshop/dashboard" replace />} />
+            <Route path="dashboard" element={<div>Dashboard Content</div>} />
+            <Route path="sale" element={<div>Sales Overview</div>} />
+            <Route path="products" element={<ProductPage />} />
+            <Route path="products/create" element={<CreateProduct />} />
+            <Route path="products/edit/:id" element={<ProductForm />} />
+            <Route path="orders" element={<OrderPage />} />
+            {/* <Route path="orders/:shopOrderId" element={<OrderDetailComp />} /> */}
+            <Route path="orders/shipping" element={<OrderShippingPage />} />
+            <Route path="orders/printing" element={<OrderPrintPage />} />
+            <Route path="messages" element={<MessagePage />} />
+            <Route path="settings" element={<Setting />} />
+          </Routes>
+        ) : (
+          <OverlayLoading visible={true} />
+        )}
       </div>
     </div>
   );
