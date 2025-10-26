@@ -15,6 +15,7 @@ const AuthoPage = lazy(() => import('./pages/Auth/AuthoPage'));
 const MyshopPage = lazy(() => import('./pages/MyshopPage/MyshopRoute'));
 const AdminPage = lazy(() => import('./pages/MyshopPage/AdminRoute'));
 const UserRoute = lazy(() => import('./pages/MyshopPage/UserRoute'));
+const RegisterShopPage = lazy(() => import('./components/User/RegisterShopPage/RegisterShopPage'));
 
 function App() {
   const theme = createTheme({
@@ -56,8 +57,8 @@ function App() {
 
   useEffect(() => {
     if (!user && !isAuthenticated) {
-        dispatch(fetchCurrentUser());
-      }
+      dispatch(fetchCurrentUser());
+    }
   }, []);
 
   return (
@@ -70,6 +71,7 @@ function App() {
             <Routes>
               <Route path={APP_ROUTES.LOGIN} element={<AuthoPage />} />
               <Route path={APP_ROUTES.REGISTER} element={<AuthoPage />} />
+              <Route path={APP_ROUTES.SHOP_REGISTER} element={<RegisterShopPage />} />
               <Route path={APP_ROUTES.MYSHOP.BASE} element={<MyshopPage />} />
               <Route path={APP_ROUTES.ADMIN.BASE} element={<AdminPage />} />
               <Route path="/*" element={<UserRoute />} />
