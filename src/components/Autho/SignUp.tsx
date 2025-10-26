@@ -69,7 +69,7 @@ export function SignUp() {
       await dispatch(registerUser(registerData)).unwrap();
       showSuccessNotification('Đăng ký thành công!', `Chào mừng ${values.fullName || " bạn"} đến với hệ thống!`);
       navigate('/login');
-    }catch (err: any) {
+    } catch (err: any) {
       console.error('Registration failed:', err);
       let notificationMessage = err.message || 'Đã có lỗi xảy ra trong quá trình đăng ký.';
 

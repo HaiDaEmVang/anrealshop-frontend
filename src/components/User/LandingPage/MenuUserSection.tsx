@@ -1,14 +1,14 @@
-import { Menu, Avatar } from '@mantine/core';
+import { Avatar, Menu } from '@mantine/core';
 import { useState } from 'react';
+import { FaClipboardList, FaHeart, FaRegUser, FaSignInAlt, FaSignOutAlt, FaStore, FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import { FaUser, FaSignOutAlt, FaClipboardList, FaHeart, FaRegUser, FaSignInAlt, FaStore } from 'react-icons/fa';
+import { APP_ROUTES } from '../../../constant';
 import { useAppDispatch } from '../../../hooks/useAppRedux';
 import { logoutUser } from '../../../store/authSlice';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
-import showErrorNotification from '../../Toast/NotificationError';
 
 interface MenuUserSectionProps {
-    user: any; 
+    user: any;
     isAuthenticated: boolean;
     scrolled: boolean;
 }
@@ -17,15 +17,6 @@ const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionPro
     const [userMenuOpened, setUserMenuOpened] = useState(false);
     const dispatch = useAppDispatch();
 
-    const handleLogout = async () => {
-        await dispatch(logoutUser()).unwrap()
-            .then(() => {
-                showSuccessNotification('Đăng xuất thành công!', 'Bạn đã đăng xuất khỏi tài khoản.');
-            })
-            .catch((error) => {
-                showErrorNotification('Đăng xuất thất bại!', error.message);
-            });
-    };
 
     return (
         <Menu
@@ -93,19 +84,30 @@ const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionPro
                             Sản phẩm yêu thích
                         </Menu.Item>
 
-                        {user?.roles?.includes('SELLER') && (
+                        <Menu.Divider />
+                        {user?.hasShop ? (
                             <Menu.Item
-                                component={Link}
-                                to="/seller/dashboard"
-                                leftSection={<FaStore size={14} />}
-                            >
-                                Quản lý cửa hàng
-                            </Menu.Item>
-                        )}
+                                    component={Link}
+                                    to={APP_ROUTES.MYSHOP.BASE}
+                                    leftSection={<FaStore size={14} />}
+                                >
+                                    Quản lý cửa hàng
+                                </Menu.Item>
+
+                        ) : <Menu.Item
+                                    component={Link}
+                                    to={APP_ROUTES.SHOP_REGISTER}
+                                    leftSection={<FaStore size={14} />}
+                                >
+                                    Đăng ký cửa hàng
+                                </Menu.Item>}
 
                         <Menu.Divider />
                         <Menu.Item
-                            onClick={handleLogout}
+                            onClick={() => {
+                                dispatch(logoutUser());
+                                showSuccessNotification('Thông báo', 'Đăng xuất thành công');
+                            }}
                             color="red"
                             leftSection={<FaSignOutAlt size={14} />}
                         >

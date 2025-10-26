@@ -1,6 +1,6 @@
 import { createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { lazy } from 'react';
+import { lazy, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import '@mantine/core/styles.css';
@@ -8,11 +8,13 @@ import '@mantine/notifications/styles.css';
 
 import './App.css';
 import { APP_ROUTES } from './constant';
+import { useAppDispatch, useAppSelector } from './hooks/useAppRedux';
+import { fetchCurrentUser } from './store/authSlice';
 
 const AuthoPage = lazy(() => import('./pages/Auth/AuthoPage'));
 const MyshopPage = lazy(() => import('./pages/MyshopPage/MyshopRoute'));
 const AdminPage = lazy(() => import('./pages/MyshopPage/AdminRoute'));
-const UserPage = lazy(() => import('./pages/MyshopPage/UserRote'));
+const UserRoute = lazy(() => import('./pages/MyshopPage/UserRoute'));
 
 function App() {
   const theme = createTheme({
@@ -49,7 +51,14 @@ function App() {
     },
   });
 
-  
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (!user && !isAuthenticated) {
+        dispatch(fetchCurrentUser());
+      }
+  }, []);
 
   return (
     <MantineProvider theme={theme}>
@@ -63,7 +72,7 @@ function App() {
               <Route path={APP_ROUTES.REGISTER} element={<AuthoPage />} />
               <Route path={APP_ROUTES.MYSHOP.BASE} element={<MyshopPage />} />
               <Route path={APP_ROUTES.ADMIN.BASE} element={<AdminPage />} />
-              <Route path="/*" element={<UserPage />} />
+              <Route path="/*" element={<UserRoute />} />
             </Routes>
             {/* </Suspense> */}
           </main>

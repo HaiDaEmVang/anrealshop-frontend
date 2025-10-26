@@ -1,6 +1,7 @@
 import type { AddressDto } from "./AddressType";
 
 export type GenderType = 'MALE' | 'FEMALE' | 'OTHER'; 
+export type UserRoleType = 'USER' | 'MY_SHOP' | 'ADMIN';
 
 export interface UserDto {
   id: string;
@@ -17,6 +18,7 @@ export interface UserDto {
 
   address?: AddressDto;
   cartCount?: number;
+  hasShop?: boolean;
 }
 
 export interface RegisterRequest {

@@ -67,7 +67,6 @@ export const HeroSection = () => {
 
 
     useEffect(() => {
-        // Initialize videos
         Object.values(videoRefs.current).forEach(videoRef => {
             if (videoRef) {
                 videoRef.muted = true;

@@ -35,8 +35,8 @@ export function SignIn() {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const returnUrl = searchParams.get('urlReturn') || '/';
-  
+  const returnUrl = searchParams.get('redirect') || '/';
+
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
   const isLoading = status === 'loading';
@@ -46,8 +46,8 @@ export function SignIn() {
 
   const form = useForm<SignInFormValues>({
     initialValues: {
-      email: '',
-      password: '',
+      email: 'botgiatv2@gmail.com',
+      password: 'Abc@123456',
       rememberMe: false,
     },
     validate: {
@@ -67,6 +67,7 @@ export function SignIn() {
       const user: UserDto = resultAction.user;
 
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
+      console.log('Navigating to returnUrl:', returnUrl);
       navigate(returnUrl);
     } catch (err: any) {
       let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
