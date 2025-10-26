@@ -3,7 +3,6 @@ import {
   Grid
 } from '@mantine/core';
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 import { paymentMethodsDataDefault } from '../../../data/CheckoutData';
 import { useAppSelector } from '../../../hooks/useAppRedux';
@@ -14,16 +13,16 @@ import type { CheckoutRequestDto, CheckoutResponseDto, PaymentGatewayType } from
 import type { CartShippingFee, CheckoutInfoDto } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
 import showErrorNotification from '../../Toast/NotificationError';
+import PageNotFound from '../../common/PageNotFound';
 import CheckoutBreadcrumbs from './CheckoutBreadcrumbs';
 import CheckoutReview from './CheckoutReview';
 import ListProduct from './ListProductForShop';
 import PaymentMethod from './PaymentMethod';
 import Address from './address/Address';
-import PageNotFound from '../../common/PageNotFound';
+import OverlayLoading from '../../common/OverlayLoading';
 
 
 const CheckoutPage = () => {
-  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
 
   const [itemCheckoutInfo, setItemCheckoutInfo] = useState<CheckoutInfoDto[]>([]);
@@ -38,12 +37,8 @@ const CheckoutPage = () => {
   const idItems: ItemsCheckoutRequest = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS) || '{}');
 
   useEffect(() => {
-    if (!idItems || !idItems.length) {
+    if (!idItems || Object.keys(idItems).length === 0) {
       showErrorNotification("Lỗi truy xuất", "Không tìm thấy đơn hàng nào để thanh toán");
-      const timer = setTimeout(() => {
-        navigate(APP_ROUTES.HOME);
-      }, 3000);
-      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -54,13 +49,13 @@ const CheckoutPage = () => {
   }, [user?.address]);
 
   useEffect(() => {
-
-    if (!idItems || !idItems.length) {
+    if (!idItems || Object.keys(idItems).length === 0) {
       return;
     }
     setItemLoading(true);
     CheckoutService.getCheckoutInfo(idItems)
       .then(data => {
+        console.log('Fetched checkout info:', data);
         setItemCheckoutInfo(data);
       })
       .catch(error => showErrorNotification("Tải danh sách sản phẩm thất bại", getErrorMessage(error)))
@@ -110,19 +105,23 @@ const CheckoutPage = () => {
         } else {
           window.location.href = APP_ROUTES.PAYMENT_RESULT(data.orderId);
         }
-        setLoading(false);
       })
       .catch(error => {
-        setLoading(false);
         showErrorNotification("Lỗi đặt hàng", getErrorMessage(error));
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
-  if (!idItems || !idItems.length) {
-    return <PageNotFound 
+  if (!idItems || Object.keys(idItems).length === 0) {
+    return <PageNotFound
       title='Không tìm thấy đơn hàng để thanh toán'
       description='Bạn sẽ được chuyển hướng về trang chủ để thêm đơn hàng.'
+      redirectLink={APP_ROUTES.HOME}
     />;
+  }
+
+  if (itemLoading) {
+    return <OverlayLoading visible/>;
   }
 
   return (
