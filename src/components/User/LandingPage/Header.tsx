@@ -5,8 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FaSearch, FaShoppingBag, FaTimes } from 'react-icons/fa';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '../../../constant';
-import { useAppDispatch, useAppSelector } from '../../../hooks/useAppRedux';
-import { fetchCurrentUser } from '../../../store/authSlice';
+import { useAppSelector } from '../../../hooks/useAppRedux';
 import SuggestSearch from '../../header/SuggestSearch';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
 import MenuUserSection from './MenuUserSection';
@@ -31,7 +30,6 @@ export const Header = () => {
     const navigate = useNavigate();
 
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-    const dispatch = useAppDispatch();
 
     const handleOpenCart = () => {
         if (!isAuthenticated)
@@ -40,11 +38,7 @@ export const Header = () => {
             navigate(APP_ROUTES.CART);
     }
 
-    useEffect(() => {
-        if (!isAuthenticated && !user) {
-            dispatch(fetchCurrentUser());
-        }
-    }, [dispatch, isAuthenticated, user]);
+
 
     const navItems: NavItem[] = [
         { label: 'Sản phẩm', link: '/products' },
@@ -150,7 +144,7 @@ export const Header = () => {
                                 aria-label="Search"
                             >
                                 <FaSearch size={18} />
-                            </button> 
+                            </button>
 
                             <Transition
                                 mounted={showSearch}

@@ -7,9 +7,15 @@ import { APP_ROUTES } from '../../../constant';
 import ShopService from '../../../service/ShopService';
 import showErrorNotification from '../../Toast/NotificationError';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
+import type { ShopCreateRequest } from '../../../types/ShopType';
+import { getErrorMessage } from '../../../untils/ErrorUntils';
+import { useAppDispatch } from '../../../hooks/useAppRedux';
+import { createShopForUser } from '../../../store/authSlice';
 
 const RegisterShopPage = () => {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    
 
     const form = useForm({
         initialValues: {
@@ -25,20 +31,23 @@ const RegisterShopPage = () => {
         if (!form.isValid()) {
             return;
         }
-
-        ShopService.createShop(values.shopName).then(() => {
+        const data: ShopCreateRequest = {
+            name: values.shopName
+        }
+        ShopService.createShop(data).then((response) => {
             showSuccessNotification("Thành công", "Đăng ký cửa hàng thành công! Đang chuyển hướng...");
+            dispatch(createShopForUser(response));
             setTimeout(() => {
                 navigate(APP_ROUTES.MYSHOP.BASE);
-            }, 5000);
-        }).catch(() => {
-            showErrorNotification("Lỗi", "Đăng ký cửa hàng thất bại. Vui lòng thử lại.");
+            }, 3000);
+        }).catch((err) => {
+            showErrorNotification("Thông báo", getErrorMessage(err));
         })
 
     };
 
     const handleBack = () => {
-        navigate(-1);
+        navigate(APP_ROUTES.HOME);
     };
 
     return (

@@ -1,9 +1,9 @@
-import { lazy } from 'react';
+import { lazy, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import Header from '../../components/header/Header';
 import LandingPage from '../../components/User/LandingPage/LandingPage';
 import { APP_ROUTES } from '../../constant';
-import Footer from '../../components/Footer/Footer';
+import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
+import { fetchCurrentUser } from '../../store/authSlice';
 
 const CartPage = lazy(() => import('../../components/User/Cart/CartPage'));
 const CategoryPage = lazy(() => import('../../components/User/CategoryPage/CategoryPage'));
@@ -18,7 +18,15 @@ const PaymentResultPage = lazy(() => import('../../components/User/paymentResult
 const RegisterShopPage = lazy(() => import('../../components/User/RegisterShopPage/RegisterShopPage'));
 
 const UserPage = () => {
-  const navigate = useLocation();
+  const { user, isAuthenticated, shop } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (!isAuthenticated && !user) {
+      console.log('User not authenticated. Fetching current user...');
+      dispatch(fetchCurrentUser());
+    }
+  }, [dispatch, isAuthenticated, user, shop]);
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* {navigate.pathname !== APP_ROUTES.HOME && <Header />} */}

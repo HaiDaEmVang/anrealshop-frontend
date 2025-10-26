@@ -2,6 +2,7 @@ import {
   ActionIcon,
   Avatar,
   Burger,
+  Collapse,
   Divider,
   Drawer,
   Group,
@@ -9,8 +10,7 @@ import {
   Menu,
   Stack,
   Text,
-  UnstyledButton,
-  Collapse
+  UnstyledButton
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
@@ -23,29 +23,31 @@ import {
   FiMessageSquare,
   FiPackage,
   FiPieChart,
+  FiPlus,
+  FiPrinter,
   FiSettings,
   FiShoppingBag,
-  FiUser,
   FiTruck,
-  FiPrinter,
-  FiPlus
+  FiUser
 } from 'react-icons/fi';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../hooks/useAppRedux';
+import { APP_ROUTES } from '../../constant';
 
 const navLinks = [
   { label: 'Tổng quan', icon: <FiPieChart size={16} />, path: '/myshop/dashboard' },
-  { 
-    label: 'Sản phẩm', 
-    icon: <FiShoppingBag size={16} />, 
+  {
+    label: 'Sản phẩm',
+    icon: <FiShoppingBag size={16} />,
     path: '/myshop/products',
     children: [
       { label: 'Quản lý', icon: <FiPackage size={16} />, path: '/myshop/products' },
       { label: 'Tạo sản phẩm', icon: <FiPlus size={16} />, path: '/myshop/products/create' },
     ]
   },
-  { 
-    label: 'Đơn hàng', 
-    icon: <FiPackage size={16} />, 
+  {
+    label: 'Đơn hàng',
+    icon: <FiPackage size={16} />,
     path: '/myshop/orders',
     children: [
       { label: 'Đơn hàng', icon: <FiPackage size={16} />, path: '/myshop/orders' },
@@ -59,9 +61,12 @@ const navLinks = [
 
 export function ShopAdminHeader() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [opened, { toggle, close }] = useDisclosure(false);
-  const [hasUnread] = useState(true); // For notification indicator
+  const [hasUnread] = useState(true);
   const [openedSubmenu, setOpenedSubmenu] = useState<string | null>(null);
+
+  const { shop } = useAppSelector((state) => state.auth);
 
   const toggleSubmenu = (label: string) => {
     setOpenedSubmenu(openedSubmenu === label ? null : label);
@@ -70,7 +75,7 @@ export function ShopAdminHeader() {
   const userMenuItems = [
     { label: 'Hồ sơ của tôi', icon: <FiUser size={14} />, onClick: () => console.log('Profile') },
     { label: 'Cài đặt tài khoản', icon: <FiSettings size={14} />, onClick: () => console.log('Settings') },
-    { label: 'Quay lại cửa hàng', icon: <FiHome size={14} />, onClick: () => console.log('Go to shop') },
+    { label: 'Quay lại cửa hàng', icon: <FiHome size={14} />, onClick: () => navigate(APP_ROUTES.HOME) },
   ];
 
   // const isUnderPath = (parentPath: string) => {
@@ -103,18 +108,17 @@ export function ShopAdminHeader() {
             <nav className="flex items-center space-x-1">
               {navLinks.map((item) => {
                 const isActive = isMenuActive(item);
-                
+
                 if (item.children) {
                   return (
                     <Menu key={item.label} trigger="hover" openDelay={100} closeDelay={200} position="bottom-start">
                       <Menu.Target>
                         <Link
                           to={item.path}
-                          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors ${
-                            isActive
-                              ? 'text-primary bg-primary/5'
-                              : 'text-gray-600 hover:bg-gray-100'
-                          }`}
+                          className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors ${isActive
+                            ? 'text-primary bg-primary/5'
+                            : 'text-gray-600 hover:bg-gray-100'
+                            }`}
                         >
                           {item.icon}
                           {item.label}
@@ -145,11 +149,10 @@ export function ShopAdminHeader() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors ${
-                      isActive
-                        ? 'text-primary bg-primary/5'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
+                    className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1.5 transition-colors ${isActive
+                      ? 'text-primary bg-primary/5'
+                      : 'text-gray-600 hover:bg-gray-100'
+                      }`}
                   >
                     {item.icon}
                     {item.label}
@@ -228,13 +231,13 @@ export function ShopAdminHeader() {
               <Menu.Target>
                 <UnstyledButton className="flex items-center gap-2 hover:bg-gray-100 p-1 rounded-full transition-colors">
                   <Avatar
-                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3"
+                    src={shop?.avatarUrl || '/images/default-shop-logo.png'}
                     size="md"
                     radius="xl"
                   />
                   <div className="hidden md:block text-left">
                     <Text size="sm" fw={500}>
-                      Nguyễn Văn A
+                      {shop?.name || 'N/A Shop'}
                     </Text>
                     <Text size="xs" c="dimmed">
                       Quản trị viên
@@ -255,14 +258,6 @@ export function ShopAdminHeader() {
                   </Menu.Item>
                 ))}
 
-                <Menu.Divider />
-                
-                <Menu.Item
-                  leftSection={<FiLogOut size={14} />}
-                  color="red"
-                >
-                  Đăng xuất
-                </Menu.Item>
               </Menu.Dropdown>
             </Menu>
           </Group>
@@ -288,17 +283,16 @@ export function ShopAdminHeader() {
         <Stack>
           {navLinks.map((item) => {
             const isActive = isMenuActive(item);
-            
+
             if (item.children) {
               const isOpen = openedSubmenu === item.label;
               return (
                 <div key={item.label}>
                   <UnstyledButton
-                    className={`w-full px-3 py-2 rounded-md text-sm font-medium flex items-center justify-between ${
-                      isActive
-                        ? 'text-primary bg-primary/5'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
+                    className={`w-full px-3 py-2 rounded-md text-sm font-medium flex items-center justify-between ${isActive
+                      ? 'text-primary bg-primary/5'
+                      : 'text-gray-600 hover:bg-gray-100'
+                      }`}
                     onClick={() => toggleSubmenu(item.label)}
                   >
                     <div className="flex items-center gap-2">
@@ -315,11 +309,10 @@ export function ShopAdminHeader() {
                           <Link
                             key={child.path}
                             to={child.path}
-                            className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${
-                              isChildActive
-                                ? 'text-primary bg-primary/5'
-                                : 'text-gray-600 hover:bg-gray-100'
-                            }`}
+                            className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${isChildActive
+                              ? 'text-primary bg-primary/5'
+                              : 'text-gray-600 hover:bg-gray-100'
+                              }`}
                             onClick={close}
                           >
                             {child.icon}
@@ -337,11 +330,10 @@ export function ShopAdminHeader() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${
-                  isActive
-                    ? 'text-primary bg-primary/5'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`px-3 py-2 rounded-md text-sm font-medium flex items-center gap-2 ${isActive
+                  ? 'text-primary bg-primary/5'
+                  : 'text-gray-600 hover:bg-gray-100'
+                  }`}
                 onClick={close}
               >
                 {item.icon}

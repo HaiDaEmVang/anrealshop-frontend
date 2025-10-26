@@ -95,7 +95,7 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(customError);
     }
 
-    return Promise.reject(new Error('Mất kết nối server hoặc lỗi không xác định.'));
+    return Promise.reject(new Error('Mất kết nối server.'));
   }
 );
 
