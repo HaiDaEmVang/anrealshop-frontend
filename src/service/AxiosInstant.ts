@@ -2,7 +2,6 @@ import type { EnhancedStore } from '@reduxjs/toolkit';
 import axios, { type AxiosRequestConfig } from 'axios';
 import showErrorNotification from '../components/Toast/NotificationError';
 import { APP_ROUTES_PUBLIC, BASE_API_URL } from '../constant';
-import { logout } from '../store/authSlice';
 import type { ErrorResponseDto } from '../types/CommonType';
 import authService from './AuthService';
 
