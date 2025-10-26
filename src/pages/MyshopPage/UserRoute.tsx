@@ -1,8 +1,8 @@
 import { lazy } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import Header from '../../components/header/Header';
 import LandingPage from '../../components/User/LandingPage/LandingPage';
 import { APP_ROUTES } from '../../constant';
-import Footer from '../../components/Footer/Footer';
 
 
 const CartPage = lazy(() => import('../../components/User/Cart/CartPage'));
@@ -15,13 +15,13 @@ const ProductDetailPage = lazy(() => import('../../components/User/ProductDetail
 const SettingPage = lazy(() => import('../../components/User/Setting.tsx/SettingPage'));
 const ShopPage = lazy(() => import('../../components/User/Shop/ShopPage'));
 const PaymentResultPage = lazy(() => import('../../components/User/paymentResult/PaymentResultPage'));
-const RegisterShopPage = lazy(() => import('../../components/User/RegisterShopPage/RegisterShopPage'));
 
 const UserRoute = () => {
+  const navigate = useLocation()
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* {navigate.pathname !== APP_ROUTES.HOME && <Header />} */}
+      {navigate.pathname !== APP_ROUTES.HOME && <Header />}
       <div className="flex-1 bg-gray-50">
         <Routes>
           <Route index element={<LandingPage />} />
@@ -35,12 +35,12 @@ const UserRoute = () => {
           <Route path="/category/:slug" element={<CategoryPage />} />
           <Route path="/shop/:slug" element={<ShopPage />} />
           <Route path={APP_ROUTES.PAYMENT_RESULT(':orderId')} element={<PaymentResultPage />} />
-          <Route path={APP_ROUTES.SHOP_REGISTER} element={<RegisterShopPage />} />
+
 
           <Route path="*" element={<Navigate to={APP_ROUTES.HOME} replace />} />
         </Routes>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
