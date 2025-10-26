@@ -1,9 +1,9 @@
-import { lazy, useEffect } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { lazy } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import LandingPage from '../../components/User/LandingPage/LandingPage';
 import { APP_ROUTES } from '../../constant';
-import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
-import { fetchCurrentUser } from '../../store/authSlice';
+import Footer from '../../components/Footer/Footer';
+
 
 const CartPage = lazy(() => import('../../components/User/Cart/CartPage'));
 const CategoryPage = lazy(() => import('../../components/User/CategoryPage/CategoryPage'));
@@ -17,23 +17,14 @@ const ShopPage = lazy(() => import('../../components/User/Shop/ShopPage'));
 const PaymentResultPage = lazy(() => import('../../components/User/paymentResult/PaymentResultPage'));
 const RegisterShopPage = lazy(() => import('../../components/User/RegisterShopPage/RegisterShopPage'));
 
-const UserPage = () => {
-  const { user, isAuthenticated, shop } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
-  useEffect(() => {
-    if (!isAuthenticated && !user) {
-      console.log('User not authenticated. Fetching current user...');
-      dispatch(fetchCurrentUser());
-    }
-  }, [dispatch, isAuthenticated, user, shop]);
+const UserRoute = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* {navigate.pathname !== APP_ROUTES.HOME && <Header />} */}
       <div className="flex-1 bg-gray-50">
-        {/* <Suspense fallback={<div>Loading...</div>}> */}
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route index element={<LandingPage />} />
           {/* <Route path={APP_ROUTES.HOME} element={<HomePage />} /> */}
           {/* <Route path="/products" element={<ListProduct />} /> */}
           <Route path={APP_ROUTES.PRODUCT_DETAIL} element={<ProductDetailPage />} />
@@ -45,12 +36,13 @@ const UserPage = () => {
           <Route path="/shop/:slug" element={<ShopPage />} />
           <Route path={APP_ROUTES.PAYMENT_RESULT(':orderId')} element={<PaymentResultPage />} />
           <Route path={APP_ROUTES.SHOP_REGISTER} element={<RegisterShopPage />} />
+
+          <Route path="*" element={<Navigate to={APP_ROUTES.HOME} replace />} />
         </Routes>
-        {/* </Suspense> */}
       </div>
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 };
 
-export default UserPage;
+export default UserRoute;

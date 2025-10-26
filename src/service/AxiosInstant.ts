@@ -1,15 +1,30 @@
+import type { EnhancedStore } from '@reduxjs/toolkit';
 import axios, { type AxiosRequestConfig } from 'axios';
+import showErrorNotification from '../components/Toast/NotificationError';
 import { APP_ROUTES_PUBLIC, BASE_API_URL } from '../constant';
+import { logout } from '../store/authSlice';
 import type { ErrorResponseDto } from '../types/CommonType';
 import authService from './AuthService';
-import { store } from '../store/store';
-import { logout } from '../store/authSlice';
-import showErrorNotification from '../components/Toast/NotificationError';
 
 
 const axiosInstance = axios.create({
   baseURL: BASE_API_URL,
   withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const axiosNoAuthInstance = axios.create({
+  baseURL: BASE_API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const axiosNoWithCredInstance = axios.create({
+  baseURL: BASE_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -32,86 +47,76 @@ const processQueue = (error: any | null, success = false) => {
   failedQueue = [];
 };
 
-const redirectToLoginWithDelay = () => {
-  store.dispatch(logout());
+export const setupAxiosInterceptors = (
+  store: EnhancedStore,
+  logoutAction: () => { type: string }
+) => {
+  const redirectToLoginWithDelay = () => {
+    store.dispatch(logoutAction());
 
-  const currentPath = window.location.pathname;
-  if (APP_ROUTES_PUBLIC.includes(currentPath)) {
-    return;
-  }
+    const currentPath = window.location.pathname;
+    if (APP_ROUTES_PUBLIC.includes(currentPath)) {
+      return;
+    }
 
-  const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+    const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
 
-  showErrorNotification("Phiên đăng nhập hết hạn.", "Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.");
+    showErrorNotification("Phiên đăng nhập hết hạn.", "Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.");
 
-  setTimeout(() => {
-    window.location.href = `/login?urlReturn=${returnUrl}`;
-  }, 3000);
-};
+    setTimeout(() => {
+      window.location.href = `/login?redirect=${returnUrl}`;
+    }, 3000);
+  };
+  axiosInstance.interceptors.response.use(
+    response => response,
+    async error => {
+      const originalRequest: AxiosRequestConfig & { _retry?: boolean } = error.config;
+      const statusCode = error.response?.status;
+      const errorResponseData: ErrorResponseDto | undefined = error.response?.data;
 
-axiosInstance.interceptors.response.use(
-  response => response,
-  async error => {
-    const originalRequest: AxiosRequestConfig & { _retry?: boolean } = error.config;
-    const statusCode = error.response?.status;
-    const errorResponseData: ErrorResponseDto | undefined = error.response?.data;
+      if (statusCode === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
 
-    if (statusCode === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+        if (isRefreshing) {
+          return new Promise((resolve) => {
+            failedQueue.push({ resolve, reject: () => { } });
+          }).then(() => axiosInstance(originalRequest));
+        }
 
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          failedQueue.push({ resolve, reject: () => { } });
-        }).then(() => axiosInstance(originalRequest));
+        isRefreshing = true;
+
+        try {
+          await authService.refreshToken();
+          processQueue(null, true);
+          return axiosInstance(originalRequest);
+        } catch {
+          processQueue(null, false);
+          redirectToLoginWithDelay();
+          return Promise.resolve({ data: null });
+        } finally {
+          isRefreshing = false;
+        }
       }
 
-      isRefreshing = true;
-
-      try {
-        await authService.refreshToken();
-        processQueue(null, true);
-        return axiosInstance(originalRequest);
-      } catch {
-        processQueue(null, false);
+      if (statusCode === 401) {
         redirectToLoginWithDelay();
         return Promise.resolve({ data: null });
-      } finally {
-        isRefreshing = false;
       }
+
+      if (errorResponseData) {
+        const customError = new Error(errorResponseData.message || 'Đã có lỗi xảy ra từ server.');
+        (customError as any).code = errorResponseData.code;
+        (customError as any).details = errorResponseData.details;
+        (customError as any).traceId = errorResponseData.traceId;
+        (customError as any).statusCode = statusCode;
+
+        return Promise.reject(customError);
+      }
+
+      return Promise.reject(new Error('Mất kết nối server.'));
     }
+  );
 
-    if (statusCode === 401) {
-      redirectToLoginWithDelay();
-      return Promise.resolve({ data: null });
-    }
-
-    if (errorResponseData) {
-      const customError = new Error(errorResponseData.message || 'Đã có lỗi xảy ra từ server.');
-      (customError as any).code = errorResponseData.code;
-      (customError as any).details = errorResponseData.details;
-      (customError as any).traceId = errorResponseData.traceId;
-      (customError as any).statusCode = statusCode;
-
-      return Promise.reject(customError);
-    }
-
-    return Promise.reject(new Error('Mất kết nối server.'));
-  }
-);
-
-const axiosNoAuthInstance = axios.create({
-  baseURL: BASE_API_URL,
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-const axiosNoWithCredInstance = axios.create({
-  baseURL: BASE_API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+};
 
 export { axiosInstance, axiosNoAuthInstance, axiosNoWithCredInstance };

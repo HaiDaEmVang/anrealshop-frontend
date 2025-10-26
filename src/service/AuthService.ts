@@ -2,7 +2,7 @@ import { API_ENDPOINTS } from '../constant';
 import type { LoginRequest, LoginResponse } from '../types/AuthType';
 import type { ShopDto } from '../types/ShopType';
 import type { RegisterRequest, UserDto } from '../types/UserType';
-import { axiosNoAuthInstance } from './AxiosInstant';
+import { axiosInstance, axiosNoAuthInstance } from './AxiosInstant';
 
 const login = async (loginRequest: LoginRequest): Promise<LoginResponse> => {
   const response = await axiosNoAuthInstance.post<LoginResponse>(
@@ -31,13 +31,9 @@ const logout = async (): Promise<void> => {
   return response.data;
 };
 
-// const switchTokenType = async (type: UserRoleType): Promise<void> => {
-//   const response = await axiosInstance.post<void>(API_ENDPOINTS.AUTH.SWITCH_TOKEN_TYPE(type));
-//   return response.data;
-// };
 
 const getProfile = async (): Promise<UserDto> => {
-  const response = await axiosNoAuthInstance.get<UserDto>(API_ENDPOINTS.USERS.ME);
+  const response = await axiosInstance.get<UserDto>(API_ENDPOINTS.USERS.ME);
   return response.data;
 };
 
@@ -51,7 +47,7 @@ const getProfile = async (): Promise<UserDto> => {
 
 
 const getShopInfo = async (): Promise<ShopDto> => {
-  const response = await axiosNoAuthInstance.get<ShopDto>(API_ENDPOINTS.SHOPS.INFO);
+  const response = await axiosInstance.get<ShopDto>(API_ENDPOINTS.SHOPS.INFO);
   return response.data;
 };
 
@@ -64,7 +60,6 @@ const authService = {
   // updateProfile,
   logout,
   register,
-  // switchTokenType,
   getShopInfo,
 };
 

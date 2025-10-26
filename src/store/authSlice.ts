@@ -4,9 +4,8 @@ import authService from '../service/AuthService';
 import type { AddressDto } from '../types/AddressType';
 import type { LoginRequest, LoginResponse } from '../types/AuthType';
 import type { ErrorResponseDto } from '../types/CommonType';
-import type { RegisterRequest, UserDto } from '../types/UserType';
 import type { ShopDto } from '../types/ShopType';
-import { create } from 'domain';
+import type { RegisterRequest, UserDto } from '../types/UserType';
 
 interface AuthError {
   message: string;
@@ -72,23 +71,22 @@ export const fetchCurrentUser = createAsyncThunk(
 );
 
 export const fetchCurrentShop = createAsyncThunk(
-    'shopAuth/fetchCurrentShop',
-    async (_, { rejectWithValue }) => {
-        try {
-            console.log("fetchCurrentShop called");
-            const response : ShopDto = await authService.getShopInfo();
-            return response;
-        } catch (error: any) {
-            const shopAuthError: AuthError = {
-                message: error.message || 'Không thể xác thực cửa hàng.',
-                code: error.code,
-                statusCode: error.statusCode,
-                details: error.details,
-                traceId: error.traceId,
-            };
-            return rejectWithValue(shopAuthError);
-        }
+  'shopAuth/fetchCurrentShop',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response: ShopDto = await authService.getShopInfo();
+      return response;
+    } catch (error: any) {
+      const shopAuthError: AuthError = {
+        message: error.message || 'Không thể xác thực cửa hàng.',
+        code: error.code,
+        statusCode: error.statusCode,
+        details: error.details,
+        traceId: error.traceId,
+      };
+      return rejectWithValue(shopAuthError);
     }
+  }
 );
 
 
@@ -183,6 +181,9 @@ const userAuthSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      state.status = 'idle';
+      state.error = null;
+      state.shop = null;
     },
 
     createShopForUser: (state, action: PayloadAction<ShopDto>) => {
@@ -234,14 +235,14 @@ const userAuthSlice = createSlice({
         state.status = 'succeeded';
         state.shop = action.payload;
         state.isAuthenticated = true;
-        state.user = action.payload && state.user ? { ...state.user, hasShop: true } : { ...state.user, hasShop: false } as UserDto;
+        if (state.user) {
+          state.user.hasShop = !!action.payload; 
+        }
         state.error = null;
       })
       .addCase(fetchCurrentShop.rejected, (state) => {
         state.status = 'idle';
-        state.isAuthenticated = false;
-        state.user = null;
-        state.error = null;
+        state.shop = null;
       })
       // .addCase(updateUserProfile.pending, (state) => {
       //   state.status = 'loading';
@@ -261,6 +262,7 @@ const userAuthSlice = createSlice({
         state.isAuthenticated = false;
         state.status = 'idle';
         state.error = null;
+        state.shop = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.status = 'failed';
