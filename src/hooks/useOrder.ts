@@ -50,7 +50,6 @@ export type PreparingStatus = 'all' | 'preparing' | 'confirmed';
 export const useOrder = (options: UseOrderOptions = {}) => {
   const { autoFetch = false, initialParams, mode = 'myshop' } = options;
 
-  // === state chính ===
   const [state, setState] = useState<UseOrderState>({
     orders: [],
     totalCount: 0,
@@ -69,7 +68,7 @@ export const useOrder = (options: UseOrderOptions = {}) => {
     setState(prev => ({ ...prev, isLoadingOrders: true, error: null }));
     try {
 
-      
+      console.log('Fetching orders with params:', params, 'in mode:', mode);
       const response = mode === 'user'
         ? await OrderService.getUserOrders(params)
         : await OrderService.getMyShopOrders(params);
