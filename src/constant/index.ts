@@ -1,3 +1,5 @@
+import type { UserRoleType } from "../types/UserType"
+
 export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:4141/api'
 export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL || 'http://localhost:4141'
 export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE 
@@ -17,6 +19,7 @@ export const API_ENDPOINTS = {
     LOGOUT: '/logout',
     FORGOT_PASSWORD: '/forgot-password',
     REFRESH: '/auth/refresh-token',
+    SWITCH_TOKEN_TYPE: (type: UserRoleType) => `/auth/switch-token-type?type=${type}`,
   },
   OTP: {
     GET_OTP: '/otp/sendOtp',
@@ -28,6 +31,13 @@ export const API_ENDPOINTS = {
     PROFILE: '/user/profile',
     CHANGE_PASSWORD: '/user/change-password',
     RESET_PASSWORD: '/user/reset-password',
+  },
+  SHOPS: {
+    INFO: '/shops',
+    REGISTER: '/shops/register',
+    // APPROVE_SHOP: (shopId: string) => `/shops/approve/${shopId}`,
+    // REJECT_SHOP: (shopId: string) => `/shops/reject/${shopId}`,
+    // SHOP_REGISTRATIONS: '/shops/registrations',
   },
   PRODUCTS: {   
     BASE: '/products', 
@@ -126,6 +136,7 @@ export const API_ENDPOINTS = {
 export const APP_ROUTES = {
   HOME: '/',
   LOGIN: '/login',
+  LOGIN_REDIRECT: (redirectPath: string) => `/login?redirect=${redirectPath}`,
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
   CART: '/carts',
@@ -140,11 +151,12 @@ export const APP_ROUTES = {
   SHOP_PAGE: (slug: string) => `/shop/${slug}`,
 
   SHOP: '/shop',
+  SHOP_REGISTER: '/shop/register',
 
   // MyShop Routes
   MYSHOP: {
     BASE: '/myshop/*',
-
+    
     DASHBOARD: '/myshop/dashboard',
     SALE: '/myshop/sale',
     PRODUCTS: '/myshop/products',
