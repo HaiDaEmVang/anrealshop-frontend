@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
+ 
 const axiosNoAuthInstance = axios.create({
   baseURL: BASE_API_URL,
   withCredentials: true,
@@ -53,8 +53,9 @@ export const setupAxiosInterceptors = (
   const redirectToLoginWithDelay = () => {
     store.dispatch(logoutAction());
 
-    const currentPath = window.location.pathname;
-    if (APP_ROUTES_PUBLIC.includes(currentPath)) {
+    const currentPath = window.location.pathname.split('/');
+    console.log('Current path segments:', currentPath[1]);
+    if (APP_ROUTES_PUBLIC.includes(currentPath[1] ? `/${currentPath[1]}` : '/')) {
       return;
     }
 
@@ -91,7 +92,7 @@ export const setupAxiosInterceptors = (
         } catch {
           processQueue(null, false);
           redirectToLoginWithDelay();
-          return Promise.resolve({ data: null });
+          return Promise.reject(new Error('Phiên làm việc hết hạn.'));
         } finally {
           isRefreshing = false;
         }

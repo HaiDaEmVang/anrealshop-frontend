@@ -14,6 +14,7 @@ export function AuthoPage() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
+    console.log(isAuthenticated);
     if (isAuthenticated) {
       navigate(APP_ROUTES.HOME);
     }
@@ -23,7 +24,7 @@ export function AuthoPage() {
   }, [location.pathname, navigate]);
 
   return (
-    <div className="min-h-[90vh] font-['Inter'] overflow-hidden relative">
+    <div className="min-h-[90vh] font-['Inter'] overflow-hidden relative bg-white">
       <span 
         onClick={() => navigate("/")} 
         className='m-4 inline-block absolute top-5 left-5 cursor-pointer z-50'
