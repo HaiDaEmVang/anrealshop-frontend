@@ -67,9 +67,9 @@ export function SignIn() {
       const user: UserDto = resultAction.user;
 
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
-      console.log('Navigating to returnUrl:', returnUrl);
       navigate(returnUrl);
     } catch (err: any) {
+      console.log('Login error:', err);
       let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
 
       if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {

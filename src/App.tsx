@@ -1,6 +1,6 @@
 import { createTheme, MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { lazy, useEffect } from 'react';
+import { lazy, use, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import '@mantine/core/styles.css';
@@ -54,12 +54,14 @@ function App() {
 
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
-
+  
   useEffect(() => {
     if (!user && !isAuthenticated) {
       dispatch(fetchCurrentUser());
     }
   }, []);
+
+  
 
   return (
     <MantineProvider theme={theme}>
