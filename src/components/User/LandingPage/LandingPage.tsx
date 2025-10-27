@@ -1,10 +1,9 @@
+import Brand from './Brand';
 import { Header } from './Header';
 import HeroSection from './HeroSection';
-import Brand from './Brand';
-import Trending from './Trending';
 import PartnerBenefitsSection from './PartnerBenefitsSection';
-import Footer from '../../Footer/Footer';
 import { TopProduct } from './TopProduct';
+import Trending from './Trending';
 
 const LandingPage = () => {
     return (
@@ -15,7 +14,6 @@ const LandingPage = () => {
             <Trending id="trending-section" />
             <PartnerBenefitsSection id="partner-benefits-section" />
             <TopProduct />
-            <Footer />
         </div>
     );
 };

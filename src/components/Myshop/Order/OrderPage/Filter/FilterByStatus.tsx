@@ -37,7 +37,7 @@ const FilterByStatus = ({ selectedStatus, onStatusChange, orderStatusData, isSho
                 key={status.id}
                 value={status.id}
                 className={`!py-3 !px-4 cursor-pointer transition-colors duration-200 ${isActive
-                  ? 'bg-primary !text-primary border-b-2 !border-primary'
+                  ? '!text-primary border-b-2 !border-primary'
                   : 'hover:bg-gray-100'
                   }`}
               >

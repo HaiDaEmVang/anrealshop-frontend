@@ -45,13 +45,13 @@ export const OrderStatusDefaultDataUser: OrderStatusDto[] = [
     count: 0
   },
   {
-    id: 'PREPARING',
-    name: 'vận chuyển',
+    id: 'CONFIRMED',
+    name: 'Đang chuẩn bị',
     count: 0
   },
   {
     id: 'SHIPPING',
-    name: 'Chờ nhận hàng',
+    name: 'Đang vận chuyển',
     count: 0
   },
   {
