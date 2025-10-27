@@ -54,14 +54,13 @@ export const setupAxiosInterceptors = (
     store.dispatch(logoutAction());
 
     const currentPath = window.location.pathname.split('/');
-    console.log('Current path segments:', currentPath[1]);
     if (APP_ROUTES_PUBLIC.includes(currentPath[1] ? `/${currentPath[1]}` : '/')) {
       return;
     }
 
     const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
 
-    showErrorNotification("Phiên đăng nhập hết hạn.", "Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.");
+    showErrorNotification("Thông báo", "Phiên đăng nhập của bạn đã hết hạn. Đăng nhập lại trong giây lát...");
 
     setTimeout(() => {
       window.location.href = `/login?redirect=${returnUrl}`;

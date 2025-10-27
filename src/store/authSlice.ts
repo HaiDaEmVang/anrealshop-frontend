@@ -57,7 +57,6 @@ export const fetchCurrentUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const user: UserDto = await authService.getProfile();
-      console.log('fetchCurrentUser user:', user);
       return user;
     } catch (error: any) {
       const authError: AuthError = {
@@ -203,7 +202,6 @@ const userAuthSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<LoginResponse>) => {
         state.status = 'succeeded';
-        console.log('Login fulfilled action payload:', action.payload);
         state.isAuthenticated = true;
         state.user = action.payload.user;
         state.error = null;
@@ -220,7 +218,6 @@ const userAuthSlice = createSlice({
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action: PayloadAction<UserDto>) => {
         state.status = 'succeeded';
-        console.log('Fetched current user:', action.payload);
         state.isAuthenticated = true;
         state.user = action.payload;
         state.error = null;
@@ -238,7 +235,6 @@ const userAuthSlice = createSlice({
       .addCase(fetchCurrentShop.fulfilled, (state, action: PayloadAction<ShopDto>) => {
         state.status = 'succeeded';
         state.shop = action.payload;
-        console.log('Fetched current shop:', action.payload);
         state.isAuthenticated = true;
         if (state.user) {
           state.user.hasShop = !!action.payload; 

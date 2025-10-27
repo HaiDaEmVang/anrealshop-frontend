@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Header from '../../components/header/Header';
 import LandingPage from '../../components/User/LandingPage/LandingPage';
@@ -18,6 +18,10 @@ const PaymentResultPage = lazy(() => import('../../components/User/paymentResult
 
 const UserRoute = () => {
   const navigate = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [navigate.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col">
