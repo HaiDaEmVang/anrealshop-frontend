@@ -1,13 +1,18 @@
-import { Container, Button, List, ThemeIcon } from '@mantine/core';
-import { FaStore, FaChartLine, FaBoxes, FaTruck, FaUsers, FaMoneyBillWave, FaStar, FaShoppingBag } from 'react-icons/fa';
+import { Button, Container, List, ThemeIcon } from '@mantine/core';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { FaBoxes, FaChartLine, FaMoneyBillWave, FaShoppingBag, FaStar, FaStore, FaTruck, FaUsers } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES } from '../../../constant';
+import { useAppSelector } from '../../../hooks/useAppRedux';
+import showErrorNotification from '../../Toast/NotificationError';
 
 interface PartnerBenefitsSectionProps {
     id?: string;
 }
 
 const PartnerBenefitsSection = ({ id }: PartnerBenefitsSectionProps) => {
+    const { isAuthenticated } = useAppSelector((state) => state.auth);
+    const navigate = useNavigate();
     const benefits = [
         {
             icon: <FaStore />,
@@ -53,6 +58,15 @@ const PartnerBenefitsSection = ({ id }: PartnerBenefitsSectionProps) => {
             position: "bottom-10 -right-10 md:bottom-20 md:right-20"
         }
     ];
+
+    const handlOpenRegisterShop = () => {
+        if (isAuthenticated) {
+            navigate(APP_ROUTES.SHOP_REGISTER);
+        } else {
+            showErrorNotification("Thông báo", "Đăng nhập trước khi mở shop nhé.");
+            return
+        }
+    };
 
     return (
         <section id={id} className="py-12 bg-white scroll-mt-24">
@@ -144,8 +158,7 @@ const PartnerBenefitsSection = ({ id }: PartnerBenefitsSectionProps) => {
 
                         <div className="flex flex-wrap gap-3">
                             <Button
-                                component={Link}
-                                to="/register-shop"
+                                onClick={handlOpenRegisterShop}
                                 size="sm"
                                 radius="md"
                             >

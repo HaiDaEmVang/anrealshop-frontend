@@ -1,8 +1,9 @@
-import { lazy } from 'react';
+import { lazy, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import Header from '../../components/header/Header';
 import LandingPage from '../../components/User/LandingPage/LandingPage';
 import { APP_ROUTES } from '../../constant';
+import Footer from '../../components/Footer/Footer';
 
 
 const CartPage = lazy(() => import('../../components/User/Cart/CartPage'));
@@ -19,6 +20,11 @@ const PaymentResultPage = lazy(() => import('../../components/User/paymentResult
 const UserRoute = () => {
   const navigate = useLocation()
 
+  useEffect(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [navigate.pathname]);
+
+    
   return (
     <div className="min-h-screen flex flex-col">
       {navigate.pathname !== APP_ROUTES.HOME && <Header />}
@@ -40,7 +46,7 @@ const UserRoute = () => {
           <Route path="*" element={<Navigate to={APP_ROUTES.HOME} replace />} />
         </Routes>
       </div>
-      {/* <Footer /> */}
+      {navigate.pathname !== APP_ROUTES.USER_SETTINGS && <Footer />}
     </div>
   );
 };
