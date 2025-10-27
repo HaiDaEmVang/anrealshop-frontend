@@ -32,8 +32,7 @@ const OptionConfig = ({ viewMode, onViewModeChange }: OptionConfigProps) => {
               <Button
                 leftSection={<FiSettings size={16} />}
                 variant="light"
-                color="dark"
-                className="bg-gray-800 text-white hover:bg-gray-700 border-gray-700 transition-colors duration-200"
+                color="blue"
               >
                 Cài đặt sản phẩm
               </Button>

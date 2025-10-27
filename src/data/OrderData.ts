@@ -45,7 +45,7 @@ export const OrderStatusDefaultDataUser: OrderStatusDto[] = [
     count: 0
   },
   {
-    id: 'PREPARING',
+    id: 'CONFIRMED',
     name: 'Đang chuẩn bị',
     count: 0
   },

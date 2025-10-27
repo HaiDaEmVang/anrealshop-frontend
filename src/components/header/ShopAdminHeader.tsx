@@ -127,7 +127,7 @@ export function ShopAdminHeader() {
                       </Menu.Target>
                       <Menu.Dropdown>
                         {item.children.map((child: any) => {
-                          const isChildActive = location.pathname === child.path || location.pathname.startsWith(child.path);
+                          const isChildActive = location.pathname === child.path;
                           return (
                             <Menu.Item
                               key={child.path}
