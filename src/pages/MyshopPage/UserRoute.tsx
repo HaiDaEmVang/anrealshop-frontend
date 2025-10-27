@@ -21,10 +21,9 @@ const UserRoute = () => {
   const navigate = useLocation()
 
   useEffect(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [navigate.pathname]);
+    window.scrollTo(0, 0);
+  }, [navigate.pathname]);
 
-    
   return (
     <div className="min-h-screen flex flex-col">
       {navigate.pathname !== APP_ROUTES.HOME && <Header />}

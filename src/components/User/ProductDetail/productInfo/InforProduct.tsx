@@ -20,8 +20,8 @@ import {
   FiShield,
   FiTruck
 } from 'react-icons/fi';
-import { APP_ROUTES } from '../../../../constant';
-import { useAppDispatch } from '../../../../hooks/useAppRedux';
+import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../../constant';
+import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppRedux';
 import { CartService } from '../../../../service/CartService';
 import { addToCart } from '../../../../store/authSlice';
 import type { ProductAttribute } from '../../../../types/AttributeType';
@@ -73,7 +73,13 @@ const InforProduct = ({
   const availableQuantity = selectedSku?.quantity || product.quantity;
   const dispatch = useAppDispatch();
 
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
   const handleAddToCart = (quantity: number) => {
+    if (!isAuthenticated) {
+      showErrorNotification("Thông báo", "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
+      return;
+    }
     if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
       showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
       return;
@@ -101,6 +107,10 @@ const InforProduct = ({
 
 
   const handleBuyNow = (quantity: number) => {
+    if (!isAuthenticated) {
+      showErrorNotification("Thông báo", "Vui lòng đăng nhập để mua sản phẩm.");
+      return;
+    }
     if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
       showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
       return;
@@ -109,7 +119,7 @@ const InforProduct = ({
       showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
       return;
     }
-    localStorage.setItem('orderItemIds', JSON.stringify({ [selectedSku.id]: quantity }));
+    localStorage.setItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS, JSON.stringify({ [selectedSku.id]: quantity }));
 
     window.location.href = APP_ROUTES.CHECKOUT;
   }

@@ -87,20 +87,20 @@ const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionPro
                         <Menu.Divider />
                         {user?.hasShop ? (
                             <Menu.Item
-                                    component={Link}
-                                    to={APP_ROUTES.MYSHOP.BASE}
-                                    leftSection={<FaStore size={14} />}
-                                >
-                                    Quản lý cửa hàng
-                                </Menu.Item>
+                                component={Link}
+                                to={APP_ROUTES.MYSHOP.BASE}
+                                leftSection={<FaStore size={14} />}
+                            >
+                                Quản lý cửa hàng
+                            </Menu.Item>
 
                         ) : <Menu.Item
-                                    component={Link}
-                                    to={APP_ROUTES.SHOP_REGISTER}
-                                    leftSection={<FaStore size={14} />}
-                                >
-                                    Đăng ký cửa hàng
-                                </Menu.Item>}
+                            component={Link}
+                            to={APP_ROUTES.SHOP_REGISTER}
+                            leftSection={<FaStore size={14} />}
+                        >
+                            Đăng ký cửa hàng
+                        </Menu.Item>}
 
                         <Menu.Divider />
                         <Menu.Item
@@ -130,14 +130,6 @@ const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionPro
                             leftSection={<FaRegUser size={14} />}
                         >
                             Đăng ký
-                        </Menu.Item>
-                        <Menu.Divider />
-                        <Menu.Item
-                            component={Link}
-                            to="/register-shop"
-                            leftSection={<FaStore size={14} />}
-                        >
-                            Đăng ký bán hàng
                         </Menu.Item>
                     </>
                 )}
