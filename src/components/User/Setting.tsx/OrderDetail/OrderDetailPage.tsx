@@ -67,7 +67,6 @@ export const OrderDetail = () => {
     }, [rejectShopOrder, handleLoadOrders]);
 
     useEffect(() => {
-        console.log('orderDetail', orderDetail);
         if (orderDetail) {
             switch (orderDetail.shopOrderStatus) {
                 case 'INIT_PROCESSING':
@@ -77,7 +76,8 @@ export const OrderDetail = () => {
                     setActiveStep(1);
                     break;
                 case 'CONFIRMED':
-                case 'IN_TRANSIT':
+                case 'PREPARING':
+                case 'SHIPPING':
                     setActiveStep(2);
                     break;
                 case 'DELIVERED':

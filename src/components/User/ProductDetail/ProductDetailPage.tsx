@@ -34,10 +34,6 @@ const ProductDetailPage = () => {
   const { isLoading, getProductById } = useGetProduct();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [slug]);
-
-  useEffect(() => {
     if (slug) {
       getProductById(slug)
         .then(productData => {
@@ -168,6 +164,7 @@ const ProductDetailPage = () => {
             </Group>
           </Grid.Col>
         </Grid>
+        {/* <OverlayLoading visible /> */}
       </Container>
     );
   }
