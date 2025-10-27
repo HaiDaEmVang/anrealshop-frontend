@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
+ 
 const axiosNoAuthInstance = axios.create({
   baseURL: BASE_API_URL,
   withCredentials: true,
@@ -53,14 +53,14 @@ export const setupAxiosInterceptors = (
   const redirectToLoginWithDelay = () => {
     store.dispatch(logoutAction());
 
-    const currentPath = window.location.pathname;
-    if (APP_ROUTES_PUBLIC.includes(currentPath)) {
+    const currentPath = window.location.pathname.split('/');
+    if (APP_ROUTES_PUBLIC.includes(currentPath[1] ? `/${currentPath[1]}` : '/')) {
       return;
     }
 
     const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
 
-    showErrorNotification("Phiên đăng nhập hết hạn.", "Bạn sẽ được chuyển đến trang đăng nhập trong giây lát.");
+    showErrorNotification("Thông báo", "Phiên đăng nhập của bạn đã hết hạn. Đăng nhập lại trong giây lát...");
 
     setTimeout(() => {
       window.location.href = `/login?redirect=${returnUrl}`;
@@ -91,7 +91,7 @@ export const setupAxiosInterceptors = (
         } catch {
           processQueue(null, false);
           redirectToLoginWithDelay();
-          return Promise.resolve({ data: null });
+          return Promise.reject(new Error('Phiên làm việc hết hạn.'));
         } finally {
           isRefreshing = false;
         }

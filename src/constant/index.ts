@@ -188,6 +188,7 @@ export const APP_ROUTES_PUBLIC = [
   APP_ROUTES.LOGIN,
   APP_ROUTES.REGISTER,
   APP_ROUTES.FORGOT_PASSWORD,
+  APP_ROUTES.PRODUCT_DETAIL.split('/:')[0],
 ]
 
 export const ROUTE_NAMES: Record<string, string> = {

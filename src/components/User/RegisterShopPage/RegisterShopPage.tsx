@@ -9,13 +9,26 @@ import showErrorNotification from '../../Toast/NotificationError';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
 import type { ShopCreateRequest } from '../../../types/ShopType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
-import { useAppDispatch } from '../../../hooks/useAppRedux';
+import { useAppDispatch, useAppSelector } from '../../../hooks/useAppRedux';
 import { createShopForUser } from '../../../store/authSlice';
+import { useEffect } from 'react';
 
 const RegisterShopPage = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+
+    const { user } = useAppSelector((state) => state.auth);
     
+    useEffect(() => {
+        let time: NodeJS.Timeout;
+        if (user?.hasShop) {
+            showSuccessNotification("Thông báo", "Bạn đã có cửa hàng. Đang chuyển hướng...");
+            time = setTimeout(() => {
+                navigate(APP_ROUTES.MYSHOP.BASE);
+            }, 3000);
+        }
+        return () => clearTimeout(time);
+    }, [user]);
 
     const form = useForm({
         initialValues: {

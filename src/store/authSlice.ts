@@ -38,12 +38,13 @@ export const loginUser = createAsyncThunk(
       const response: LoginResponse = await authService.login(loginData);
       return response;
     } catch (error: any) {
+      const response = error.response.data as ErrorResponseDto;
       const authError: AuthError = {
-        message: error.message || 'Đăng nhập thất bại.',
-        code: error.code,
-        statusCode: error.statusCode,
-        details: error.details,
-        traceId: error.traceId,
+        message: response.message || 'Đăng nhập thất bại.',
+        code: response.code,
+        // statusCode: response.code,
+        details: response.details,
+        traceId: response.traceId,
       };
       return rejectWithValue(authError);
     }
