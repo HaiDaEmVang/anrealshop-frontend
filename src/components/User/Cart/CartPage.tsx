@@ -9,8 +9,9 @@ import {
 } from '@mantine/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiTruck } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 import { removeFromCart, updateCartCount } from '../../../store/authSlice';
-import { useAppDispatch } from '../../../hooks/useAppRedux';
+import { useAppDispatch, useAppSelector } from '../../../hooks/useAppRedux';
 import { CartService } from '../../../service/CartService';
 import { ShipmentService } from '../../../service/ShipmentService';
 import type { CartDto } from '../../../types/CartType';
@@ -22,17 +23,21 @@ import CartBreadcrumbs from './Breadcrumbs';
 import ListProduct from './ListProduct';
 import ListProductSkeleton, { SummerSkeleton } from './Skeleton';
 import Summer from './Summer';
+import { NotificationModal } from '../../common/NotificationModal';
+import { APP_ROUTES } from '../../../constant';
+import { ContentEmpty } from '../../common/ContentEmpty';
 
 const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartDto[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [selectAll, setSelectAll] = useState(false);
-
   const [shippingFees, setShippingFees] = useState<CartShippingFee[]>([]);
   const [loadingShopIds, setLoadingShopIds] = useState<string[]>([]);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const { user } = useAppSelector(state => state.auth);
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const getAllItemIds = useCallback(() => {
     if (cartItems.length === 0) return [];
@@ -76,6 +81,10 @@ const CartPage: React.FC = () => {
     if (ids.length === 0) {
       return;
     }
+    // Chặn fetch nếu user chưa có address
+    if (user?.address === null || user?.address === undefined) {
+      return;
+    }
     ShipmentService.getFeeForCart(ids)
       .then(data => {
         setShippingFees(pre => {
@@ -89,7 +98,7 @@ const CartPage: React.FC = () => {
         setLoadingShopIds([]);
         showErrorNotification('Lấy phí vận chuyển thất bại', getErrorMessage(error));
       });
-  }, [])
+  }, [user?.address])
 
 
   useEffect(() => {
@@ -100,12 +109,20 @@ const CartPage: React.FC = () => {
 
   useEffect(() => {
     if (loading) return;
+    // Chặn fetch ban đầu nếu user chưa có address
+    if (user?.address === null || user?.address === undefined) return;
     const initiallySelected = getAllSelectedItemIds();
     if (initiallySelected.length === 0) return;
     const shopIds = cartItems.filter(s => s.items.some(i => i.isSelected)).map(s => s.shop.id);
     setLoadingShopIds(shopIds);
     fetchFee(initiallySelected);
-  }, [loading, cartItems, getAllSelectedItemIds, fetchFee]);
+  }, [loading, cartItems, getAllSelectedItemIds, fetchFee, user?.address]);
+
+  useEffect(() => {
+    if (!loading && (user?.address === null || user?.address === undefined)) {
+      setShowAddressModal(true);
+    }
+  }, [user?.address, loading]);
 
   const handleSelectAll = (checked: boolean) => {
     const allIds = getAllItemIds();
@@ -216,62 +233,94 @@ const CartPage: React.FC = () => {
       });
   };
 
+  const handleNavigateToAddress = () => {
+    setShowAddressModal(false);
+    navigate(APP_ROUTES.USER_ADDRESSES);
+  };
+
+  const handleCancelAddress = () => {
+    setShowAddressModal(false);
+    navigate(-1);
+  };
 
   return (
     <Container size="xl" className="py-6">
       <CartBreadcrumbs />
 
-      <Grid gutter="xl">
-        <Grid.Col span={{ base: 12, md: 8 }}>
-          <Paper radius="md" shadow="sm" p="md" className="bg-white">
-            {loading ? (
-              <ListProductSkeleton />
-            ) : (
-              <ListProduct
-                cartItems={cartItems}
-                selectAll={selectAll}
-                onSelectAll={handleSelectAll}
-                onSelectItem={handleSelectItem}
-                onUpdateQuantity={handleUpdateQuantity}
-                onRemoveItem={handleRemoveItem}
-                onRemoveSelected={handleRemoveSelected}
-                shippingFees={shippingFees}
-                loadingShopIds={loadingShopIds}
-              />
-            )}
-          </Paper>
-        </Grid.Col>
+      <NotificationModal
+        opened={showAddressModal}
+        onClose={handleCancelAddress}
+        title="Thông báo"
+        message="Bạn chưa có địa chỉ giao hàng. Vui lòng thêm địa chỉ để tiếp tục đặt hàng."
+        confirmText="Thêm địa chỉ"
+        onConfirm={handleNavigateToAddress}
+        showCancel={true}
+        cancelText="Để sau"
+        imageType="boan_khoan"
+      />
 
-        <Grid.Col span={{ base: 12, md: 4 }}>
-          <Box className="sticky top-4">
-            {loading ? (
-              <SummerSkeleton />
-            ) : (
-              <Summer
-                cartItems={cartItems}
-                shippingFees={shippingFees}
-                freeShippingThreshold={500000}
-                loadingShop={loadingShopIds.length > 0}
-              />
-            )}
+      {!loading && cartItems.length === 0 ? (
+        <ContentEmpty
+          title="Giỏ hàng trống"
+          description="Bạn chưa có sản phẩm nào trong giỏ hàng. Hãy khám phá và thêm sản phẩm yêu thích của bạn!"
+          buttonText="Mua sắm ngay"
+          buttonLink="/products"
+          imageType="cart"
+          height="h-[60vh]"
+        />
+      ) : (
+        <Grid gutter="xl">
+          <Grid.Col span={{ base: 12, md: 8 }}>
+            <Paper radius="md" shadow="sm" p="md" className="bg-white">
+              {loading ? (
+                <ListProductSkeleton />
+              ) : (
+                <ListProduct
+                  cartItems={cartItems}
+                  selectAll={selectAll}
+                  onSelectAll={handleSelectAll}
+                  onSelectItem={handleSelectItem}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                  onRemoveSelected={handleRemoveSelected}
+                  shippingFees={shippingFees}
+                  loadingShopIds={loadingShopIds}
+                />
+              )}
+            </Paper>
+          </Grid.Col>
 
-            {!loading && cartItems.length > 0 && (
-              <Paper radius="md" shadow="sm" p="md" className="bg-white">
-                <Box className="space-y-4">
-                  <Group gap="xs">
-                    <FiTruck className="text-gray-500" size={18} />
-                    <Text size="sm">Miễn phí vận chuyển cho đơn hàng từ 500.000₫</Text>
-                  </Group>
-                  <Divider />
-                  <Text size="xs" color="dimmed">
-                    Lưu ý: Đơn hàng của bạn có thể được giao thành nhiều đợt tùy thuộc vào kho hàng và địa điểm giao hàng.
-                  </Text>
-                </Box>
-              </Paper>
-            )}
-          </Box>
-        </Grid.Col>
-      </Grid>
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Box className="sticky top-4">
+              {loading ? (
+                <SummerSkeleton />
+              ) : (
+                <Summer
+                  cartItems={cartItems}
+                  shippingFees={shippingFees}
+                  freeShippingThreshold={500000}
+                  loadingShop={loadingShopIds.length > 0}
+                />
+              )}
+
+              {!loading && cartItems.length > 0 && (
+                <Paper radius="md" shadow="sm" p="md" className="bg-white">
+                  <Box className="space-y-4">
+                    <Group gap="xs">
+                      <FiTruck className="text-gray-500" size={18} />
+                      <Text size="sm">Miễn phí vận chuyển cho đơn hàng từ 500.000₫</Text>
+                    </Group>
+                    <Divider />
+                    <Text size="xs" color="dimmed">
+                      Lưu ý: Đơn hàng của bạn có thể được giao thành nhiều đợt tùy thuộc vào kho hàng và địa điểm giao hàng.
+                    </Text>
+                  </Box>
+                </Paper>
+              )}
+            </Box>
+          </Grid.Col>
+        </Grid>
+      )}
     </Container>
   );
 };
