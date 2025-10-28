@@ -16,6 +16,7 @@ import { getErrorMessage } from '../../../../untils/ErrorUntils';
 import showErrorNotification from '../../../Toast/NotificationError';
 import AddressDisplayItem from './AddressDisplayItem';
 import ModalFormAddress from './ModalFormAddress';
+import { useAppSelector } from '../../../../hooks/useAppRedux';
 
 
 interface AddressProps {
@@ -34,8 +35,10 @@ const Address: React.FC<AddressProps> = ({
   const [showAddressSelection, setShowAddressSelection] = useState(false);
 
   const [tempSelectedAddress, setTempSelectedAddress] = useState<AddressDto | null>(null);
+  const {user} = useAppSelector((state) => state.auth);
 
   const fetchAddresses = useCallback(() => {
+    if (user?.address === null || user?.address === undefined) return;
     AddressService.getUserAddresses()
       .then((data) => {
           setAddressList(data);

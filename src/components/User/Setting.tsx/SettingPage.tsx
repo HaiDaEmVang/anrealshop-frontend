@@ -4,6 +4,7 @@ import {
     NavLink,
     Paper
 } from '@mantine/core';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
     FiAward,
     FiBell,
@@ -26,6 +27,7 @@ import { OrderDetail } from './OrderDetail/OrderDetailPage';
 import OrderHistory from './OrderHistory/OrderHistoryPage';
 import Preferences from './Preferences';
 import Security from './Security';
+import { AddressPage } from './Address/AddressPage';
 
 // Define navigation item interface
 interface NavItem {
@@ -87,7 +89,7 @@ const SettingPage = () => {
             path: '/addresses',
             label: 'Địa chỉ giao hàng',
             icon: <FiMapPin size={16} />,
-            component: <div>Địa chỉ giao hàng</div> // Placeholder component
+            component: <AddressPage />
         },
         {
             path: '/reviews',
@@ -119,45 +121,130 @@ const SettingPage = () => {
         return location.pathname.substring(0, `/settings${path}`.length) === `/settings${path}`;
     };
 
+    // Animation variants
+    const containerVariants: Variants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    };
+
+    const itemVariants: Variants = {
+        hidden: { opacity: 0, x: -20 },
+        visible: {
+            opacity: 1,
+            x: 0,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const contentVariants: Variants = {
+        initial: { opacity: 0, y: 20 },
+        animate: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.4,
+                ease: [0.4, 0, 0.2, 1]
+            }
+        },
+        exit: {
+            opacity: 0,
+            y: -20,
+            transition: {
+                duration: 0.2,
+                ease: [0.4, 0, 1, 1]
+            }
+        }
+    };
+
     return (
         <Container size="xl" className="pt-6">
             {/* Breadcrumbs */}
-            <Breadcrumbs />
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+            >
+                <Breadcrumbs />
+            </motion.div>
 
-            <Grid gutter="md">
+            <Grid gutter="md" mb={"md"}>
                 {/* Sidebar Navigation */}
                 <Grid.Col span={{ base: 12, md: 3 }}>
-                    <Paper shadow="sm" radius="md" className="overflow-hidden h-full">
-                        <div className="p-4">
-                            {navItems.map((item) => (
-                                <NavLink
-                                    key={item.path}
-                                    label={item.label}
-                                    leftSection={item.icon}
-                                    active={isActive(item.path)}
-                                    onClick={() => navigate(`/settings${item.path}`)}
-                                    className="font-medium rounded-md"
-                                />
-                            ))}
-                        </div>
-                    </Paper>
+                    <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                    >
+                        <Paper shadow="sm" radius="md" className="overflow-hidden h-full">
+                            <motion.div
+                                className="p-4"
+                                variants={containerVariants}
+                                initial="hidden"
+                                animate="visible"
+                            >
+                                {navItems.map((item) => (
+                                    <motion.div
+                                        key={item.path}
+                                        variants={itemVariants}
+                                        whileHover={{
+                                            scale: 1.02,
+                                            transition: { duration: 0.2 }
+                                        }}
+                                        whileTap={{ scale: 0.98 }}
+                                    >
+                                        <NavLink
+                                            label={item.label}
+                                            leftSection={item.icon}
+                                            active={isActive(item.path)}
+                                            onClick={() => navigate(`/settings${item.path}`)}
+                                            className="font-medium rounded-md"
+                                        />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        </Paper>
+                    </motion.div>
                 </Grid.Col>
 
                 {/* Main Content */}
-                <Grid.Col span={{ base: 12, md: 9 }}>
-                    <Paper shadow="sm" radius="md" p="lg" className="bg-white">
-                        <Routes>
-                            <Route path="/" element={<Navigate to="/settings/info" replace />} />
-                            {navItems.map((item) => (
-                                <Route
-                                    key={item.path}
-                                    path={item.path}
-                                    element={item.component}
-                                />
-                            ))}
-                            <Route path="/orders/:orderId" element={<OrderDetail />} />
-                        </Routes>
-                    </Paper>
+                <Grid.Col span={{ base: 12, md: 9 }} className='min-h-[100vh]'>
+                    <motion.div
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+                    >
+                        <Paper shadow="sm" radius="md" p="lg" className="bg-white">
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={location.pathname}
+                                    variants={contentVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                >
+                                    <Routes>
+                                        <Route path="/" element={<Navigate to="/settings/info" replace />} />
+                                        {navItems.map((item) => (
+                                            <Route
+                                                key={item.path}
+                                                path={item.path}
+                                                element={item.component}
+                                            />
+                                        ))}
+                                        <Route path="/orders/:orderId" element={<OrderDetail />} />
+                                    </Routes>
+                                </motion.div>
+                            </AnimatePresence>
+                        </Paper>
+                    </motion.div>
                 </Grid.Col>
             </Grid>
         </Container>

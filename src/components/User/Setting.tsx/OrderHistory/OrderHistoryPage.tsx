@@ -1,12 +1,8 @@
 import {
-    Button,
-    Paper,
     Stack,
-    Text,
     Title
 } from '@mantine/core';
 import { Suspense, useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { OrderStatusDefaultDataUser } from '../../../../data/OrderData';
 import { useOrder, type SearchType } from '../../../../hooks/useOrder';
 import { useURLParams } from '../../../../hooks/useURLParams';
@@ -14,10 +10,11 @@ import type { ShopOrderStatus, UserOrderItemDto } from '../../../../types/OrderT
 import FilterByStatus from '../../../Myshop/Order/OrderPage/Filter/FilterByStatus';
 import Pagination from '../../../Myshop/Product/Managerment/ProductView/Pagination';
 import { PaginationSkeleton } from '../../../Myshop/Product/Managerment/Skeleton';
+import showSuccessNotification from '../../../Toast/NotificationSuccess';
+import { ContentEmpty } from '../../../common/ContentEmpty';
 import OrderFilter from './OrderFilter';
 import ShopOrderItem from './ShopOrderItem';
 import OrderSkeleton from './Skeleton';
-import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
 const OrderHistory = () => {
     const { getParam, updateParams, setPageParam } = useURLParams();
@@ -181,15 +178,14 @@ const OrderHistory = () => {
 
                 </div>
             ) : (
-                <Paper withBorder p="xl" radius="md" className="text-center h-[72vh]">
-                    <Text size="lg" fw={500} mb="xs">Không có đơn hàng nào</Text>
-                    <Text size="sm" color="dimmed" mb="lg">
-                        Bạn chưa có đơn hàng thời trang nào trong danh mục này
-                    </Text>
-                    <Button component={Link} to="/products">
-                        Khám phá thời trang
-                    </Button>
-                </Paper>
+                <ContentEmpty
+                    title="Không có đơn hàng nào"
+                    description="Bạn chưa có đơn hàng thời trang nào trong danh mục này"
+                    buttonText="Khám phá thời trang"
+                    buttonLink="/products"
+                    imageType="boan_khoan"
+                    height="h-[72vh]"
+                />
             )}
         </div>
     );
