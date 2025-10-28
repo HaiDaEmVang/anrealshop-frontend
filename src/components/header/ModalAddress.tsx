@@ -46,6 +46,10 @@ const ModalAddress: React.FC<ModalAddressProps> = ({
             onClose={onClose}
             title="Chọn địa chỉ giao hàng"
             size="lg"
+            overlayProps={{
+                backgroundOpacity: 0.55,
+                blur: 3,
+            }}
         >
 
             <Stack>

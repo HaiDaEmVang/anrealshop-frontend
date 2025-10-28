@@ -14,7 +14,7 @@ export interface SimpleAddressDto {
 export interface AddressDto {
   id: string;
   receiverOrSenderName: string;
-  phoneNumber: string;
+  phoneNumber: string; 
   detailAddress: string;
   provinceId: string;
   districtId: string;

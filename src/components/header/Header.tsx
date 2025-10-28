@@ -403,14 +403,20 @@ const Header: React.FC = () => {
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.5, duration: 0.4 }}
                             >
-                                <Flex className="mt-1 mb-1 mr-2" justify="flex-end">
+                                <Flex className="mt-1 mb-1 mr-2" justify="flex-end" >
                                     <Group gap="xs" className="text-gray-600 items-center">
                                         {isAuthenticated ? (
                                             <>
                                                 <FiMapPin size={14} />
-                                                <Text size="sm">Giao đến: <Text component="span" size="sm" fw={600}
+                                                {user?.address ? (
+                                                    <Text size="sm">Giao đến: <Text component="span" size="sm" fw={600}
                                                     // onClick={() => setAddressModalOpened(true)} 
                                                     className="hover:text-primary cursor-pointer">{user?.address?.districtName + ", " + user?.address?.provinceName || "Nho cap nhat dia chi nhe"}</Text></Text>
+                                                ): (
+                                                    <Text size="sm" className="hover:text-primary cursor-pointer"
+                                                    // onClick={() => setAddressModalOpened(true)}
+                                                    >Tạo địa chỉ mới</Text>
+                                                )}
                                             </>
                                         ) : (
                                             <Text size="sm">Đăng nhập để xem địa chỉ...</Text>
