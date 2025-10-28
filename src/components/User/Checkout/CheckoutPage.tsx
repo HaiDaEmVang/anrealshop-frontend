@@ -3,6 +3,7 @@ import {
   Grid
 } from '@mantine/core';
 import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 import { paymentMethodsDataDefault } from '../../../data/CheckoutData';
 import { useAppSelector } from '../../../hooks/useAppRedux';
@@ -20,10 +21,12 @@ import ListProduct from './ListProductForShop';
 import PaymentMethod from './PaymentMethod';
 import Address from './address/Address';
 import OverlayLoading from '../../common/OverlayLoading';
+import { NotificationModal } from '../../common/NotificationModal';
 
 
 const CheckoutPage = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   const [itemCheckoutInfo, setItemCheckoutInfo] = useState<CheckoutInfoDto[]>([]);
 
@@ -32,7 +35,8 @@ const CheckoutPage = () => {
   const [feeUpdated, setFeeUpdated] = useState<CartShippingFee[] | []>([]);
   const [feeLoading, setFeeLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [itemLoading, setItemLoading] = useState(true);
+  const [itemLoading, setItemLoading] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
 
   const idItems: ItemsCheckoutRequest = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS) || '{}');
 
@@ -52,10 +56,10 @@ const CheckoutPage = () => {
     if (!idItems || Object.keys(idItems).length === 0) {
       return;
     }
+    if (user?.address === null || user?.address === undefined) return;
     setItemLoading(true);
     CheckoutService.getCheckoutInfo(idItems)
       .then(data => {
-        console.log('Fetched checkout info:', data);
         setItemCheckoutInfo(data);
       })
       .catch(error => showErrorNotification("Tải danh sách sản phẩm thất bại", getErrorMessage(error)))
@@ -66,8 +70,15 @@ const CheckoutPage = () => {
     return itemCheckoutInfo.map(item => item.items.map(i => i.id)).flat();
   }, [itemCheckoutInfo])
 
+  useEffect(() => {
+    if (!itemLoading && (user?.address === null || user?.address === undefined)) {
+      setShowAddressModal(true);
+    }
+  }, [user?.address, itemLoading]);
+
   const refreshFee = useCallback(() => {
     if (!selectedAddress || !itemCheckoutInfo.length) return;
+    if (user?.address === null || user?.address === undefined) return;
     setFeeLoading(true);
     ShipmentService.getFeeForCart(getAllIdItem())
       .then(data => {
@@ -75,7 +86,7 @@ const CheckoutPage = () => {
       })
       .catch(error => showErrorNotification("Tính phí vận chuyển thất bại", getErrorMessage(error)))
       .finally(() => setFeeLoading(false));
-  }, [selectedAddress])
+  }, [selectedAddress, user?.address])
 
   useEffect(() => {
     refreshFee();
@@ -112,6 +123,16 @@ const CheckoutPage = () => {
       .finally(() => setLoading(false));
   };
 
+  const handleNavigateToAddress = () => {
+    setShowAddressModal(false);
+    navigate(APP_ROUTES.USER_ADDRESSES);
+  };
+
+  const handleCancelAddress = () => {
+    setShowAddressModal(false);
+    navigate(-1);
+  };
+
   if (!idItems || Object.keys(idItems).length === 0) {
     return <PageNotFound
       title='Không tìm thấy đơn hàng để thanh toán'
@@ -121,12 +142,25 @@ const CheckoutPage = () => {
   }
 
   if (itemLoading) {
-    return <OverlayLoading visible/>;
+    return <OverlayLoading visible />;
   }
 
   return (
     <Container size="xl" className="py-6">
       <CheckoutBreadcrumbs />
+
+      <NotificationModal
+        opened={showAddressModal}
+        onClose={handleCancelAddress}
+        title="Thông báo"
+        message="Bạn chưa có địa chỉ giao hàng. Vui lòng thêm địa chỉ để tiếp tục thanh toán."
+        confirmText="Thêm địa chỉ"
+        onConfirm={handleNavigateToAddress}
+        showCancel={true}
+        cancelText="Quay lại"
+        imageType="boan_khoan"
+      />
+
       <Grid gutter="xl">
         <Grid.Col span={{ base: 12, md: 8 }}>
 

@@ -143,6 +143,9 @@ export const APP_ROUTES = {
   PAYMENT_RESULT: (orderId: string) => `/payment/result/${orderId}`,
   PRODUCT_DETAIL: '/products/:slug',
   USER_SETTINGS: '/settings/*',
+  USER_PROFILE: '/settings/profile',
+  USER_SECURITY: '/settings/security',
+  USER_ADDRESSES: '/settings/addresses',
 
   PRODUCTS: '/products',
   SEARCH: '/search',
