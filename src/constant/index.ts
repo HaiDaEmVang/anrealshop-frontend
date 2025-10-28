@@ -4,7 +4,7 @@ export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL || 'http://localho
 export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL || 'http://localhost:4141'
 export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE 
 export const BASE_FE_URL = import.meta.env.VITE_BASE_FE_URL
-export const GOOGLE_LOGIN_URL = `${BASE_BE_URL}/oauth2/authorization/google`
+export const GOOGLE_LOGIN_URL = `${BASE_BE_URL}/oauth2/authorize/google`
 export const CLOUNDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 export const CLOUNDINARY_NAME = import.meta.env.VITE_CLOUDINARY_NAME
 
@@ -15,7 +15,6 @@ export type TypeMode = 'myshop' | 'admin' | 'user';
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/login',
-    LOGIN_GOOGLE: '/oauth2/callback/google',
     LOGOUT: '/logout',
     FORGOT_PASSWORD: '/forgot-password',
     REFRESH: '/auth/refresh-token',
