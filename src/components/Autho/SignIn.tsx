@@ -15,9 +15,9 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useRef } from 'react';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { API_ENDPOINTS, BASE_API_URL } from '../../constant';
-import { fetchCurrentUser, loginUser } from '../../store/authSlice';
+import { GOOGLE_LOGIN_URL } from '../../constant';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
+import { loginUser } from '../../store/authSlice';
 import type { LoginRequest } from '../../types/AuthType';
 import type { UserDto } from '../../types/UserType';
 import { validateEmail, validatePassword } from '../../untils/ValidateInput';
@@ -38,7 +38,7 @@ export function SignIn() {
   const returnUrl = searchParams.get('redirect') || '/';
 
   const dispatch = useAppDispatch();
-  const { status } = useAppSelector((state) => state.auth);
+  const { status, isAuthenticated } = useAppSelector((state) => state.auth);
   const isLoading = status === 'loading';
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -69,7 +69,6 @@ export function SignIn() {
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
       navigate(returnUrl);
     } catch (err: any) {
-      console.log('Login error:', err);
       let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
 
       if (err.statusCode === 400 && err.details && Array.isArray(err.details)) {
@@ -89,10 +88,13 @@ export function SignIn() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${BASE_API_URL}${API_ENDPOINTS.AUTH.LOGIN_GOOGLE}`;
+    window.location.href = GOOGLE_LOGIN_URL;
   }
 
   useEffect(() => {
+    if (isAuthenticated) {
+      navigate(returnUrl);
+    }
 
     const handleOAuthLogin = async () => {
       if (hasNotifiedRef.current) return;
@@ -103,13 +105,8 @@ export function SignIn() {
 
       hasNotifiedRef.current = true;
       if (successMessage) {
-        try {
-          const user: UserDto = await dispatch(fetchCurrentUser()).unwrap();
-          showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
-          navigate(returnUrl);
-        } catch (err: any) {
-          let notificationMessage = err.message || 'Không thể lấy thông tin user.'; showErrorNotification('Đăng nhập thất bại', notificationMessage);
-        }
+        showSuccessNotification('Đăng nhập thành công!', `Chào mừng bạn đến với hệ thống!`);
+        navigate(returnUrl);
       } else if (errorMessage) {
         const timeoutId = setTimeout(() => {
           params.delete('error');
