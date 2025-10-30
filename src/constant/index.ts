@@ -34,9 +34,6 @@ export const API_ENDPOINTS = {
   SHOPS: {
     INFO: '/shops',
     REGISTER: '/shops/register',
-    // APPROVE_SHOP: (shopId: string) => `/shops/approve/${shopId}`,
-    // REJECT_SHOP: (shopId: string) => `/shops/reject/${shopId}`,
-    // SHOP_REGISTRATIONS: '/shops/registrations',
   },
   PRODUCTS: {   
     BASE: '/products', 
@@ -83,6 +80,7 @@ export const API_ENDPOINTS = {
   SHIPMENT: {
     BASE: '/shipping',
     GET_SHIPPING_FEE_FORCART: '/shipping/fee-for-cart',
+    GET_SHIPPING_FEE_FORCHECKOUT: '/shipping/fee-for-checkout',
     CREATE_SHIPMENTS: '/shipping/create-shipments',
     MYSHOP_LIST: '/shipping/my-shop',
     MYSHOP_REJECT: (shippingId: string) => `/shipping/my-shop/reject-shipping/${shippingId}`,

@@ -25,6 +25,7 @@ export interface CheckoutInfoDto {
 
 export type PaymentMethodId = 'cash_on_delivery' | 'bank_transfer' | 'zalopay' | 'momo' | 'vnpay';
 
+
 export interface CreateShipmentRequest {
     shopOrderIds: string[],
     addressId: string,
@@ -78,3 +79,10 @@ export type HistoryShippingNote = {
     content: string;
     timestamp: Date | string;
 }
+
+
+export type CheckoutShippingFee = {
+    userAddressId: string;
+    checkoutItems: Record<string, number>;
+}
+
