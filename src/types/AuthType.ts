@@ -1,6 +1,5 @@
 import type { UserDto } from "./UserType";
 
-export type  OTP_TYPE = 'REGISTER' | 'RESET_PASSWORD';
 
 export interface LoginRequest {
   username: string;

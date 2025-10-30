@@ -21,13 +21,13 @@ import {
 } from 'react-icons/fi';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
-import Infor from './Infor';
 import Notification from './Notification';
 import { OrderDetail } from './OrderDetail/OrderDetailPage';
 import OrderHistory from './OrderHistory/OrderHistoryPage';
 import Preferences from './Preferences';
 import Security from './Security';
 import { AddressPage } from './Address/AddressPage';
+import Profile from './Profile/Profile';
 
 // Define navigation item interface
 interface NavItem {
@@ -44,10 +44,10 @@ const SettingPage = () => {
     // Navigation configuration
     const navItems: NavItem[] = [
         {
-            path: '/info',
+            path: '/profile',
             label: 'Thông tin cá nhân',
             icon: <FiUser size={16} />,
-            component: <Infor />
+            component: <Profile />
         },
         {
             path: '/security',
