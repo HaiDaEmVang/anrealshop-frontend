@@ -29,6 +29,13 @@ export const API_ENDPOINTS = {
     CHANGE_PASSWORD: '/user/change-password',
     RESET_PASSWORD: '/user/reset-password',
   },
+<<<<<<< Updated upstream
+=======
+  SHOPS: {
+    INFO: '/shops',
+    REGISTER: '/shops/register',
+  },
+>>>>>>> Stashed changes
   PRODUCTS: {   
     BASE: '/products', 
     GET_BY_ID: (id: string) => `/public/products/${id}`,
@@ -74,6 +81,13 @@ export const API_ENDPOINTS = {
   SHIPMENT: {
     BASE: '/shipping',
     GET_SHIPPING_FEE_FORCART: '/shipping/fee-for-cart',
+<<<<<<< Updated upstream
+=======
+    GET_SHIPPING_FEE_FORCHECKOUT: '/shipping/fee-for-checkout',
+    CREATE_SHIPMENTS: '/shipping/create-shipments',
+    MYSHOP_LIST: '/shipping/my-shop',
+    MYSHOP_REJECT: (shippingId: string) => `/shipping/my-shop/reject-shipping/${shippingId}`,
+>>>>>>> Stashed changes
   },
   
   ADDRESS: {

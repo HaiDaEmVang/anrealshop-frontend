@@ -11,15 +11,24 @@ import { CheckoutService, type ItemsCheckoutRequest } from '../../../service/Che
 import { ShipmentService } from '../../../service/ShipmentService';
 import type { AddressDto } from '../../../types/AddressType';
 import type { CheckoutRequestDto, CheckoutResponseDto, PaymentGatewayType } from '../../../types/CheckoutType';
-import type { CartShippingFee, CheckoutInfoDto } from '../../../types/ShipmentType';
+import type { CartShippingFee, CheckoutInfoDto, CheckoutShippingFee } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
 import showErrorNotification from '../../Toast/NotificationError';
+<<<<<<< Updated upstream
+=======
+import { NotificationModal } from '../../common/NotificationModal';
+import OverlayLoading from '../../common/OverlayLoading';
+import PageNotFound from '../../common/PageNotFound';
+>>>>>>> Stashed changes
 import CheckoutBreadcrumbs from './CheckoutBreadcrumbs';
 import CheckoutReview from './CheckoutReview';
 import ListProduct from './ListProductForShop';
 import PaymentMethod from './PaymentMethod';
 import Address from './address/Address';
+<<<<<<< Updated upstream
 import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
+=======
+>>>>>>> Stashed changes
 
 
 const CheckoutPage = () => {
@@ -28,15 +37,20 @@ const CheckoutPage = () => {
   const [itemCheckoutInfo, setItemCheckoutInfo] = useState<CheckoutInfoDto[]>([]);
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentGatewayType>('cash_on_delivery');
-  const [selectedAddress, setSelectedAddress] = useState<AddressDto | null>(user?.address === undefined ? null : user?.address);
+  const [selectedAddress, setSelectedAddress] = useState<AddressDto | null>(null);
   const [feeUpdated, setFeeUpdated] = useState<CartShippingFee[] | []>([]);
   const [feeLoading, setFeeLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [itemLoading, setItemLoading] = useState(true);
+<<<<<<< Updated upstream
+=======
+  const [showAddressModal, setShowAddressModal] = useState(false);
+>>>>>>> Stashed changes
 
   const idItems: ItemsCheckoutRequest = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS) || '{}');
 
   useEffect(() => {
+<<<<<<< Updated upstream
     if (!idItems) {
       showErrorNotification("Lỗi thanh toán", "Không tìm thấy sản phẩm nào để thanh toán");
       return;
@@ -56,14 +70,58 @@ const CheckoutPage = () => {
 
   const refreshFee = useCallback(() => {
     if (!selectedAddress || !itemCheckoutInfo.length) return;
+=======
+    if (!idItems || Object.keys(idItems).length === 0) {
+      showErrorNotification("Lỗi truy xuất", "Không tìm thấy đơn hàng nào để thanh toán");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user && (user.address === null || user.address === undefined)) {
+      setItemLoading(false);
+      setShowAddressModal(true);
+    } else if (user && user.address) {
+      setSelectedAddress(user?.address || null);
+    }
+  }, [user?.address]);
+
+  useEffect(() => {
+    if (!idItems || Object.keys(idItems).length === 0) {
+      return;
+    }
+    if (!user || user.address === null || user.address === undefined) {
+      return;
+    }
+    setItemLoading(true);
+    CheckoutService.getCheckoutInfo(idItems)
+      .then(data => {
+        setItemCheckoutInfo(data);
+      })
+      .catch(error => showErrorNotification("Tải danh sách sản phẩm thất bại", getErrorMessage(error)))
+      .finally(() => setItemLoading(false));
+  }, [user]);
+
+  const refreshFee = useCallback(() => {
+    if (!selectedAddress || itemCheckoutInfo.length < 1) return;
+>>>>>>> Stashed changes
     setFeeLoading(true);
-    ShipmentService.getFeeForCart(getAllIdItem())
+    const checkoutShippingFee: CheckoutShippingFee = {
+      userAddressId: selectedAddress.id,
+      checkoutItems: Object.fromEntries(
+        itemCheckoutInfo.flatMap(item => item.items.map(i => [i.id, i.quantity]))
+      ),
+    }
+    ShipmentService.getFeeForCheckout(checkoutShippingFee)
       .then(data => {
         setFeeUpdated(data);
       })
       .catch(error => showErrorNotification("Tính phí vận chuyển thất bại", getErrorMessage(error)))
       .finally(() => setFeeLoading(false));
+<<<<<<< Updated upstream
   }, [selectedAddress])
+=======
+  }, [selectedAddress, itemCheckoutInfo]);
+>>>>>>> Stashed changes
 
   useEffect(() => {
     refreshFee();
@@ -86,6 +144,8 @@ const CheckoutPage = () => {
       })))
     }
 
+    console.log('Checkout request:', request);
+
     CheckoutService.createCheckout(request)
     .then((data: CheckoutResponseDto) => {
       localStorage.remove(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS);
@@ -102,6 +162,30 @@ const CheckoutPage = () => {
     });
   };
 
+<<<<<<< Updated upstream
+=======
+  const handleNavigateToAddress = () => {
+    setShowAddressModal(false);
+    navigate(APP_ROUTES.USER_ADDRESSES);
+  };
+
+  const handleCancelAddress = () => {
+    setShowAddressModal(false);
+    navigate(-1);
+  };
+
+  if (!idItems || Object.keys(idItems).length === 0) {
+    return <PageNotFound
+      title='Không tìm thấy đơn hàng để thanh toán'
+      description='Bạn sẽ được chuyển hướng về trang chủ để thêm đơn hàng.'
+      redirectLink={APP_ROUTES.HOME}
+    />;
+  }
+
+  if (loading) {
+    return <OverlayLoading visible message={`${loading ? 'Đang tạo đơn hàng' : undefined}...`} />;
+  }
+>>>>>>> Stashed changes
 
   return (
     <Container size="xl" className="py-6">

@@ -36,6 +36,10 @@ const Address: React.FC<AddressProps> = ({
   const [tempSelectedAddress, setTempSelectedAddress] = useState<AddressDto | null>(null);
 
   const fetchAddresses = useCallback(() => {
+<<<<<<< Updated upstream
+=======
+    if (!user  || user.address === null || user.address === undefined) return;
+>>>>>>> Stashed changes
     AddressService.getUserAddresses()
       .then((data) => {
           setAddressList(data);
@@ -43,7 +47,7 @@ const Address: React.FC<AddressProps> = ({
       .catch((error) => {
         showErrorNotification("Lỗi lấy thông tin địa chỉ", getErrorMessage(error));
       })
-  }, [])
+  }, [user?.address]);
 
   useEffect(() => {
     fetchAddresses();

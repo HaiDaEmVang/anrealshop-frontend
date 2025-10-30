@@ -91,7 +91,21 @@ const ProductDetailPage = () => {
       setSelectedImage(getOrderImageActive(matchingSku?.imageUrl || product.thumbnailUrl));
     }
   };
+<<<<<<< Updated upstream
 
+=======
+ 
+  useEffect(() => {
+    if (product?.productSkus && Object.keys(selectedAttributes).length > 0) {
+      const matchingSku = product.productSkus.find(sku => {
+        if (!sku.attributeForSku) return false;
+        if (sku.attributeForSku.length !== Object.keys(selectedAttributes).length) return false;
+        return sku.attributeForSku.every(attr => {
+          const attrKey = attr.attributeKeyName;
+          return !selectedAttributes[attrKey] || selectedAttributes[attrKey] === attr.values;
+        });
+      });
+>>>>>>> Stashed changes
 
 
   const handleAddToCart = (quantity: number) => {

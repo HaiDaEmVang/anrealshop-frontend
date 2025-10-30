@@ -9,13 +9,22 @@ import {
 } from '@mantine/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiTruck } from 'react-icons/fi';
+<<<<<<< Updated upstream
 import { removeFromCart, updateCartCount } from '../../../store/authSlice';
 import { useAppDispatch } from '../../../hooks/useAppRedux';
+=======
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES } from '../../../constant';
+import { useAppDispatch, useAppSelector } from '../../../hooks/useAppRedux';
+>>>>>>> Stashed changes
 import { CartService } from '../../../service/CartService';
 import { ShipmentService } from '../../../service/ShipmentService';
+import { removeFromCart, updateCartCount } from '../../../store/authSlice';
 import type { CartDto } from '../../../types/CartType';
 import type { CartShippingFee } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
+import { ContentEmpty } from '../../common/ContentEmpty';
+import { NotificationModal } from '../../common/NotificationModal';
 import showErrorNotification from '../../Toast/NotificationError';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
 import CartBreadcrumbs from './Breadcrumbs';
@@ -100,12 +109,26 @@ const CartPage: React.FC = () => {
 
   useEffect(() => {
     if (loading) return;
+<<<<<<< Updated upstream
+=======
+    if (user?.address === null || user?.address === undefined) return;
+>>>>>>> Stashed changes
     const initiallySelected = getAllSelectedItemIds();
     if (initiallySelected.length === 0) return;
     const shopIds = cartItems.filter(s => s.items.some(i => i.isSelected)).map(s => s.shop.id);
     setLoadingShopIds(shopIds);
     fetchFee(initiallySelected);
+<<<<<<< Updated upstream
   }, [loading, cartItems, getAllSelectedItemIds, fetchFee]);
+=======
+  }, [loading, cartItems, getAllSelectedItemIds, fetchFee, user?.address]);
+
+  useEffect(() => {
+    if (user && (user.address === null || user.address === undefined)) {
+      setShowAddressModal(true);
+    }
+  }, [user?.address]);
+>>>>>>> Stashed changes
 
   const handleSelectAll = (checked: boolean) => {
     const allIds = getAllItemIds();

@@ -28,7 +28,11 @@ import ProductDescription from './ProductDescription';
 import ProductPriceAndAttributes from './ProductPriceAndAttributes';
 import ProductShippingInfo from './ProductShippingInfo';
 import { ShopInfo } from './ShopInfo';
+<<<<<<< Updated upstream
 import { useState } from 'react';
+=======
+import { useNavigate } from 'react-router-dom';
+>>>>>>> Stashed changes
 
 
 
@@ -52,6 +56,63 @@ const InforProduct = ({
   groupedAttributes,
 }: InforProductProps) => {
   const availableQuantity = selectedSku?.quantity || product.quantity;
+<<<<<<< Updated upstream
+=======
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
+
+  const handleAddToCart = (quantity: number) => {
+    if (!isAuthenticated) {
+      showErrorNotification("Thông báo", "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
+      return;
+    }
+    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
+      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
+      return;
+    }
+    if (quantity < 1 || quantity > selectedSku.quantity) {
+      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
+      return;
+    }
+
+    const cartItemDto: CartAddItemDto = {
+      productSkuId: selectedSku.id,
+      quantity: quantity,
+    }
+
+    CartService.addItemToCart(cartItemDto)
+      .then((data) => {
+        showSuccessNotification("Thông báo", "Sản phẩm đã được thêm vào giỏ hàng thành công.");
+        if (data.isNew)
+          dispatch(addToCart());
+      })
+      .catch((error) => {
+        showErrorNotification("Lỗi", getErrorMessage(error));
+      });
+  }
+
+
+  const handleBuyNow = (quantity: number) => {
+    if (!isAuthenticated) {
+      showErrorNotification("Thông báo", "Vui lòng đăng nhập để mua sản phẩm.");
+      return;
+    }
+    if (!selectedSku || Object.keys(selectedAttributes).length !== selectedSku.attributeForSku?.length) {
+      showErrorNotification("Thông báo", "Vui lòng chọn đầy đủ thuộc tính sản phẩm trước khi thêm vào giỏ hàng.");
+      return;
+    }
+    if (quantity < 1 || quantity > selectedSku.quantity) {
+      showErrorNotification("Thông báo", "Số lượng không hợp lệ hoặc vượt quá số lượng có sẵn.");
+      return;
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS, JSON.stringify({ [selectedSku.id]: quantity }));
+
+    navigate(APP_ROUTES.CHECKOUT);
+  }
+
+>>>>>>> Stashed changes
 
   return (
     <div>
