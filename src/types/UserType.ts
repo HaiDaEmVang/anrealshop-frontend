@@ -13,6 +13,7 @@ export interface UserDto {
   gender: GenderType;
   dob: string; 
   role: string;
+  isVerified: boolean;
   createdAt: string; 
   updatedAt: string;
 
