@@ -64,7 +64,7 @@ const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionPro
                         <Menu.Divider />
                         <Menu.Item
                             component={Link}
-                            to="/account/profile"
+                            to={APP_ROUTES.USER_PROFILE}
                             leftSection={<FaRegUser size={14} />}
                         >
                             Hồ sơ của tôi

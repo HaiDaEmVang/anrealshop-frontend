@@ -5,7 +5,7 @@ import type { AddressDto } from '../types/AddressType';
 import type { LoginRequest, LoginResponse } from '../types/AuthType';
 import type { ErrorResponseDto } from '../types/CommonType';
 import type { ShopDto } from '../types/ShopType';
-import type { RegisterRequest, UserDto } from '../types/UserType';
+import type { ProfileRequest, RegisterRequest, UserDto } from '../types/UserType';
 
 interface AuthError {
   message: string;
@@ -91,24 +91,24 @@ export const fetchCurrentShop = createAsyncThunk(
 );
 
 
-// export const updateUserProfile = createAsyncThunk(
-//   'auth/updateUserProfile',
-//   async (profileData: ProfileRequest, { rejectWithValue }) => {
-//     try {
-//       const updatedUser: UserDto = await authService.updateProfile(profileData);
-//       return updatedUser;
-//     } catch (error: any) {
-//       const authError: AuthError = {
-//         message: error.message || 'Cập nhật thông tin thất bại.',
-//         code: error.code,
-//         statusCode: error.statusCode,
-//         details: error.details,
-//         traceId: error.traceId,
-//       };
-//       return rejectWithValue(authError);
-//     }
-//   }
-// );
+export const updateUserProfile = createAsyncThunk(
+  'auth/updateUserProfile',
+  async (profileData: ProfileRequest, { rejectWithValue }) => {
+    try {
+      const updatedUser: UserDto = await authService.updateProfile(profileData);
+      return updatedUser;
+    } catch (error: any) {
+      const authError: AuthError = {
+        message: error.message || 'Cập nhật thông tin thất bại.',
+        code: error.code,
+        statusCode: error.statusCode,
+        details: error.details,
+        traceId: error.traceId,
+      };
+      return rejectWithValue(authError);
+    }
+  }
+);
 
 export const logoutUser = createAsyncThunk(
   API_ENDPOINTS.AUTH.LOGOUT,
@@ -192,7 +192,13 @@ const userAuthSlice = createSlice({
       if (state.user) {
         state.user.hasShop = true;
       }
-    }
+    },
+
+    updateVerifiedStatus: (state, action: PayloadAction<boolean>) => {
+      if (state.user) {
+        state.user.isVerified = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -237,7 +243,7 @@ const userAuthSlice = createSlice({
         state.shop = action.payload;
         state.isAuthenticated = true;
         if (state.user) {
-          state.user.hasShop = !!action.payload; 
+          state.user.hasShop = !!action.payload;
         }
         state.error = null;
       })
@@ -245,19 +251,19 @@ const userAuthSlice = createSlice({
         state.status = 'idle';
         state.shop = null;
       })
-      // .addCase(updateUserProfile.pending, (state) => {
-      //   state.status = 'loading';
-      //   state.error = null;
-      // })
-      // .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<UserDto>) => {
-      //   state.status = 'succeeded';
-      //   state.user = action.payload;
-      //   state.error = null;
-      // })
-      // .addCase(updateUserProfile.rejected, (state, action) => {
-      //   state.status = 'failed';
-      //   state.error = (action.payload as AuthError) || { message: 'Cập nhật thông tin thất bại.' };
-      // })
+      .addCase(updateUserProfile.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<UserDto>) => {
+        state.status = 'succeeded';
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = (action.payload as AuthError) || { message: 'Cập nhật thông tin thất bại.' };
+      })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
@@ -285,4 +291,12 @@ const userAuthSlice = createSlice({
 });
 
 export default userAuthSlice.reducer;
-export const { addToCart, removeFromCart, updateCartCount, clearCart, logout, createShopForUser } = userAuthSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  updateCartCount,
+  clearCart,
+  logout,
+  createShopForUser,
+  updateVerifiedStatus
+} = userAuthSlice.actions;
