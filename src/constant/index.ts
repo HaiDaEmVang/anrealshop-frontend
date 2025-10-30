@@ -30,6 +30,8 @@ export const API_ENDPOINTS = {
     PROFILE: '/user/profile',
     CHANGE_PASSWORD: '/user/change-password',
     RESET_PASSWORD: '/user/reset-password',
+    UPDATE_PROFILE: '/user/update-profile',
+    VERIFY_EMAIL: '/user/verify-email',
   },
   SHOPS: {
     INFO: '/shops',

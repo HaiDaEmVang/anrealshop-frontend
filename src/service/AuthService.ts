@@ -1,7 +1,7 @@
 import { API_ENDPOINTS } from '../constant';
 import type { LoginRequest, LoginResponse } from '../types/AuthType';
 import type { ShopDto } from '../types/ShopType';
-import type { RegisterRequest, UserDto } from '../types/UserType';
+import type { ProfileRequest, RegisterRequest, UserDto } from '../types/UserType';
 import { axiosInstance, axiosNoAuthInstance } from './AxiosInstant';
 
 const login = async (loginRequest: LoginRequest): Promise<LoginResponse> => {
@@ -37,13 +37,21 @@ const getProfile = async (): Promise<UserDto> => {
   return response.data;
 };
 
-// const updateProfile = async (profileData: ProfileRequest): Promise<UserDto> => {
-//   const response = await axiosInstance.put<UserDto>(
-//     API_ENDPOINTS.USERS.UPDATE_PROFILE,
-//     profileData
-//   );
-//   return response.data;
-// };
+const updateProfile = async (profileData: ProfileRequest): Promise<UserDto> => {
+  const response = await axiosInstance.put<UserDto>(
+    API_ENDPOINTS.USERS.UPDATE_PROFILE,
+    profileData
+  );
+  return response.data;
+};
+
+const verifyEmail = async (code: string): Promise<UserDto> => {
+  const response = await axiosInstance.put<UserDto>(
+    API_ENDPOINTS.USERS.VERIFY_EMAIL, {},
+    { params: { code } }
+  );
+  return response.data;
+};
 
 
 const getShopInfo = async (): Promise<ShopDto> => {
@@ -57,10 +65,11 @@ const authService = {
   login,
   refreshToken,
   getProfile,
-  // updateProfile,
+  updateProfile,
   logout,
   register,
   getShopInfo,
+  verifyEmail,
 };
 
 export default authService;

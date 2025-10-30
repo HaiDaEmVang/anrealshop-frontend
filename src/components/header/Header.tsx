@@ -311,7 +311,7 @@ const Header: React.FC = () => {
                                                             <Menu.Item
                                                                 leftSection={<BiUser size={16} />}
                                                                 component={Link}
-                                                                to="/account/profile"
+                                                                to={APP_ROUTES.USER_PROFILE}
                                                             >
                                                                 Thông tin tài khoản
                                                             </Menu.Item>
