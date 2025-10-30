@@ -38,7 +38,7 @@ const Address: React.FC<AddressProps> = ({
   const {user} = useAppSelector((state) => state.auth);
 
   const fetchAddresses = useCallback(() => {
-    if (user?.address === null || user?.address === undefined) return;
+    if (!user  || user.address === null || user.address === undefined) return;
     AddressService.getUserAddresses()
       .then((data) => {
           setAddressList(data);
@@ -46,7 +46,7 @@ const Address: React.FC<AddressProps> = ({
       .catch((error) => {
         showErrorNotification("Lỗi lấy thông tin địa chỉ", getErrorMessage(error));
       })
-  }, [])
+  }, [user?.address]);
 
   useEffect(() => {
     if (showAddressSelection && addressList.length === 0) {
