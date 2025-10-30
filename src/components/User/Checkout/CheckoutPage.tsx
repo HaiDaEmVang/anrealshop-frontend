@@ -4,24 +4,24 @@ import {
 } from '@mantine/core';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 import { paymentMethodsDataDefault } from '../../../data/CheckoutData';
 import { useAppSelector } from '../../../hooks/useAppRedux';
 import { CheckoutService, type ItemsCheckoutRequest } from '../../../service/CheckoutService';
 import { ShipmentService } from '../../../service/ShipmentService';
 import type { AddressDto } from '../../../types/AddressType';
 import type { CheckoutRequestDto, CheckoutResponseDto, PaymentGatewayType } from '../../../types/CheckoutType';
-import type { CartShippingFee, CheckoutInfoDto } from '../../../types/ShipmentType';
+import type { CartShippingFee, CheckoutInfoDto, CheckoutShippingFee } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
 import showErrorNotification from '../../Toast/NotificationError';
+import { NotificationModal } from '../../common/NotificationModal';
+import OverlayLoading from '../../common/OverlayLoading';
 import PageNotFound from '../../common/PageNotFound';
 import CheckoutBreadcrumbs from './CheckoutBreadcrumbs';
 import CheckoutReview from './CheckoutReview';
 import ListProduct from './ListProductForShop';
 import PaymentMethod from './PaymentMethod';
 import Address from './address/Address';
-import OverlayLoading from '../../common/OverlayLoading';
-import { NotificationModal } from '../../common/NotificationModal';
+import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 
 
 const CheckoutPage = () => {
@@ -31,24 +31,21 @@ const CheckoutPage = () => {
   const [itemCheckoutInfo, setItemCheckoutInfo] = useState<CheckoutInfoDto[]>([]);
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentGatewayType>('cash_on_delivery');
-  const [selectedAddress, setSelectedAddress] = useState<AddressDto | null>(user?.address === undefined ? null : user?.address);
+  const [selectedAddress, setSelectedAddress] = useState<AddressDto | null>(null);
   const [feeUpdated, setFeeUpdated] = useState<CartShippingFee[] | []>([]);
   const [feeLoading, setFeeLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [itemLoading, setItemLoading] = useState(false);
+  const [itemLoading, setItemLoading] = useState(true);
   const [showAddressModal, setShowAddressModal] = useState(false);
 
   const idItems: ItemsCheckoutRequest = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS) || '{}');
 
   useEffect(() => {
-    if (!idItems || Object.keys(idItems).length === 0) {
-      showErrorNotification("Lỗi truy xuất", "Không tìm thấy đơn hàng nào để thanh toán");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (user?.address) {
-      setSelectedAddress(user.address);
+    if (user && (user.address === null || user.address === undefined)) {
+      setItemLoading(false);
+      setShowAddressModal(true);
+    } else if (user && user.address) {
+      setSelectedAddress(user?.address || null);
     }
   }, [user?.address]);
 
@@ -56,7 +53,9 @@ const CheckoutPage = () => {
     if (!idItems || Object.keys(idItems).length === 0) {
       return;
     }
-    if (user?.address === null || user?.address === undefined) return;
+    if (!user || user.address === null || user.address === undefined) {
+      return;
+    }
     setItemLoading(true);
     CheckoutService.getCheckoutInfo(idItems)
       .then(data => {
@@ -64,29 +63,24 @@ const CheckoutPage = () => {
       })
       .catch(error => showErrorNotification("Tải danh sách sản phẩm thất bại", getErrorMessage(error)))
       .finally(() => setItemLoading(false));
-  }, [])
-
-  const getAllIdItem = useCallback(() => {
-    return itemCheckoutInfo.map(item => item.items.map(i => i.id)).flat();
-  }, [itemCheckoutInfo])
-
-  useEffect(() => {
-    if (!itemLoading && (user?.address === null || user?.address === undefined)) {
-      setShowAddressModal(true);
-    }
-  }, [user?.address, itemLoading]);
+  }, [user]);
 
   const refreshFee = useCallback(() => {
-    if (!selectedAddress || !itemCheckoutInfo.length) return;
-    if (user?.address === null || user?.address === undefined) return;
+    if (!selectedAddress || itemCheckoutInfo.length < 1) return;
     setFeeLoading(true);
-    ShipmentService.getFeeForCart(getAllIdItem())
+    const checkoutShippingFee: CheckoutShippingFee = {
+      userAddressId: selectedAddress.id,
+      checkoutItems: Object.fromEntries(
+        itemCheckoutInfo.flatMap(item => item.items.map(i => [i.id, i.quantity]))
+      ),
+    }
+    ShipmentService.getFeeForCheckout(checkoutShippingFee)
       .then(data => {
         setFeeUpdated(data);
       })
       .catch(error => showErrorNotification("Tính phí vận chuyển thất bại", getErrorMessage(error)))
       .finally(() => setFeeLoading(false));
-  }, [selectedAddress, user?.address])
+  }, [selectedAddress])
 
   useEffect(() => {
     refreshFee();
@@ -123,6 +117,7 @@ const CheckoutPage = () => {
       .finally(() => setLoading(false));
   };
 
+
   const handleNavigateToAddress = () => {
     setShowAddressModal(false);
     navigate(APP_ROUTES.USER_ADDRESSES);
@@ -141,9 +136,10 @@ const CheckoutPage = () => {
     />;
   }
 
-  if (itemLoading) {
-    return <OverlayLoading visible />;
+  if (loading) {
+    return <OverlayLoading visible message={`${loading ? 'Đang tạo đơn hàng' : undefined}...`} />;
   }
+
 
   return (
     <Container size="xl" className="py-6">
