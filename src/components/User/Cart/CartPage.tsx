@@ -9,14 +9,16 @@ import {
 } from '@mantine/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiTruck } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
 import { removeFromCart, updateCartCount } from '../../../store/authSlice';
+import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES } from '../../../constant';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useAppRedux';
 import { CartService } from '../../../service/CartService';
 import { ShipmentService } from '../../../service/ShipmentService';
 import type { CartDto } from '../../../types/CartType';
 import type { CartShippingFee } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
+import { ContentEmpty } from '../../common/ContentEmpty';
 import showErrorNotification from '../../Toast/NotificationError';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
 import CartBreadcrumbs from './Breadcrumbs';
@@ -24,8 +26,6 @@ import ListProduct from './ListProduct';
 import ListProductSkeleton, { SummerSkeleton } from './Skeleton';
 import Summer from './Summer';
 import { NotificationModal } from '../../common/NotificationModal';
-import { APP_ROUTES } from '../../../constant';
-import { ContentEmpty } from '../../common/ContentEmpty';
 
 const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartDto[]>([]);
@@ -109,7 +109,6 @@ const CartPage: React.FC = () => {
 
   useEffect(() => {
     if (loading) return;
-    // Chặn fetch ban đầu nếu user chưa có address
     if (user?.address === null || user?.address === undefined) return;
     const initiallySelected = getAllSelectedItemIds();
     if (initiallySelected.length === 0) return;
@@ -119,10 +118,11 @@ const CartPage: React.FC = () => {
   }, [loading, cartItems, getAllSelectedItemIds, fetchFee, user?.address]);
 
   useEffect(() => {
-    if (!loading && (user?.address === null || user?.address === undefined)) {
+    if (user && (user.address === null || user.address === undefined)) {
       setShowAddressModal(true);
     }
-  }, [user?.address, loading]);
+  }, [user?.address]);
+
 
   const handleSelectAll = (checked: boolean) => {
     const allIds = getAllItemIds();

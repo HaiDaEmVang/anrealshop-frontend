@@ -37,6 +37,7 @@ import ProductDescription from './ProductDescription';
 import ProductPriceAndAttributes from './ProductPriceAndAttributes';
 import ProductShippingInfo from './ProductShippingInfo';
 import { ShopInfo } from './ShopInfo';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -71,7 +72,9 @@ const InforProduct = ({
   groupedAttributes,
 }: InforProductProps) => {
   const availableQuantity = selectedSku?.quantity || product.quantity;
+
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
@@ -121,7 +124,7 @@ const InforProduct = ({
     }
     localStorage.setItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS, JSON.stringify({ [selectedSku.id]: quantity }));
 
-    window.location.href = APP_ROUTES.CHECKOUT;
+    navigate(APP_ROUTES.CHECKOUT);
   }
 
 
