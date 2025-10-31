@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     FORGOT_PASSWORD: '/forgot-password',
     REFRESH: '/auth/refresh-token',
     SWITCH_TOKEN_TYPE: (type: UserRoleType) => `/auth/switch-token-type?type=${type}`,
+    HISTORY_LOGIN: '/history-login',
   },
   OTP: {
     GET_OTP: '/otp/sendOtp',
