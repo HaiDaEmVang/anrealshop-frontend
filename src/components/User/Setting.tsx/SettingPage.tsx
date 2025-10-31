@@ -25,7 +25,7 @@ import Notification from './Notification';
 import { OrderDetail } from './OrderDetail/OrderDetailPage';
 import OrderHistory from './OrderHistory/OrderHistoryPage';
 import Preferences from './Preferences';
-import Security from './Security';
+import Security from './Security/Security';
 import { AddressPage } from './Address/AddressPage';
 import Profile from './Profile/Profile';
 

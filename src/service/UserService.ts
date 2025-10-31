@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from "../constant";
-import type { forgotPwRequest } from "../types/UserType";
-import { axiosNoWithCredInstance } from "./AxiosInstant";
+import type { ChangePasswordDto, forgotPwRequest } from "../types/UserType";
+import { axiosInstance, axiosNoWithCredInstance } from "./AxiosInstant";
 
 const forgotPassword = async (forgotPassword: forgotPwRequest) => {
     const response = await axiosNoWithCredInstance.post(
@@ -10,7 +10,16 @@ const forgotPassword = async (forgotPassword: forgotPwRequest) => {
     return response.data;
 }
 
+const changePassword = async (changePassword: ChangePasswordDto) => {
+    const response = await axiosInstance.post(
+        `${API_ENDPOINTS.USERS.CHANGE_PASSWORD}`,
+        changePassword
+    )
+    return response.data;
+}
+
 const UserService = {
-    forgotPassword
+    forgotPassword,
+    changePassword,
 };
 export default UserService;
