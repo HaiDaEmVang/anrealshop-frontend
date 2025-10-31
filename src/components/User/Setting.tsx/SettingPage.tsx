@@ -215,13 +215,13 @@ const SettingPage = () => {
                 </Grid.Col>
 
                 {/* Main Content */}
-                <Grid.Col span={{ base: 12, md: 9 }} className='min-h-[100vh]'>
+                <Grid.Col span={{ base: 12, md: 9 }} >
                     <motion.div
                         initial={{ opacity: 0, x: 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
                     >
-                        <Paper shadow="sm" radius="md" p="lg" className="bg-white">
+                        <Paper shadow="sm" radius="md" p="lg" className="bg-white min-h-[60vh]">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={location.pathname}
