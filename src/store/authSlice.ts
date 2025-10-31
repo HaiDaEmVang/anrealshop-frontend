@@ -199,6 +199,12 @@ const userAuthSlice = createSlice({
         state.user.isVerified = action.payload;
       }
     },
+
+    updatePasswordStatus: (state, action: PayloadAction<boolean>) => {
+      if (state.user) {
+        state.user.hasPassword = action.payload;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -298,5 +304,6 @@ export const {
   clearCart,
   logout,
   createShopForUser,
-  updateVerifiedStatus
+  updateVerifiedStatus,
+  updatePasswordStatus,
 } = userAuthSlice.actions;
