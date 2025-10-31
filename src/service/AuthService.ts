@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '../constant';
-import type { LoginRequest, LoginResponse } from '../types/AuthType';
+import type { HistoryLoginDto, LoginRequest, LoginResponse } from '../types/AuthType';
 import type { ShopDto } from '../types/ShopType';
 import type { ProfileRequest, RegisterRequest, UserDto } from '../types/UserType';
 import { axiosInstance, axiosNoAuthInstance } from './AxiosInstant';
@@ -60,6 +60,11 @@ const getShopInfo = async (): Promise<ShopDto> => {
 };
 
 
+const getHistoryLogin = async (): Promise<HistoryLoginDto[]> => {
+  const response = await axiosInstance.get<HistoryLoginDto[]>(API_ENDPOINTS.AUTH.HISTORY_LOGIN);
+  return response.data;
+};
+
 
 const authService = {
   login,
@@ -70,6 +75,7 @@ const authService = {
   register,
   getShopInfo,
   verifyEmail,
+  getHistoryLogin,
 };
 
 export default authService;

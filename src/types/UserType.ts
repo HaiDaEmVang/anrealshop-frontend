@@ -20,6 +20,7 @@ export interface UserDto {
   address?: AddressDto;
   cartCount?: number;
   hasShop?: boolean;
+  hasPassword: boolean;
 }
 
 export interface RegisterRequest {
@@ -41,4 +42,9 @@ export interface forgotPwRequest  {
   email: string;
   password: string;
   otp: string;
+}
+
+export interface ChangePasswordDto {
+  oldPassword: string;
+  newPassword: string;
 }

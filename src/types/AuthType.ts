@@ -21,3 +21,14 @@ export interface ResetPwRequest {
   password: string;
   otp: string;
 }
+
+export interface HistoryLoginDto {
+  id: string;
+  loginAt: string;
+  logoutAt: string;
+  userAgent: string;
+  location: string;
+  device: string;
+  currentSession: boolean;
+  active: boolean;
+}
