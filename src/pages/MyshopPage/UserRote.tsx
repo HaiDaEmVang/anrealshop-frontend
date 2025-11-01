@@ -9,7 +9,7 @@ const CategoryPage = lazy(() => import('../../components/User/CategoryPage/Categ
 const CheckoutPage = lazy(() => import('../../components/User/Checkout/CheckoutPage'));
 const FilterProductPage = lazy(() => import('../../components/User/FilterProduct/FilterProductPage'));
 const HomePage = lazy(() => import('../../components/User/HomePage/HomePage'));
-const ListProduct = lazy(() => import('../../components/User/HomePage/Products/ListProduct'));
+// const ListProduct = lazy(() => import('../../components/User/HomePage/Products/ListProduct'));
 const ProductDetailPage = lazy(() => import('../../components/User/ProductDetail/ProductDetailPage'));
 const SettingPage = lazy(() => import('../../components/User/Setting.tsx/SettingPage'));
 const ShopPage = lazy(() => import('../../components/User/Shop/ShopPage'));
