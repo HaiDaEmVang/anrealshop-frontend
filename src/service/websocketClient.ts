@@ -1,9 +1,12 @@
-// 'src/ws.ts'
-import SockJS from 'sockjs-client';
 import { Client, type IMessage } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+import { BASE_API_URL } from '../constant';
+import showErrorNotification from '../components/Toast/NotificationError';
+import NoticeService from './NoticeService';
 
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4141';
-const WS_URL = `${API_BASE}/api/ws_drew`;
+const WS_URL = `${BASE_API_URL}/ws_drew`;
+const DESTINATION_NOTICE = '/user/queue/notifications';
+const DESTINATION_CHAT = '/user/queue/chat';
 
 let stompClient: Client | null = null;
 
@@ -19,27 +22,30 @@ function ensureClient(): Client {
     reconnectDelay: 5000,
     heartbeatIncoming: 10000,
     heartbeatOutgoing: 10000,
-    debug: (m) => console.log('[STOMP]', m),
   });
 
   stompClient.onConnect = () => {
-    stompClient!.subscribe('/user/queue/notifications', (msg: IMessage) => {
-      console.log('Notification:', msg.body);
+    stompClient!.subscribe('/topic/public', (response) => {
+      console.log('Received message:', response.body);
     });
 
-    stompClient!.subscribe('/topic/system', (response) => {
-                    console.log('Received message:', response.body);
-                });
+    stompClient!.subscribe(DESTINATION_NOTICE, (msg: IMessage) => {
+      NoticeService.showPrivateNotice(JSON.parse(msg.body));
+    });
 
-  
+    stompClient!.subscribe(DESTINATION_CHAT, (msg: IMessage) => {
+      console.log('Chat message:', msg.body);
+    });
+
+
   };
 
   stompClient.onStompError = (frame) => {
-    console.error('Broker error:', frame.headers['message'], frame.body);
+    showErrorNotification('Thông báo lỗi hệ thống', frame.headers['message'] || 'An error occurred with the WebSocket connection.');
   };
 
   stompClient.onWebSocketError = (event) => {
-    console.error('WS error:', event);
+    showErrorNotification('Thông báo lỗi hệ thống', event.headers['message'] || 'An error occurred with the WebSocket connection.');
   };
 
   return stompClient;
@@ -47,11 +53,9 @@ function ensureClient(): Client {
 
 export function connectWs(): void {
   if (stompClient?.active) {
-    console.log('[WS] Already active, skip connect');
     return;
   }
 
-  // Nếu stompClient tồn tại nhưng không active, reset nó
   if (stompClient && !stompClient.active) {
     stompClient = null;
   }
@@ -70,13 +74,11 @@ export function disconnectWs(): void {
 
 export function sendMessage(destination: string, body: any) {
   if (!stompClient || !stompClient.active) {
-    console.warn('[WS] Client not connected!');
     return;
   }
 
   stompClient.publish({
-    destination: '/app_message' + destination, 
+    destination: '/app_message' + destination,
     body: JSON.stringify(body),
   });
-  console.log('[WS] Message sent to', destination);
 }

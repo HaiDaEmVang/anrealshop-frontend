@@ -10,6 +10,7 @@ import './App.css';
 import { APP_ROUTES } from './constant';
 import { useAppDispatch, useAppSelector } from './hooks/useAppRedux';
 import { fetchCurrentUser } from './store/authSlice';
+import { connectWs, disconnectWs } from './service/websocketClient';
 
 const AuthoPage = lazy(() => import('./pages/Auth/AuthoPage'));
 const MyshopPage = lazy(() => import('./pages/MyshopPage/MyshopRoute'));
@@ -59,9 +60,14 @@ function App() {
     if (!user && !isAuthenticated) {
       dispatch(fetchCurrentUser());
     }
-  }, []);
+    if (user) {
+      connectWs();
+    }
 
-
+    return () => {
+      disconnectWs();
+    };
+  }, [user]);
 
   return (
     <MantineProvider theme={theme}>

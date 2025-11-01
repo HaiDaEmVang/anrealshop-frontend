@@ -37,24 +37,6 @@ const POPULAR_CATEGORIES = [
 
 ];
 
-// Dữ liệu địa chỉ mẫu
-// const SAVED_ADDRESSES: SimpleAddressDto[] = [
-//     {
-//         id: '2',
-//         receiverOrSenderName: 'Trần Thị Bình',
-//         phoneNumber: '0912345678',
-//         detailAddress: '45 Lê Văn Lương, Phường Tân Hưng, Quận 7, TP. Hồ Chí Minh',
-//         isDefault: false
-//     },
-//     {
-//         id: '3',
-//         receiverOrSenderName: 'Lê Văn Cường',
-//         phoneNumber: '0987654321',
-//         detailAddress: '78 Nguyễn Thị Minh Khai, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-//         isDefault: false
-//     }
-// ];
-
 
 const Header: React.FC = () => {
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);

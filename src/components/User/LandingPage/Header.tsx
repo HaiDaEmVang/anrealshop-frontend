@@ -231,7 +231,6 @@ export const Header = () => {
                 </div>
 
 
-
                 {/* Mobile menu */}
                 {opened && (
                     <MobileMenu
