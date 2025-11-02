@@ -16,9 +16,6 @@ const ShopPage = lazy(() => import('../../components/User/Shop/ShopPage'));
 const PaymentResultPage = lazy(() => import('../../components/User/paymentResult/PaymentResultPage'));
 
 const UserPage = () => {
-
-
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />

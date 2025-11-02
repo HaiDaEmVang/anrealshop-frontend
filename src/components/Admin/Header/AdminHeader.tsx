@@ -22,11 +22,12 @@ import {
   FiUser
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { useAppSelector } from '../../../hooks/useAppRedux';
 
 const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean }> = ({ toggleSidebar, sidebarOpened }) => {
-  const [hasUnread] = useState(true); // Trạng thái có thông báo chưa đọc
+  const [hasUnread] = useState(true);
+  const { user } = useAppSelector((state) => state.auth);
 
-  // Menu tài khoản người dùng
   const userMenuItems = [
     { label: 'Hồ sơ của tôi', icon: <FiUser size={14} />, path: '/admin/profile' },
     { label: 'Cài đặt tài khoản', icon: <FiSettings size={14} />, path: '/admin/settings' },
@@ -34,17 +35,30 @@ const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean 
     { label: 'Quay lại cửa hàng', icon: <FiHome size={14} />, path: '/' },
   ];
 
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'ADMIN':
+        return 'Quản trị viên';
+      case 'MY_SHOP':
+        return 'Chủ cửa hàng';
+      case 'USER':
+        return 'Người dùng';
+      default:
+        return role;
+    }
+  };
+
   return (
     <div className="sticky top-0 z-10">
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
           {/* Logo và nút menu cho mobile */}
           <div className="flex items-center">
-            <Burger 
+            <Burger
               size="sm"
-              opened={sidebarOpened} 
-              onClick={toggleSidebar} 
-              className="mr-2 md:hidden" 
+              opened={sidebarOpened}
+              onClick={toggleSidebar}
+              className="mr-2 md:hidden"
             />
             <Link to="/admin/dashboard" className="flex items-center gap-2">
               <img src="/images/logo.jfif" alt="AnrealShop" className="h-8 w-auto" />
@@ -66,7 +80,7 @@ const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean 
             >
               <FiSearch size={20} className="text-gray-700" />
             </ActionIcon>
-            
+
             {/* Tin nhắn */}
             <ActionIcon
               variant="subtle"
@@ -134,10 +148,10 @@ const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean 
 
                   <Divider className="my-2" />
 
-                  <UnstyledButton 
+                  <UnstyledButton
                     className="w-full text-center text-sm text-primary py-1"
                     component={Link}
-                    to="/admin/notifications"  
+                    to="/admin/notifications"
                   >
                     Xem tất cả thông báo
                   </UnstyledButton>
@@ -150,16 +164,19 @@ const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean 
               <Menu.Target>
                 <UnstyledButton className="flex items-center gap-2 hover:bg-gray-100 p-1 rounded-full transition-colors">
                   <Avatar
-                    src="https://i.pravatar.cc/200?img=33"
+                    src={user?.avatarUrl || undefined}
+                    alt={user?.fullName}
                     size="md"
                     radius="xl"
-                  />
+                  >
+                    {!user?.avatarUrl && user?.fullName?.charAt(0).toUpperCase()}
+                  </Avatar>
                   <div className="hidden md:block text-left">
                     <Text size="sm" fw={500}>
-                      Admin User
+                      {user?.fullName || user?.username || 'Admin User'}
                     </Text>
                     <Text size="xs" c="dimmed">
-                      Quản trị viên
+                      {user?.role ? getRoleLabel(user.role) : 'Quản trị viên'}
                     </Text>
                   </div>
                   <FiChevronDown size={14} className="hidden md:block text-gray-500" />
@@ -179,7 +196,7 @@ const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean 
                 ))}
 
                 <Menu.Divider />
-                
+
                 <Menu.Item
                   leftSection={<FiLogOut size={14} />}
                   color="red"

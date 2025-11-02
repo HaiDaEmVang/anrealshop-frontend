@@ -2,7 +2,11 @@ import { Anchor, Box, Breadcrumbs, Flex, Group, Paper, Text } from '@mantine/cor
 import { useDisclosure } from '@mantine/hooks';
 import React, { Suspense, lazy } from 'react';
 import { FiChevronRight, FiHome } from 'react-icons/fi';
-import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import OverlayLoading from '../../components/common/OverlayLoading';
+import showErrorNotification from '../../components/Toast/NotificationError';
+import { APP_ROUTES } from '../../constant';
+import { useAppSelector } from '../../hooks/useAppRedux';
 
 const CategoryManagement = lazy(() => import('../../components/Admin/Category/CategoryPage'));
 const AdminHeader = lazy(() => import('../../components/Admin/Header/AdminHeader'));
@@ -73,6 +77,19 @@ const AdminPage: React.FC = () => {
     return items;
   };
 
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+
+  if (!isAuthenticated || !user) {
+    return <OverlayLoading visible={true} />
+  }
+
+  if (isAuthenticated && user.role !== 'ADMIN') {
+    showErrorNotification('Quyền truy cập bị từ chối', 'Bạn không có quyền truy cập vào trang quản trị.');
+    navigate(APP_ROUTES.HOME);
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Suspense fallback={<div></div>}>
@@ -106,7 +123,7 @@ const AdminPage: React.FC = () => {
           </Paper>
         </Box>
       </Flex>
-     </div>
+    </div>
   );
 };
 
