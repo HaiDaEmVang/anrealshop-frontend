@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react-swc'
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'global': 'window', 
+  },
   server: {
     // allowedHosts: [
     //   'local.haiemdavang.id.vn', 
