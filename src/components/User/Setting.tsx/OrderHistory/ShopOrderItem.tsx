@@ -26,10 +26,10 @@ import { getReasonValueByKey, getRejectReasons } from '../../../../data/RejectDa
 import { useOrderStatus } from '../../../../hooks/useOrderStatus';
 import { type ShopOrderStatus, type UserOrderItemDto } from '../../../../types/OrderType';
 import { formatDate, formatPrice } from '../../../../untils/Untils';
-import RejectModal from '../../../RejectModal/RejectOrder';
+import RejectModal from '../../../RejectModal/RejectModal';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 
- 
+
 interface ShopOrderItemProps {
     order: UserOrderItemDto;
     onCancelOrder?: (orderId: string, reason: string) => void;

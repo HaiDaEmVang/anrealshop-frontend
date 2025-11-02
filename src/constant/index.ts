@@ -34,6 +34,10 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: '/user/update-profile',
     VERIFY_EMAIL: '/user/verify-email',
   },
+  ADMIN: {
+    USER_LIST: '/admin/users',
+    USER_DISABLE: (userId: string) => `/admin/users/${userId}/disable`,
+  },
   SHOPS: {
     INFO: '/shops',
     REGISTER: '/shops/register',

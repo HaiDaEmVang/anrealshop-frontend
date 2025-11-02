@@ -7,6 +7,7 @@ import OverlayLoading from '../../components/common/OverlayLoading';
 import showErrorNotification from '../../components/Toast/NotificationError';
 import { APP_ROUTES } from '../../constant';
 import { useAppSelector } from '../../hooks/useAppRedux';
+import User from '../../components/Admin/User/UserPage.tsx';
 
 const CategoryManagement = lazy(() => import('../../components/Admin/Category/CategoryPage'));
 const AdminHeader = lazy(() => import('../../components/Admin/Header/AdminHeader'));
@@ -19,8 +20,8 @@ const ShopApprovalPage = lazy(() => import('../../components/Admin/Shop/ShopPage
 // const OrderManagement = lazy(() => import('../../components/Admin/Order/OrderManagement'));
 // const ReportManagement = lazy(() => import('../../components/Admin/Report/ReportManagement'));
 // const SystemSettings = lazy(() => import('../../components/Admin/Setting/SystemSettings'));
-const AdminDashboard = () => <div>Dashboard Admin</div>;
-const UserManagement = () => <div>Quản lý người dùng</div>;
+const UserManagement = () => <User />;
+const AdminDashboard = () => <div>Quản lý người dùng</div>;
 const OrderManagement = () => <div>Quản lý đơn hàng</div>;
 const ReportManagement = () => <div>Báo cáo và thống kê</div>;
 const SystemSettings = () => <div>Cài đặt hệ thống</div>;
@@ -99,7 +100,6 @@ const AdminPage: React.FC = () => {
       <Flex className="flex-1">
         <AdminSidebar opened={opened} onClose={close} />
 
-
         <Box className="flex-1 bg-gray-50 p-4 "  >
           <Paper p="md" mb="md" radius="md" shadow="xs">
             <Breadcrumbs separator={<FiChevronRight size={14} />}>
@@ -107,7 +107,7 @@ const AdminPage: React.FC = () => {
             </Breadcrumbs>
           </Paper>
 
-          <Paper p="md" radius="md" shadow="xs">
+          <Paper p="md" radius="md" shadow="xs" className='min-h-[80vh]'>
             <Routes>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />

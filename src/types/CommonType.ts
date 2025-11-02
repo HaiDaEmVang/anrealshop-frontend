@@ -9,7 +9,7 @@ export interface ErrorResponseDto {
   timestamp: string;
   traceId?: string;
   details?: Array<ItemError>;
-} 
+}
 
 export interface MediaDto {
   isUploading?: boolean;
@@ -19,9 +19,8 @@ export interface MediaDto {
   thumbnailUrl: string;
   url: string;
   type: 'IMAGE' | 'VIDEO';
-} 
+}
 
-export interface ItemList {
-  key: string;
-  value : string;
+export interface RejectRequest {
+  reason: string;
 }

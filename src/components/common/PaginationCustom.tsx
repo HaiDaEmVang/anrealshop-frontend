@@ -8,7 +8,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const Pagination = ({
+const PaginationCustom = ({
   currentPage,
   totalPages,
   totalItems,
@@ -19,10 +19,10 @@ const Pagination = ({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="px-4 ">
-      <div className="px-2 py-4 flex justify-between items-center border-t-2 border-gray-200">  
+    <div className="px-4">
+      <div className="px-2 py-4 flex justify-between items-center border-t-2 border-gray-200">
         <Text size="sm" c="dimmed">
-          Hiển thị {startItem} - {endItem} trên {totalItems} sản phẩm | Lưu gần nhất: {new Date().toLocaleTimeString('vi-VN')} - {new Date().toLocaleDateString('vi-VN')}
+          Hiển thị {startItem} - {endItem} trên {totalItems} mục | Cập nhật lúc: {new Date().toLocaleTimeString('vi-VN')} - {new Date().toLocaleDateString('vi-VN')}
         </Text>
         <MantinePagination
           value={currentPage}
@@ -32,10 +32,8 @@ const Pagination = ({
           radius="md"
         />
       </div>
-
-
     </div>
   );
 };
 
-export default Pagination;
+export default PaginationCustom;

@@ -6,7 +6,7 @@ import type { PreparingStatus } from '../../../../../hooks/useOrder';
 import { useOrderStatus } from '../../../../../hooks/useOrderStatus';
 import type { OrderItemDto } from '../../../../../types/OrderType';
 import { formatDate } from '../../../../../untils/Untils';
-import RejectModal from '../../../../RejectModal/RejectOrder';
+import RejectModal from '../../../../RejectModal/RejectModal';
 import Header from './HeaderListView';
 import { SkeletonOrderShip } from './SkeletonOrderShip';
 
@@ -117,7 +117,7 @@ const OrderShippingProductList = ({
                                                             <Text size="sm" c="dimmed">|</Text>
                                                         </>
                                                     )}
-                                                    
+
                                                     <Text size="sm" c="dimmed">
                                                         Mã đơn hàng:
                                                         <Text component="span" fw={500} className='ml-1 hover:text-primary cursor-pointer !underline'>

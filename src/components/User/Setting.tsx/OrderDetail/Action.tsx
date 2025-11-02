@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { FiShoppingBag, FiStar } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { getRejectReasons } from '../../../../data/RejectData';
-import RejectModal from '../../../RejectModal/RejectOrder';
+import RejectModal from '../../../RejectModal/RejectModal';
 import type { UserOrderDetailDto } from '../../../../types/OrderType';
 
 interface ActionProps {

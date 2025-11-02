@@ -8,7 +8,7 @@ import { useOrder, type SearchType } from '../../../../hooks/useOrder';
 import { useURLParams } from '../../../../hooks/useURLParams';
 import type { ShopOrderStatus, UserOrderItemDto } from '../../../../types/OrderType';
 import FilterByStatus from '../../../Myshop/Order/OrderPage/Filter/FilterByStatus';
-import Pagination from '../../../Myshop/Product/Managerment/ProductView/Pagination';
+import Pagination from '../../../common/PaginationCustom';
 import { PaginationSkeleton } from '../../../Myshop/Product/Managerment/Skeleton';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 import { ContentEmpty } from '../../../common/ContentEmpty';
