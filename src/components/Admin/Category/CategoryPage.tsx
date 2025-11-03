@@ -1,587 +1,307 @@
-import {
-    Box,
-    Button,
-    Group,
-    LoadingOverlay,
-    Paper,
-    Stack,
-    Text,
-    Title
-} from '@mantine/core';
+import { Button, Divider, Group, Paper, SegmentedControl, Stack, Title, Tooltip } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-    FiLayers,
-    FiList,
-    FiPlus
-} from 'react-icons/fi';
-import slugify from 'slugify';
-import showSuccessNotification from '../../Toast/NotificationSuccess';
-import CategoryTable from './CategoryTable';
-import CategoryTree from './CategoryTree';
-import DeleteCategoryModal from './ModalDelete';
+import { useEffect, useState, useRef } from 'react';
+import { FiGitBranch, FiList, FiPlus } from 'react-icons/fi';
+import { useCategory } from '../../../hooks/useCategory';
+import type { AdminCategoryDto, CategoryRequestDto } from '../../../types/CategoryType';
+import { CategoryTable } from './CategoryTable';
+import { CategoryTree } from './CategoryTree';
+import ModalConfirmStatus from './ModalConfirmStatus';
+import ModalDelete from './ModalDelete';
 import CategoryModal from './ModalEdit';
 
+type ViewMode = 'tree' | 'table';
 
-interface Category {
-    id: string;
-    name: string;
-    parentId: string | null;
-    description: string;
-    slug: string;
-    active: boolean;
-    order: number;
-    level: number;
-    iconUrl?: string;
-    imageUrl?: string;
-    children?: Category[];
-}
+export const CategoryPage = () => {
+    const [viewMode, setViewMode] = useState<ViewMode>('tree');
+    const [opened, { open, close }] = useDisclosure(false);
+    const [editingCategory, setEditingCategory] = useState<AdminCategoryDto | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
+    const [disabledCurrentPage, setDisabledCurrentPage] = useState(1);
 
-const MOCK_CATEGORIES: Category[] = [
-    {
-        id: '1',
-        name: 'Thời trang',
-        parentId: null,
-        description: 'Sản phẩm thời trang các loại',
-        slug: 'thoi-trang',
-        active: true,
-        order: 1,
-        level: 0,
-        children: [
-            {
-                id: '1-1',
-                name: 'Thời trang nam',
-                parentId: '1',
-                description: 'Thời trang dành cho nam giới',
-                slug: 'thoi-trang-nam',
-                active: true,
-                order: 1,
-                level: 1,
-                children: [
-                    {
-                        id: '1-1-1',
-                        name: 'Áo sơ mi nam',
-                        parentId: '1-1',
-                        description: 'Áo sơ mi dành cho nam giới',
-                        slug: 'ao-so-mi-nam',
-                        active: true,
-                        order: 1,
-                        level: 2
-                    },
-                    {
-                        id: '1-1-2',
-                        name: 'Quần jean nam',
-                        parentId: '1-1',
-                        description: 'Quần jean dành cho nam giới',
-                        slug: 'quan-jean-nam',
-                        active: true,
-                        order: 2,
-                        level: 2
-                    }
-                ]
-            },
-            {
-                id: '1-2',
-                name: 'Thời trang nữ',
-                parentId: '1',
-                description: 'Thời trang dành cho nữ giới',
-                slug: 'thoi-trang-nu',
-                active: true,
-                order: 2,
-                level: 1,
-                children: [
-                    {
-                        id: '1-2-1',
-                        name: 'Váy đầm',
-                        parentId: '1-2',
-                        description: 'Váy đầm dành cho nữ giới',
-                        slug: 'vay-dam',
-                        active: true,
-                        order: 1,
-                        level: 2
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        id: '2',
-        name: 'Điện tử',
-        parentId: null,
-        description: 'Các sản phẩm điện tử',
-        slug: 'dien-tu',
-        active: true,
-        order: 2,
-        level: 0,
-        children: [
-            {
-                id: '2-1',
-                name: 'Điện thoại',
-                parentId: '2',
-                description: 'Điện thoại di động các loại',
-                slug: 'dien-thoai',
-                active: true,
-                order: 1,
-                level: 1
-            },
-            {
-                id: '2-2',
-                name: 'Máy tính',
-                parentId: '2',
-                description: 'Máy tính, laptop các loại',
-                slug: 'may-tinh',
-                active: true,
-                order: 2,
-                level: 1,
-                children: [
-                    {
-                        id: '2-2-1',
-                        name: 'Laptop',
-                        parentId: '2-2',
-                        description: 'Máy tính xách tay',
-                        slug: 'laptop',
-                        active: true,
-                        order: 1,
-                        level: 2
-                    },
-                    {
-                        id: '2-2-2',
-                        name: 'PC',
-                        parentId: '2-2',
-                        description: 'Máy tính để bàn',
-                        slug: 'pc',
-                        active: false,
-                        order: 2,
-                        level: 2
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        id: '3',
-        name: 'Nhà cửa & Đời sống',
-        parentId: null,
-        description: 'Các sản phẩm dành cho nhà cửa và đời sống',
-        slug: 'nha-cua-doi-song',
-        active: true,
-        order: 3,
-        level: 0,
-    }
-];
+    const [toggleModalOpened, { open: openToggleModal, close: closeToggleModal }] = useDisclosure(false);
+    const [categoryToToggle, setCategoryToToggle] = useState<AdminCategoryDto | null>(null);
+    const [includeChildren, setIncludeChildren] = useState(false);
 
-const createSlug = (name: string): string => {
-    if (!name) return '';
-    return slugify(name, {
-        lower: true,
-        replacement: '-',
-        locale: 'vi',
-        strict: true,
-        trim: true
-    });
-};
-
-const buildCategoryTree = (list: Category[], parentId: string | null = null): Category[] => {
-    return list
-        .filter(item => item.parentId === parentId)
-        .map(item => ({
-            ...item,
-            children: buildCategoryTree(list, item.id)
-        }))
-        .sort((a, b) => a.order - b.order);
-};
-
-const flattenCategoryTree = (categoriesToFlatten: Category[], level = 0): Omit<Category, 'children'>[] => {
-    let result: Omit<Category, 'children'>[] = [];
-    for (const category of categoriesToFlatten.sort((a, b) => a.order - b.order)) {
-        const { children, ...categoryWithoutChildren } = category;
-        result.push({ ...categoryWithoutChildren, level });
-        if (children && children.length > 0) {
-            result = result.concat(flattenCategoryTree(children, level + 1));
-        }
-    }
-    return result;
-};
-
-
-const CategoryManagement: React.FC = () => {
-    const [viewMode, setViewMode] = useState<'tree' | 'table'>('tree');
-    const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES);
-    const [flatCategories, setFlatCategories] = useState<Omit<Category, 'children'>[]>([]);
-    const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
     const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false);
-    const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+    const [categoryToDelete, setCategoryToDelete] = useState<AdminCategoryDto | null>(null);
 
-    useEffect(() => {
-        setFlatCategories(flattenCategoryTree(categories));
-    }, [categories]);
+    const slugUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const getDescendantIds = useCallback((categoryId: string): string[] => {
-        const result: string[] = [];
-        const allCategoriesFlat = flattenCategoryTree(categories);
-        const findChildrenRecursive = (currentParentId: string) => {
-            const children = allCategoriesFlat.filter(cat => cat.parentId === currentParentId);
-            for (const child of children) {
-                result.push(child.id);
-                findChildrenRecursive(child.id);
-            }
-        };
-        findChildrenRecursive(categoryId);
-        return result;
-    }, [categories]);
+    const {
+        categories,
+        disabledCategories,
+        isSubmitting,
+        addCategory,
+        updateCategory,
+        toggleCategoryStatus,
+        deleteCategory,
+    } = useCategory({ autoFetch: true });
 
-    const toggleExpand = useCallback((categoryId: string) => {
-        setExpandedCategories(prev =>
-            prev.includes(categoryId)
-                ? prev.filter(id => id !== categoryId)
-                : [...prev, categoryId]
-        );
-    }, []);
-
-    const openAddSubcategoryModal = useCallback((parentCategory: Category) => {
-        const childrenOfParent = categories.find(c => c.id === parentCategory.id)?.children || [];
-        setCurrentCategory({
-            id: '',
+    const form = useForm<CategoryRequestDto>({
+        initialValues: {
             name: '',
-            parentId: parentCategory.id,
-            description: '',
             slug: '',
-            active: true,
-            order: childrenOfParent.length + 1,
-            level: parentCategory.level + 1,
-            children: []
-        });
-        setIsEditing(false);
-        openModal();
-    }, [openModal, categories]);
-
-    const openAddRootCategoryModal = useCallback(() => {
-        const rootCategories = categories.filter(c => c.parentId === null);
-        setCurrentCategory({
-            id: '',
-            name: '',
             parentId: null,
             description: '',
-            slug: '',
-            active: true,
-            order: rootCategories.length + 1,
             level: 0,
-            children: []
-        });
-        setIsEditing(false);
-        openModal();
-    }, [openModal, categories]);
+            visible: true,
+        },
+        validate: {
+            name: (value) => (!value ? 'Tên danh mục là bắt buộc' : null),
+            slug: (value) => (!value ? 'Slug là bắt buộc' : null),
+        },
+    });
 
-    const openEditCategoryModal = useCallback((category: Category) => {
-        setCurrentCategory({ ...category });
-        setIsEditing(true);
-        openModal();
-    }, [openModal]);
+    const parentOptions = categories
+        .filter(cat => !editingCategory || cat.id !== editingCategory.id)
+        .map(cat => ({
+            value: cat.id,
+            label: cat.name,
+            disabled: editingCategory ? cat.level >= 2 : false,
+        }));
 
-    const openConfirmDeleteModal = useCallback((category: Category) => {
-        setCurrentCategory(category);
-        openDeleteModal();
-    }, [openDeleteModal]);
-
-    const handleCategoryChange = useCallback((field: keyof Category, value: any) => {
-        setCurrentCategory(prevCategory => {
-            if (!prevCategory) return null;
-            const updatedCategory = { ...prevCategory, [field]: value };
-
-            if (field === 'name' && !isEditing) {
-                updatedCategory.slug = createSlug(value as string);
-            }
-            return updatedCategory;
-        });
-    }, [isEditing]);
-
-    const saveCategory = useCallback(() => {
-        if (!currentCategory) return;
-        setLoading(true);
-
-        const newCategoryData = {
-            ...currentCategory,
-            id: isEditing ? currentCategory.id : `new-${Date.now()}`,
-            children: currentCategory.children || []
-        };
-
-        if (isEditing) {
-            const updateCategoryInTree = (list: Category[]): Category[] => {
-                return list.map(category => {
-                    if (category.id === newCategoryData.id) {
-                        return { ...newCategoryData, children: category.children };
-                    }
-                    if (category.children) {
-                        return {
-                            ...category,
-                            children: updateCategoryInTree(category.children)
-                        };
-                    }
-                    return category;
-                }).sort((a, b) => a.order - b.order);
-            };
-            setCategories(prev => updateCategoryInTree(prev));
-            showSuccessNotification("thoong bao", `Đã cập nhật danh mục ${newCategoryData.name}`);
-        } else {
-            const categoryToAdd = { ...newCategoryData };
-            if (newCategoryData.parentId === null) {
-                setCategories(prev => [...prev, categoryToAdd].sort((a, b) => a.order - b.order));
+    const handleOpenModal = (category?: AdminCategoryDto, isAdd?: boolean) => {
+        if (category) {
+            if (isAdd) {
+                setEditingCategory(null);
+                form.setValues({
+                    name: '',
+                    slug: '',
+                    parentId: category.id,
+                    description: '',
+                    level: category.level + 1,
+                    visible: true,
+                });
             } else {
-                const addChildToCategory = (list: Category[]): Category[] => {
-                    return list.map(category => {
-                        if (category.id === newCategoryData.parentId) {
-                            return {
-                                ...category,
-                                children: [...(category.children || []), categoryToAdd]
-                                    .sort((a, b) => a.order - b.order)
-                            };
-                        }
-                        if (category.children) {
-                            return {
-                                ...category,
-                                children: addChildToCategory(category.children)
-                            };
-                        }
-                        return category;
-                    }).sort((a, b) => a.order - b.order);
-                };
-                setCategories(prev => addChildToCategory(prev));
-                if (newCategoryData.parentId && !expandedCategories.includes(newCategoryData.parentId)) {
-                    setExpandedCategories(prev => [...prev, newCategoryData.parentId!]);
-                }
+                setEditingCategory(category);
+                form.setValues({
+                    name: category.name,
+                    slug: category.slug,
+                    parentId: category.parentId || null,
+                    description: category.description || '',
+                    level: category.level,
+                    visible: category.visible,
+                });
             }
-            showSuccessNotification("thoong bao", `Đã thêm danh mục ${newCategoryData.name}`);
+        } else {
+            setEditingCategory(null);
+            form.reset();
         }
-        setLoading(false);
-        closeModal();
-    }, [currentCategory, isEditing, closeModal, expandedCategories]);
-
-
-    const deleteCategoryInTree = useCallback((list: Category[], idsToDelete: Set<string>): Category[] => {
-        return list
-            .filter(category => !idsToDelete.has(category.id))
-            .map(category => {
-                if (category.children) {
-                    return {
-                        ...category,
-                        children: deleteCategoryInTree(category.children, idsToDelete)
-                    };
-                }
-                return category;
-            });
-    }, []);
-
-    const deleteCategory = useCallback(() => {
-        if (!currentCategory) return;
-        setLoading(true);
-        const idsToDelete = new Set([currentCategory.id, ...getDescendantIds(currentCategory.id)]);
-        setCategories(prev => deleteCategoryInTree(prev, idsToDelete));
-        showSuccessNotification("thoong bao", `Đã xóa danh mục ${currentCategory.name} và các danh mục con`);
-        setLoading(false);
-        closeDeleteModal();
-    }, [currentCategory, getDescendantIds, closeDeleteModal, deleteCategoryInTree]);
-
-
-    const reorderAndRenumberSiblings = (siblings: Category[], categoryId: string, direction: 'up' | 'down'): Category[] => {
-        const index = siblings.findIndex(cat => cat.id === categoryId);
-        if (index === -1) return siblings;
-        if ((direction === 'up' && index === 0) || (direction === 'down' && index === siblings.length - 1)) {
-            return siblings;
-        }
-        const newSiblings = [...siblings];
-        const swapIndex = direction === 'up' ? index - 1 : index + 1;
-        [newSiblings[index], newSiblings[swapIndex]] = [newSiblings[swapIndex], newSiblings[index]];
-        return newSiblings.map((cat, idx) => ({ ...cat, order: idx + 1 }));
+        open();
     };
 
-    const moveCategoryRecursive = useCallback((list: Category[], categoryId: string, direction: 'up' | 'down', parentIdToFind: string | null): { updatedList: Category[], foundAndMoved: boolean } => {
-        let foundAndMovedOverall = false;
+    const handleCloseModal = () => {
+        close();
+        setEditingCategory(null);
+        form.reset();
+    };
 
-        if (parentIdToFind === null) { // Operating on root items
-            const itemParentId = list.find(c => c.id === categoryId)?.parentId;
-            if (itemParentId === null) { // Item is a root item
-                const updatedRootList = reorderAndRenumberSiblings(list.filter(c => c.parentId === null), categoryId, direction);
-                // const nonRootItems = list.filter(c => c.parentId !== null); 
-                const updatedRootMap = new Map(updatedRootList.map(item => [item.id, item]));
-                const newCategoriesList = list.map(item => {
-                    if (item.parentId === null) {
-                        return updatedRootMap.get(item.id) || item; // Get updated item or original if somehow not in map
-                    }
-                    return item; // Return non-root items as is
-                });
-
-                return { updatedList: newCategoriesList, foundAndMoved: true };
+    const handleSubmit = async (values: CategoryRequestDto) => {
+        if (editingCategory) {
+            const result = await updateCategory(editingCategory.id, values);
+            if (result) {
+                handleCloseModal();
+            }
+        } else {
+            const result = await addCategory(values);
+            if (result) {
+                handleCloseModal();
             }
         }
+    };
 
-        const processedList = list.map(cat => {
-            if (foundAndMovedOverall) return cat;
+    const handleDelete = (categoryId: string) => {
+        const category = categories.find(c => c.id === categoryId) || disabledCategories.find(c => c.id === categoryId);
+        if (!category) return;
 
-            if (cat.id === parentIdToFind) { // Found the parent of the item to move (for non-root items)
-                if (cat.children && cat.children.find(child => child.id === categoryId)) {
-                    const updatedChildren = reorderAndRenumberSiblings(cat.children, categoryId, direction);
-                    foundAndMovedOverall = true;
-                    return { ...cat, children: updatedChildren };
-                }
-            }
-            if (cat.children && !foundAndMovedOverall) {
-                const result = moveCategoryRecursive(cat.children, categoryId, direction, parentIdToFind);
-                if (result.foundAndMoved) {
-                    foundAndMovedOverall = true;
-                    return { ...cat, children: result.updatedList };
-                }
-            }
-            return cat;
-        });
-        return { updatedList: processedList, foundAndMoved: foundAndMovedOverall };
-    }, []);
+        setCategoryToDelete(category);
+        openDeleteModal();
+    };
+
+    const handleConfirmDelete = async (includeChildren: boolean) => {
+        if (!categoryToDelete) return;
+
+        const success = await deleteCategory(categoryToDelete.id, includeChildren);
+        if (success) {
+            closeDeleteModal();
+            setCategoryToDelete(null);
+        }
+    };
+
+    const handleToggleStatus = (categoryId: string) => {
+        const category = categories.find(c => c.id === categoryId) || disabledCategories.find(c => c.id === categoryId);
+        if (!category) return;
+
+        const hasChildren = [...categories, ...disabledCategories].some(c => c.parentId === categoryId);
+
+        if (hasChildren) {
+            setCategoryToToggle(category);
+            setIncludeChildren(false);
+            openToggleModal();
+        } else {
+            toggleCategoryStatus(categoryId, false);
+        }
+    };
+
+    const handleConfirmToggle = async () => {
+        if (!categoryToToggle) return;
+
+        await toggleCategoryStatus(categoryToToggle.id, includeChildren);
+        closeToggleModal();
+        setCategoryToToggle(null);
+        setIncludeChildren(false);
+    };
 
 
-    const moveCategory = useCallback((categoryId: string, direction: 'up' | 'down') => {
-        setLoading(true);
-        const categoryToMove = flatCategories.find(cat => cat.id === categoryId);
-        if (!categoryToMove) {
-            setLoading(false);
-            return;
+    useEffect(() => {
+        setCurrentPage(1);
+        setDisabledCurrentPage(1);
+    }, [viewMode]);
+
+    useEffect(() => {
+        if (slugUpdateTimeoutRef.current) {
+            clearTimeout(slugUpdateTimeoutRef.current);
         }
 
-        setCategories(prevCategories => {
-            const result = moveCategoryRecursive(prevCategories, categoryId, direction, categoryToMove.parentId);
-            if (result.foundAndMoved) {
-                showSuccessNotification("thong bao", `Đã thay đổi vị trí danh mục ${categoryToMove.name}`);
-                return result.updatedList;
+        if (form.values.name) {
+            slugUpdateTimeoutRef.current = setTimeout(() => {
+                const newSlug = form.values.name.toLowerCase().replace(/\s+/g, '-');
+                form.setFieldValue('slug', newSlug);
+            }, 1000);
+        }
+        return () => {
+            if (slugUpdateTimeoutRef.current) {
+                clearTimeout(slugUpdateTimeoutRef.current);
             }
-            return prevCategories; // Should not happen if categoryToMove was found
-        });
-        setLoading(false);
-    }, [flatCategories, moveCategoryRecursive]);
-
-
-    const handleToggleCategoryActive = useCallback((categoryId: string, currentActiveState: boolean) => {
-        const categoryName = flatCategories.find(c => c.id === categoryId)?.name || 'danh mục';
-
-        const updateCategoryActiveStateInTree = (list: Category[]): Category[] => {
-            return list.map(cat => {
-                if (cat.id === categoryId) {
-                    return { ...cat, active: !currentActiveState };
-                }
-                if (cat.children) {
-                    return {
-                        ...cat,
-                        children: updateCategoryActiveStateInTree(cat.children)
-                    };
-                }
-                return cat;
-            });
         };
-
-        setCategories(prevCategories => updateCategoryActiveStateInTree(prevCategories));
-        showSuccessNotification("thong bao", `Đã ${!currentActiveState ? 'hiện' : 'ẩn'} ${categoryName}`);
-    }, [flatCategories]);
-
+    }, [form.values.name]);
 
     return (
-        <Box>
-            <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
-            <Paper p="md" radius="md" withBorder mb="md">
-                <Group justify="space-between" mb="md">
-                    <Title order={3} size="h4">Quản lý danh mục</Title>
-                    <Button
-                        leftSection={<FiPlus size={16} />}
-                        onClick={openAddRootCategoryModal}>
-                        Thêm danh mục gốc
-                    </Button>
-                </Group>
-                <Text size="sm" c="dimmed" mb="lg">
-                    Quản lý danh mục sản phẩm nhiều cấp. Bạn có thể thêm, sửa, xóa và sắp xếp danh mục.
-                </Text>
-                <Box mb="md">
-                    <Box className="categories-display">
-                        {categories.length > 0 ? (
-                            <>
-                                {viewMode === 'tree' ? (
-                                    <CategoryTree
-                                        categories={categories.filter(c => c.parentId === null)}
-                                        expandedCategories={expandedCategories}
-                                        toggleExpand={toggleExpand}
-                                        moveCategory={moveCategory}
-                                        openAddSubcategoryModal={openAddSubcategoryModal}
-                                        openEditCategoryModal={openEditCategoryModal}
-                                        openConfirmDeleteModal={openConfirmDeleteModal}
-                                        handleToggleCategoryActive={handleToggleCategoryActive}
-                                    />
-                                ) : (
-                                    <CategoryTable
-                                        flatCategories={flatCategories}
-                                        openAddSubcategoryModal={openAddSubcategoryModal}
-                                        openEditCategoryModal={openEditCategoryModal}
-                                        openConfirmDeleteModal={openConfirmDeleteModal}
-                                        handleToggleCategoryActive={handleToggleCategoryActive}
-                                        allCategories={categories}
-                                    />
-                                )}
-                            </>
-                        ) : (
-                            <Paper p="xl" radius="md" withBorder>
-                                <Stack align="center" gap="md">
-                                    <FiLayers size={48} className="text-gray-300" />
-                                    <Text fw={500}>Chưa có danh mục nào</Text>
-                                    <Text size="sm" c="dimmed" ta="center">
-                                        Bạn chưa tạo danh mục nào. Hãy thêm danh mục gốc để bắt đầu.
-                                    </Text>
-                                    <Button
-                                        leftSection={<FiPlus size={16} />}
-                                        onClick={openAddRootCategoryModal}>
-                                        Thêm danh mục gốc
-                                    </Button>
-                                </Stack>
-                            </Paper>
-                        )}
-                    </Box>
-                </Box>
-                {flatCategories.length > 0 && (
-                    <Group justify="space-between">
-                        <Text size="sm">{flatCategories.length} danh mục</Text>
-                        <Group>
-                            <Button
-                                variant={viewMode === 'tree' ? 'light' : 'subtle'}
-                                leftSection={<FiLayers size={16} />}
-                                onClick={() => setViewMode('tree')}
-                            >
-                                Cấu trúc cây
-                            </Button>
-                            <Button
-                                variant={viewMode === 'table' ? 'light' : 'subtle'}
-                                leftSection={<FiList size={16} />}
-                                onClick={() => setViewMode('table')}
-                            >
-                                Dạng bảng
-                            </Button>
-                        </Group>
+        <div >
+            <Stack gap="lg">
+                <Group justify="space-between" align="center">
+                    <Title order={4}>Quản lý danh mục</Title>
+                    <Group>
+                        <SegmentedControl
+                            size='xs'
+                            value={viewMode}
+                            onChange={(value) => setViewMode(value as ViewMode)}
+                            data={[
+                                {
+                                    label: (
+                                        <Tooltip label="Cây danh mục">
+                                            <FiGitBranch size={18} />
+                                        </Tooltip>
+                                    ),
+                                    value: 'tree'
+                                },
+                                {
+                                    label: (
+                                        <Tooltip label="Bảng">
+                                            <FiList size={18} />
+                                        </Tooltip>
+                                    ),
+                                    value: 'table'
+                                },
+                            ]}
+                        />
+                        <Button size='xs' leftSection={<FiPlus size={16} />} onClick={() => handleOpenModal()}>
+                            Thêm danh mục
+                        </Button>
                     </Group>
+                </Group>
+
+                <div className="relative">
+
+                    {viewMode === 'tree' ? (
+                        <CategoryTree
+                            categories={categories}
+                            onEdit={handleOpenModal}
+                            onDelete={handleDelete}
+                            onToggleStatus={handleToggleStatus}
+                        />
+                    ) : (
+                        <CategoryTable
+                            categories={categories}
+                            currentPage={currentPage}
+                            itemsPerPage={itemsPerPage}
+                            onPageChange={setCurrentPage}
+                            onEdit={handleOpenModal}
+                            onDelete={handleDelete}
+                            onToggleStatus={handleToggleStatus}
+                        />
+                    )}
+                </div>
+
+                {disabledCategories.length > 0 && (
+                    <>
+                        <Divider my="md" />
+
+                        <Paper shadow="none" >
+                            <Stack gap="md">
+                                <Group justify="space-between" align="center">
+                                    <Title order={5}>Danh mục bị ẩn ({disabledCategories.length})</Title>
+                                </Group>
+
+                                <div className="relative">
+
+                                    {viewMode === 'tree' ? (
+                                        <CategoryTree
+                                            categories={disabledCategories}
+                                            onEdit={handleOpenModal}
+                                            onDelete={handleDelete}
+                                            onToggleStatus={handleToggleStatus}
+                                        />
+                                    ) : (
+                                        <CategoryTable
+                                            categories={disabledCategories}
+                                            currentPage={disabledCurrentPage}
+                                            itemsPerPage={itemsPerPage}
+                                            onPageChange={setDisabledCurrentPage}
+                                            onEdit={handleOpenModal}
+                                            onDelete={handleDelete}
+                                            onToggleStatus={handleToggleStatus}
+                                        />
+                                    )}
+                                </div>
+                            </Stack>
+                        </Paper>
+                    </>
                 )}
-            </Paper>
+            </Stack>
+
             <CategoryModal
-                opened={modalOpened}
-                onClose={closeModal}
-                onSave={saveCategory}
-                currentCategory={currentCategory}
-                isEditing={isEditing}
-                handleCategoryChange={handleCategoryChange}
-                flatCategories={flatCategories}
-                getDescendantIds={getDescendantIds}
+                opened={opened}
+                onClose={handleCloseModal}
+                form={form}
+                onSubmit={handleSubmit}
+                isEditing={!!editingCategory}
+                isSubmitting={isSubmitting}
+                parentOptions={parentOptions}
             />
-            <DeleteCategoryModal
+
+            <ModalConfirmStatus
+                opened={toggleModalOpened}
+                onClose={closeToggleModal}
+                category={categoryToToggle}
+                includeChildren={includeChildren}
+                onIncludeChildrenChange={setIncludeChildren}
+                onConfirm={handleConfirmToggle}
+                isSubmitting={isSubmitting}
+            />
+
+            <ModalDelete
                 opened={deleteModalOpened}
                 onClose={closeDeleteModal}
-                onConfirmDelete={deleteCategory}
-                category={currentCategory}
+                category={categoryToDelete}
+                onConfirmDelete={handleConfirmDelete}
+                isSubmitting={isSubmitting}
             />
-        </Box>
+        </div>
     );
 };
 
-export default CategoryManagement;
+export default CategoryPage;

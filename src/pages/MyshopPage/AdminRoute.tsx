@@ -107,7 +107,7 @@ const AdminPage: React.FC = () => {
             </Breadcrumbs>
           </Paper>
 
-          <Paper p="md" radius="md" shadow="xs" className='min-h-[80vh]'>
+          <Paper p="md" radius="md" shadow="xs" className='min-h-[76vh]'>
             <Routes>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />

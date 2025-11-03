@@ -1,4 +1,3 @@
-
 export interface BaseCategoryDto {
     id: string;
     name: string;
@@ -15,3 +14,27 @@ export interface FullCategoryDto extends BaseCategoryDto {
     imageUrl?: string;
     productCount?: number;
 }
+
+export interface AdminCategoryDto {
+    id: string;
+    name: string;
+    slug: string;
+    parentId?: string | null;
+    description?: string;
+    level: number;
+    hasChildren: boolean;
+    productCount: number;
+    visible: boolean;
+}
+
+export interface CategoryRequestDto {
+    name: string;
+    slug: string;
+    parentId?: string | null;
+    description?: string;
+    level?: number;
+    visible: boolean;
+}
+
+
+

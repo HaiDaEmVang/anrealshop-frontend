@@ -2,7 +2,7 @@ import type { UserRoleType } from "../types/UserType"
 
 export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL || 'http://localhost:4141/api'
 export const BASE_BE_URL = import.meta.env.VITE_BASE_BE_URL || 'http://localhost:4141'
-export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE 
+export const MAX_IMAGE_SIZE = import.meta.env.VITE_MAX_IMAGE_SIZE
 export const BASE_FE_URL = import.meta.env.VITE_BASE_FE_URL
 export const GOOGLE_LOGIN_URL = `${BASE_BE_URL}/oauth2/authorize/google`
 export const CLOUNDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
@@ -37,13 +37,17 @@ export const API_ENDPOINTS = {
   ADMIN: {
     USER_LIST: '/admin/users',
     USER_DISABLE: (userId: string) => `/admin/users/${userId}/disable`,
+    CATEGORY_LIST: '/admin/categories',
+    CATEGORY_DISABLED: '/admin/categories/disabled',
+    CATEGORY_ID: (categoryId: string) => `/admin/categories/${categoryId}`,
+    CATEGORY_SWITCH: (categoryId: string) => `/admin/categories/${categoryId}/switch-status`,
   },
   SHOPS: {
     INFO: '/shops',
     REGISTER: '/shops/register',
   },
-  PRODUCTS: {   
-    BASE: '/products', 
+  PRODUCTS: {
+    BASE: '/products',
     GET_BY_ID: (id: string) => `/public/products/${id}`,
     GET_RECOMMENDED_PRODUCTS: '/public/products',
     GET_TRENDING_PRODUCTS: 'chua phat trien',
@@ -92,7 +96,7 @@ export const API_ENDPOINTS = {
     MYSHOP_LIST: '/shipping/my-shop',
     MYSHOP_REJECT: (shippingId: string) => `/shipping/my-shop/reject-shipping/${shippingId}`,
   },
-  
+
   ADDRESS: {
     USER_ADDRESS_PRIMARY: 'address/get-address-primary',
     SHOP_ADDRESS_PRIMARY: 'address/get-shop-address-primary',
@@ -163,7 +167,7 @@ export const APP_ROUTES = {
   // MyShop Routes
   MYSHOP: {
     BASE: '/myshop/*',
-    
+
     DASHBOARD: '/myshop/dashboard',
     SALE: '/myshop/sale',
     PRODUCTS: '/myshop/products',
