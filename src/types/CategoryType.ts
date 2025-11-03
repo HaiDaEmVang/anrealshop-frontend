@@ -1,3 +1,5 @@
+import type { MediaType } from "./CommonType";
+
 export interface BaseCategoryDto {
     id: string;
     name: string;
@@ -36,5 +38,22 @@ export interface CategoryRequestDto {
     visible: boolean;
 }
 
+export interface CategoryDisplayDto {
+    id: string;
+    categoryId: string;
+    categoryName: string;
+    position: 'HOMEPAGE' | 'SIDEBAR';
+    order: number;
+    thumbnailUrl?: string;
+    mediaType?: MediaType;
+}
 
 
+export interface CategoryDisplayRequestDto {
+    id?: string;
+    categoryId: string;
+    position: 'HOMEPAGE' | 'SIDEBAR';
+    order: number;
+    thumbnailUrl?: string;
+    mediaType?: MediaType;
+}

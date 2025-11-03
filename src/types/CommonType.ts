@@ -1,3 +1,6 @@
+
+export type MediaType = 'IMAGE' | 'VIDEO';
+
 export interface ItemError {
   field: string;
   message: string;
@@ -18,7 +21,7 @@ export interface MediaDto {
   id?: string;
   thumbnailUrl: string;
   url: string;
-  type: 'IMAGE' | 'VIDEO';
+  type: MediaType;
 }
 
 export interface RejectRequest {

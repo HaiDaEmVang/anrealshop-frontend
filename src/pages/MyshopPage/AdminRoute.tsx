@@ -8,6 +8,7 @@ import showErrorNotification from '../../components/Toast/NotificationError';
 import { APP_ROUTES } from '../../constant';
 import { useAppSelector } from '../../hooks/useAppRedux';
 import User from '../../components/Admin/User/UserPage.tsx';
+import { CategoryDisplayPage } from '../../components/Admin/CategoryDisplay/CategoryDisplayPage.tsx';
 
 const CategoryManagement = lazy(() => import('../../components/Admin/Category/CategoryPage'));
 const AdminHeader = lazy(() => import('../../components/Admin/Header/AdminHeader'));
@@ -44,7 +45,8 @@ const AdminPage: React.FC = () => {
       'product-approvals': 'Duyệt sản phẩm',
       'orders': 'Quản lý đơn hàng',
       'reports': 'Báo cáo & Thống kê',
-      'settings': 'Cài đặt hệ thống'
+      'settings': 'Cài đặt hệ thống',
+      'display': 'Hiển thị trang chủ'
     };
 
     const items = [
@@ -112,6 +114,7 @@ const AdminPage: React.FC = () => {
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="categories" element={<CategoryManagement />} />
+              <Route path="categories/display" element={<CategoryDisplayPage />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="shop-registrations" element={<ShopApprovalPage />} />
               <Route path="product-approvals" element={<ProductApprovalPage />} />

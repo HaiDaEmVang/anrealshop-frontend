@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '../constant';
-import type { AdminCategoryDto, BaseCategoryDto, CategoryRequestDto } from '../types/CategoryType';
+import type { AdminCategoryDto, BaseCategoryDto, CategoryDisplayDto, CategoryDisplayRequestDto, CategoryRequestDto } from '../types/CategoryType';
 import { axiosInstance } from './AxiosInstant';
 
 const getCategorySuggestions = async (keyword: string): Promise<BaseCategoryDto[]> => {
@@ -54,6 +54,23 @@ const deleteCategory = async (categoryId: string, includeChildren: boolean = fal
     return response.data;
 };
 
+const getCategoriesDisplay = async (position?: 'HOMEPAGE' | 'SIDEBAR'): Promise<CategoryDisplayDto[]> => {
+    const response = await axiosInstance.get(API_ENDPOINTS.ADMIN.CATEGORY_DISPLAY, {
+        params: { position }
+    });
+    return response.data;
+};
+
+const updateCategoryDisplay = async (categoryDisplayRequestDtos: CategoryDisplayRequestDto[]): Promise<void> => {
+    await axiosInstance.put(API_ENDPOINTS.ADMIN.CATEGORY_DISPLAY, categoryDisplayRequestDtos);
+};
+
+const deleteCategoryDisplay = async (ids: string[]): Promise<void> => {
+    await axiosInstance.delete(API_ENDPOINTS.ADMIN.CATEGORY_DISPLAY, {
+        data: ids
+    });
+}
+
 export const CategoryService = {
     getCategorySuggestions,
     getCategorySuggestionsByNameProduct,
@@ -64,4 +81,7 @@ export const CategoryService = {
     updateCategory,
     deleteCategory,
     toggleCategoryStatus,
+    getCategoriesDisplay,
+    updateCategoryDisplay,
+    deleteCategoryDisplay
 };

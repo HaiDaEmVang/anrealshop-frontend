@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import showErrorNotification from '../components/Toast/NotificationError';
 import showSuccessNotification from '../components/Toast/NotificationSuccess';
 import { CategoryService } from '../service/CategoryService';
-import type { AdminCategoryDto, CategoryRequestDto } from '../types/CategoryType';
+import type { AdminCategoryDto, CategoryDisplayDto, CategoryDisplayRequestDto, CategoryRequestDto } from '../types/CategoryType';
 
 interface UseCategoryParams {
     autoFetch?: boolean;
@@ -10,6 +10,7 @@ interface UseCategoryParams {
 
 export const useCategory = ({ autoFetch = false }: UseCategoryParams = {}) => {
     const [categories, setCategories] = useState<AdminCategoryDto[]>([]);
+    const [categoriesDisplay, setCategoriesDisplay] = useState<CategoryDisplayDto[]>([]);
     const [disabledCategories, setDisabledCategories] = useState<AdminCategoryDto[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingDisabled, setIsLoadingDisabled] = useState(false);
@@ -113,6 +114,44 @@ export const useCategory = ({ autoFetch = false }: UseCategoryParams = {}) => {
         }
     }, [fetchCategories, fetchDisabledCategories]);
 
+    const getCategoriesDisplay = useCallback(async (position?: 'HOMEPAGE' | 'SIDEBAR') => {
+        setIsLoading(true);
+        try {
+            const response = await CategoryService.getCategoriesDisplay(position);
+            setCategoriesDisplay(response);
+            return response;
+        } catch (error) {
+            showErrorNotification('Không thể tải danh sách danh mục hiển thị');
+            return [];
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const updateCategoryDisplay = useCallback(async (categoryDisplayRequestDtos: CategoryDisplayRequestDto[]) => {
+        setIsSubmitting(true);
+        try {
+            await CategoryService.updateCategoryDisplay(categoryDisplayRequestDtos);
+            showSuccessNotification('Cập nhật danh sách hiển thị thành công');
+            await getCategoriesDisplay();
+        } catch (error) {
+            showErrorNotification('Không thể cập nhật danh sách hiển thị');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [getCategoriesDisplay]);
+
+    const deleteCategoryDisplay = useCallback(async (ids: string[]) => {
+        setIsSubmitting(true);
+        try {
+            await CategoryService.deleteCategoryDisplay(ids);
+        } catch (error) {
+            showErrorNotification('Không thể xóa danh sách hiển thị');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }, [getCategoriesDisplay]);
+
     useEffect(() => {
         if (autoFetch) {
             fetchCategories();
@@ -122,6 +161,7 @@ export const useCategory = ({ autoFetch = false }: UseCategoryParams = {}) => {
 
     return {
         categories,
+        categoriesDisplay,
         disabledCategories,
         isLoading,
         isLoadingDisabled,
@@ -132,5 +172,8 @@ export const useCategory = ({ autoFetch = false }: UseCategoryParams = {}) => {
         updateCategory,
         toggleCategoryStatus,
         deleteCategory,
+        getCategoriesDisplay,
+        updateCategoryDisplay,
+        deleteCategoryDisplay,
     };
 };

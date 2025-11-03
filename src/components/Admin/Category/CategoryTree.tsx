@@ -20,6 +20,7 @@ import {
 } from 'react-icons/fi';
 import { useState } from 'react';
 import type { AdminCategoryDto } from '../../../types/CategoryType';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CategoryTreeProps {
     categories: AdminCategoryDto[];
@@ -66,11 +67,15 @@ export const CategoryTree = ({ categories, onEdit, onDelete, onToggleStatus }: C
         return categoryList.map((category, index) => {
             const typedCategory = category as AdminCategoryDto & { children?: AdminCategoryDto[] };
             const hasChildren = typedCategory.children && typedCategory.children.length > 0;
+            const isExpanded = expandedCategories.includes(category.id);
 
             return (
-                <Box
+                <motion.div
                     key={category.id}
                     className="category-item"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
                     style={{
                         marginLeft: `${currentLevel * 20}px`,
                         marginBottom: '8px',
@@ -179,13 +184,22 @@ export const CategoryTree = ({ categories, onEdit, onDelete, onToggleStatus }: C
                         </Group>
                     </Box>
 
-                    {hasChildren &&
-                        expandedCategories.includes(category.id) && (
-                            <Box mt="xs">
-                                {renderCategoryTreeRecursive(typedCategory.children!, currentLevel + 1)}
-                            </Box>
+                    <AnimatePresence>
+                        {hasChildren && isExpanded && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.3 }}
+                                style={{ overflow: 'hidden' }}
+                            >
+                                <Box mt="xs">
+                                    {renderCategoryTreeRecursive(typedCategory.children!, currentLevel + 1)}
+                                </Box>
+                            </motion.div>
                         )}
-                </Box>
+                    </AnimatePresence>
+                </motion.div>
             );
         });
     };

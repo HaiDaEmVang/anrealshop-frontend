@@ -41,6 +41,7 @@ export const API_ENDPOINTS = {
     CATEGORY_DISABLED: '/admin/categories/disabled',
     CATEGORY_ID: (categoryId: string) => `/admin/categories/${categoryId}`,
     CATEGORY_SWITCH: (categoryId: string) => `/admin/categories/${categoryId}/switch-status`,
+    CATEGORY_DISPLAY: '/admin/categories/display',
   },
   SHOPS: {
     INFO: '/shops',
