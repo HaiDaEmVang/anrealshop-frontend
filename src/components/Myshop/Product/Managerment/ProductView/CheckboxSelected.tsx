@@ -5,7 +5,7 @@ import { FiCopy, FiDownload, FiEye, FiEyeOff, FiMoreVertical, FiTrash2, FiUpload
 import { useProductDelete } from '../../../../../hooks/useProduct';
 import type { MyShopProductDto } from '../../../../../types/ProductType';
 import ConfirmDeleteModal from '../Modal/ConfirmDeleteModal';
-import ImportModal from '../Modal/ImportModal';
+import ImportModal from '../../../../common/ImportModal';
 
 interface CheckboxSelectedProps {
   selectedProductIds: string[];

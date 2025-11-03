@@ -1,12 +1,13 @@
-import { Button, Divider, Group, Paper, SegmentedControl, Stack, Title, Tooltip } from '@mantine/core';
+import { Divider, Group, Paper, Stack, Title } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useState, useRef } from 'react';
-import { FiGitBranch, FiList, FiPlus } from 'react-icons/fi';
+import { useEffect, useRef, useState } from 'react';
 import { useCategory } from '../../../hooks/useCategory';
 import type { AdminCategoryDto, CategoryRequestDto } from '../../../types/CategoryType';
+import ImportModal from '../../common/ImportModal';
 import { CategoryTable } from './CategoryTable';
 import { CategoryTree } from './CategoryTree';
+import GroupAction from './GroupAction';
 import ModalConfirmStatus from './ModalConfirmStatus';
 import ModalDelete from './ModalDelete';
 import CategoryModal from './ModalEdit';
@@ -27,6 +28,8 @@ export const CategoryPage = () => {
 
     const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false);
     const [categoryToDelete, setCategoryToDelete] = useState<AdminCategoryDto | null>(null);
+
+    const [importModalOpened, { open: openImportModal, close: closeImportModal }] = useDisclosure(false);
 
     const slugUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -155,6 +158,13 @@ export const CategoryPage = () => {
         setIncludeChildren(false);
     };
 
+    const handleExportExcel = () => {
+        console.log('Export Excel clicked');
+    };
+
+    const handleImportExcel = () => {
+        openImportModal();
+    };
 
     useEffect(() => {
         setCurrentPage(1);
@@ -180,42 +190,17 @@ export const CategoryPage = () => {
     }, [form.values.name]);
 
     return (
-        <div >
+        <div>
             <Stack gap="lg">
-                <Group justify="space-between" align="center">
-                    <Title order={4}>Quản lý danh mục</Title>
-                    <Group>
-                        <SegmentedControl
-                            size='xs'
-                            value={viewMode}
-                            onChange={(value) => setViewMode(value as ViewMode)}
-                            data={[
-                                {
-                                    label: (
-                                        <Tooltip label="Cây danh mục">
-                                            <FiGitBranch size={18} />
-                                        </Tooltip>
-                                    ),
-                                    value: 'tree'
-                                },
-                                {
-                                    label: (
-                                        <Tooltip label="Bảng">
-                                            <FiList size={18} />
-                                        </Tooltip>
-                                    ),
-                                    value: 'table'
-                                },
-                            ]}
-                        />
-                        <Button size='xs' leftSection={<FiPlus size={16} />} onClick={() => handleOpenModal()}>
-                            Thêm danh mục
-                        </Button>
-                    </Group>
-                </Group>
+                <GroupAction
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    onAddClick={() => handleOpenModal()}
+                    onExportExcel={handleExportExcel}
+                    onImportExcel={handleImportExcel}
+                />
 
                 <div className="relative">
-
                     {viewMode === 'tree' ? (
                         <CategoryTree
                             categories={categories}
@@ -240,14 +225,13 @@ export const CategoryPage = () => {
                     <>
                         <Divider my="md" />
 
-                        <Paper shadow="none" >
+                        <Paper shadow="none">
                             <Stack gap="md">
                                 <Group justify="space-between" align="center">
                                     <Title order={5}>Danh mục bị ẩn ({disabledCategories.length})</Title>
                                 </Group>
 
                                 <div className="relative">
-
                                     {viewMode === 'tree' ? (
                                         <CategoryTree
                                             categories={disabledCategories}
@@ -299,6 +283,11 @@ export const CategoryPage = () => {
                 category={categoryToDelete}
                 onConfirmDelete={handleConfirmDelete}
                 isSubmitting={isSubmitting}
+            />
+
+            <ImportModal
+                opened={importModalOpened}
+                onClose={closeImportModal}
             />
         </div>
     );
