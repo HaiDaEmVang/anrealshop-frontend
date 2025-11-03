@@ -1,3 +1,4 @@
+import type { MediaType } from "./CommonType";
 
 export interface BaseCategoryDto {
     id: string;
@@ -14,4 +15,45 @@ export interface FullCategoryDto extends BaseCategoryDto {
     description?: string;
     imageUrl?: string;
     productCount?: number;
+}
+
+export interface AdminCategoryDto {
+    id: string;
+    name: string;
+    slug: string;
+    parentId?: string | null;
+    description?: string;
+    level: number;
+    hasChildren: boolean;
+    productCount: number;
+    visible: boolean;
+}
+
+export interface CategoryRequestDto {
+    name: string;
+    slug: string;
+    parentId?: string | null;
+    description?: string;
+    level?: number;
+    visible: boolean;
+}
+
+export interface CategoryDisplayDto {
+    id: string;
+    categoryId: string;
+    categoryName: string;
+    position: 'HOMEPAGE' | 'SIDEBAR';
+    order: number;
+    thumbnailUrl?: string;
+    mediaType?: MediaType;
+}
+
+
+export interface CategoryDisplayRequestDto {
+    id?: string;
+    categoryId: string;
+    position: 'HOMEPAGE' | 'SIDEBAR';
+    order: number;
+    thumbnailUrl?: string;
+    mediaType?: MediaType;
 }

@@ -15,7 +15,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useRef } from 'react';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { GOOGLE_LOGIN_URL } from '../../constant';
+import { APP_ROUTES, GOOGLE_LOGIN_URL } from '../../constant';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
 import { loginUser } from '../../store/authSlice';
 import type { LoginRequest } from '../../types/AuthType';
@@ -46,8 +46,8 @@ export function SignIn() {
 
   const form = useForm<SignInFormValues>({
     initialValues: {
-      email: 'botgiatv2@gmail.com',
-      password: 'Abc@123456',
+      email: 'admin@example.com',
+      password: 'Abc123456@',
       rememberMe: false,
     },
     validate: {
@@ -68,6 +68,9 @@ export function SignIn() {
 
       showSuccessNotification('Đăng nhập thành công!', `Chào mừng ${user.fullName || user.username} trở lại!`);
       navigate(returnUrl);
+      if (returnUrl === '/' && user.role === 'ADMIN') {
+        navigate(APP_ROUTES.ADMIN.DASHBOARD);
+      }
     } catch (err: any) {
       let notificationMessage = err.message || 'Email hoặc mật khẩu không chính xác.';
 
