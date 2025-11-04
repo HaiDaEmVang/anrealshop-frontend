@@ -1,3 +1,6 @@
+
+export type MediaType = 'IMAGE' | 'VIDEO';
+
 export interface ItemError {
   field: string;
   message: string;
@@ -9,7 +12,7 @@ export interface ErrorResponseDto {
   timestamp: string;
   traceId?: string;
   details?: Array<ItemError>;
-} 
+}
 
 export interface MediaDto {
   isUploading?: boolean;
@@ -18,10 +21,9 @@ export interface MediaDto {
   id?: string;
   thumbnailUrl: string;
   url: string;
-  type: 'IMAGE' | 'VIDEO';
-} 
+  type: MediaType;
+}
 
-export interface ItemList {
-  key: string;
-  value : string;
+export interface RejectRequest {
+  reason: string;
 }

@@ -20,6 +20,7 @@
     "@mantine/tiptap": "^7.17.7",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.8.2",
+    "@stomp/stompjs": "^7.2.0",
     "@tiptap/extension-highlight": "^2.12.0",
     "@tiptap/extension-image": "^2.12.0",
     "@tiptap/extension-link": "^2.12.0",
@@ -39,13 +40,15 @@
     "react-number-format": "^5.4.4",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.1",
-    "slugify": "^1.6.6"
+    "slugify": "^1.6.6",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/node": "^22.15.23",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/sockjs-client": "^1.5.4",
     "@vitejs/plugin-react-swc": "^3.9.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.25.0",

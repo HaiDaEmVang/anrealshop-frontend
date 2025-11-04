@@ -1,4 +1,4 @@
-import type { ItemList } from "../types/CommonType";
+import type { ItemList } from "./RejectData";
 
 export const paymentMethods: ItemList[] = [
   { key: 'vnpay', value: 'VNPAY'},

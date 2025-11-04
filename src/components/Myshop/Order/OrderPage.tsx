@@ -8,7 +8,7 @@ import { useURLParams } from '../../../hooks/useURLParams';
 import { ShipmentService } from '../../../service/ShipmentService';
 import type { OrderRejectRequest, ShopOrderStatus } from '../../../types/OrderType';
 import type { BaseCreateShipmentRequest } from '../../../types/ShipmentType';
-import Pagination from '../Product/Managerment/ProductView/Pagination';
+import Pagination from '../../common/PaginationCustom';
 import { PaginationSkeleton, StatusFilterSkeleton } from '../Product/Managerment/Skeleton';
 import FilterByStatus from './OrderPage/Filter/FilterByStatus';
 import OrderFilter from './OrderPage/Filter/OrderFilter';

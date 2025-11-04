@@ -7,7 +7,7 @@ import { paymentMethods } from '../../../../../data/ShippingData';
 import { useOrderStatus } from '../../../../../hooks/useOrderStatus';
 import type { OrderItemDto, OrderRejectRequest, ProductOrderItemDto, ShopOrderStatus } from '../../../../../types/OrderType';
 import { formatPrice } from '../../../../../untils/Untils';
-import RejectModal from '../../../../RejectModal/RejectOrder';
+import RejectModal from '../../../../RejectModal/RejectModal';
 import ModalCreateOrderShip from '../Modal/ModalCreateOrderShip';
 
 interface OrderViewProps {

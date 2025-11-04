@@ -1,7 +1,7 @@
 import { Button, Group, Modal, Radio, Stack, Text, Textarea } from '@mantine/core';
 import { useState } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
-import type { ItemList } from '../../types/CommonType';
+import type { ItemList } from '../../data/RejectData';
 
 interface RejectModalProps {
   data: ItemList[];

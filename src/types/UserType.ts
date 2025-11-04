@@ -48,3 +48,27 @@ export interface ChangePasswordDto {
   oldPassword: string;
   newPassword: string;
 }
+
+
+
+// manager 
+
+
+export interface UserManagerDto {
+    id: string;
+    username: string;
+    email: string;
+    fullName: string;
+    phoneNumber: string;
+    avatarUrl: string;
+    role: string;
+    isVerified: boolean;
+    createdAt: string; 
+}
+
+export interface AdminUserListResponse {
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+    users: UserManagerDto[];
+}

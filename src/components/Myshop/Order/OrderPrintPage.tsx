@@ -7,7 +7,7 @@ import { FiChevronRight, FiPrinter } from 'react-icons/fi';
 import { type SearchType } from '../../../hooks/useOrder';
 import { useURLParams } from '../../../hooks/useURLParams';
 import { useShipping, type shipParams } from '../../../hooks/useShipping';
-import Pagination from '../Product/Managerment/ProductView/Pagination';
+import Pagination from '../../common/PaginationCustom';
 import { PaginationSkeleton } from '../Product/Managerment/Skeleton';
 import { type PreparingShippingStatus } from './Data';
 import NonOrderFound from './OrderPage/OrderView/NonOrderFond';

@@ -2,7 +2,13 @@ import { Anchor, Box, Breadcrumbs, Flex, Group, Paper, Text } from '@mantine/cor
 import { useDisclosure } from '@mantine/hooks';
 import React, { Suspense, lazy } from 'react';
 import { FiChevronRight, FiHome } from 'react-icons/fi';
-import { Link, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import OverlayLoading from '../../components/common/OverlayLoading';
+import showErrorNotification from '../../components/Toast/NotificationError';
+import { APP_ROUTES } from '../../constant';
+import { useAppSelector } from '../../hooks/useAppRedux';
+import User from '../../components/Admin/User/UserPage.tsx';
+import { CategoryDisplayPage } from '../../components/Admin/CategoryDisplay/CategoryDisplayPage.tsx';
 
 const CategoryManagement = lazy(() => import('../../components/Admin/Category/CategoryPage'));
 const AdminHeader = lazy(() => import('../../components/Admin/Header/AdminHeader'));
@@ -15,8 +21,8 @@ const ShopApprovalPage = lazy(() => import('../../components/Admin/Shop/ShopPage
 // const OrderManagement = lazy(() => import('../../components/Admin/Order/OrderManagement'));
 // const ReportManagement = lazy(() => import('../../components/Admin/Report/ReportManagement'));
 // const SystemSettings = lazy(() => import('../../components/Admin/Setting/SystemSettings'));
-const AdminDashboard = () => <div>Dashboard Admin</div>;
-const UserManagement = () => <div>Quản lý người dùng</div>;
+const UserManagement = () => <User />;
+const AdminDashboard = () => <div>Quản lý người dùng</div>;
 const OrderManagement = () => <div>Quản lý đơn hàng</div>;
 const ReportManagement = () => <div>Báo cáo và thống kê</div>;
 const SystemSettings = () => <div>Cài đặt hệ thống</div>;
@@ -39,7 +45,8 @@ const AdminPage: React.FC = () => {
       'product-approvals': 'Duyệt sản phẩm',
       'orders': 'Quản lý đơn hàng',
       'reports': 'Báo cáo & Thống kê',
-      'settings': 'Cài đặt hệ thống'
+      'settings': 'Cài đặt hệ thống',
+      'display': 'Hiển thị trang chủ'
     };
 
     const items = [
@@ -73,6 +80,19 @@ const AdminPage: React.FC = () => {
     return items;
   };
 
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+
+  if (!isAuthenticated || !user) {
+    return <OverlayLoading visible={true} />
+  }
+
+  if (isAuthenticated && user.role !== 'ADMIN') {
+    showErrorNotification('Quyền truy cập bị từ chối', 'Bạn không có quyền truy cập vào trang quản trị.');
+    navigate(APP_ROUTES.HOME);
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Suspense fallback={<div></div>}>
@@ -82,7 +102,6 @@ const AdminPage: React.FC = () => {
       <Flex className="flex-1">
         <AdminSidebar opened={opened} onClose={close} />
 
-
         <Box className="flex-1 bg-gray-50 p-4 "  >
           <Paper p="md" mb="md" radius="md" shadow="xs">
             <Breadcrumbs separator={<FiChevronRight size={14} />}>
@@ -90,11 +109,12 @@ const AdminPage: React.FC = () => {
             </Breadcrumbs>
           </Paper>
 
-          <Paper p="md" radius="md" shadow="xs">
+          <Paper p="md" radius="md" shadow="xs" className='min-h-[76vh]'>
             <Routes>
               <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="categories" element={<CategoryManagement />} />
+              <Route path="categories/display" element={<CategoryDisplayPage />} />
               <Route path="users" element={<UserManagement />} />
               <Route path="shop-registrations" element={<ShopApprovalPage />} />
               <Route path="product-approvals" element={<ProductApprovalPage />} />
@@ -106,7 +126,7 @@ const AdminPage: React.FC = () => {
           </Paper>
         </Box>
       </Flex>
-     </div>
+    </div>
   );
 };
 

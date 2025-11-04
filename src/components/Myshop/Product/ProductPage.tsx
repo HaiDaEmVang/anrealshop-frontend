@@ -22,7 +22,7 @@ const CheckboxSelected = lazy(() => import('./Managerment/ProductView/CheckboxSe
 const GridView = lazy(() => import('./Managerment/ProductView/GridView/GridView'));
 const ListView = lazy(() => import('./Managerment/ProductView/ListView/ListView'));
 const NonProductFound = lazy(() => import('./Managerment/ProductView/NonProductFound'));
-const Pagination = lazy(() => import('./Managerment/ProductView/Pagination'));
+const Pagination = lazy(() => import('../../common/PaginationCustom'));
 
 const ProductPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -78,7 +78,7 @@ const ProductPage = () => {
     }
   });
 
-  const loadProducts = useCallback(() => { 
+  const loadProducts = useCallback(() => {
     updateURLParams({
       search: searchQuery || null,
       categoryId: category?.urlSlug || category?.id || null,
@@ -89,7 +89,7 @@ const ProductPage = () => {
       status: status !== 'ALL' ? status : null,
       view: viewMode
     });
-  
+
     fetchProducts({
       page: activePage - 1,
       limit: viewMode === 'list' ? 10 : 12,
@@ -122,7 +122,7 @@ const ProductPage = () => {
     fetchStatusMetadata();
   }, [fetchStatusMetadata]);
 
-  
+
   const handleStatusChange = useCallback((newStatus: ProductStatus) => {
     setStatus(newStatus);
     setActivePage(1);
@@ -156,7 +156,7 @@ const ProductPage = () => {
     loadProducts();
   }, [searchQuery, category, sortBy, updateURLParams, loadProducts]);
 
-  const handleClearAll = useCallback(() => { 
+  const handleClearAll = useCallback(() => {
     setSearchQuery('');
     setCategory(null);
     setSortBy(null);

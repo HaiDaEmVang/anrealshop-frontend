@@ -11,7 +11,7 @@ import { useURLParams } from '../../../hooks/useURLParams';
 import type { OrderItemDto } from '../../../types/OrderType';
 import type { CreateShipmentRequest } from '../../../types/ShipmentType';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../../../untils/Untils';
-import Pagination from '../Product/Managerment/ProductView/Pagination';
+import Pagination from '../../common/PaginationCustom';
 import { PaginationSkeleton } from '../Product/Managerment/Skeleton';
 import NonOrderFound from './OrderPage/OrderView/NonOrderFond';
 import Filter, { type SortByType } from './OrderShipping/Filter/Filter';
@@ -98,7 +98,7 @@ const OrderShippingPage = () => {
       ...params,
       ...filterData,
     });
-  }, [ activePage, fetchOrders, itemsPerPage, params, updateParams]);
+  }, [activePage, fetchOrders, itemsPerPage, params, updateParams]);
 
   useEffect(() => {
     setData(orders);

@@ -1,9 +1,11 @@
 import { lazy, useEffect } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import Footer from '../../components/Footer/Footer';
 import Header from '../../components/header/Header';
+import showErrorNotification from '../../components/Toast/NotificationError';
 import LandingPage from '../../components/User/LandingPage/LandingPage';
 import { APP_ROUTES } from '../../constant';
-import Footer from '../../components/Footer/Footer';
+import { useAppSelector } from '../../hooks/useAppRedux';
 
 
 const CartPage = lazy(() => import('../../components/User/Cart/CartPage'));
@@ -18,16 +20,22 @@ const ShopPage = lazy(() => import('../../components/User/Shop/ShopPage'));
 const PaymentResultPage = lazy(() => import('../../components/User/paymentResult/PaymentResultPage'));
 
 const UserRoute = () => {
-  const navigate = useLocation()
+  const location = useLocation()
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   useEffect(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [navigate.pathname]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.pathname]);
 
-    
+  if (isAuthenticated && user?.role === 'ADMIN') {
+    showErrorNotification('Quyền truy cập bị từ chối', 'Bạn sẽ được chuyển đến trang quản trị.');
+    navigate(APP_ROUTES.ADMIN.BASE);
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
-      {navigate.pathname !== APP_ROUTES.HOME && <Header />}
+      {location.pathname !== APP_ROUTES.HOME && <Header />}
       <div className="flex-1 bg-gray-50">
         <Routes>
           <Route index element={<LandingPage />} />
@@ -46,7 +54,7 @@ const UserRoute = () => {
           <Route path="*" element={<Navigate to={APP_ROUTES.HOME} replace />} />
         </Routes>
       </div>
-      {navigate.pathname !== APP_ROUTES.USER_SETTINGS && <Footer />}
+      {location.pathname !== APP_ROUTES.USER_SETTINGS && <Footer />}
     </div>
   );
 };

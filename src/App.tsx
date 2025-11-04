@@ -9,8 +9,8 @@ import '@mantine/notifications/styles.css';
 import './App.css';
 import { APP_ROUTES } from './constant';
 import { useAppDispatch, useAppSelector } from './hooks/useAppRedux';
-import { fetchCurrentUser } from './store/authSlice';
 import { connectWs, disconnectWs } from './service/websocketClient';
+import { fetchCurrentUser } from './store/authSlice';
 
 const AuthoPage = lazy(() => import('./pages/Auth/AuthoPage'));
 const MyshopPage = lazy(() => import('./pages/MyshopPage/MyshopRoute'));
@@ -63,7 +63,6 @@ function App() {
     if (user) {
       connectWs();
     }
-
     return () => {
       disconnectWs();
     };
@@ -79,9 +78,9 @@ function App() {
             <Routes>
               <Route path={APP_ROUTES.LOGIN} element={<AuthoPage />} />
               <Route path={APP_ROUTES.REGISTER} element={<AuthoPage />} />
+              <Route path={APP_ROUTES.ADMIN.BASE} element={<AdminPage />} />
               <Route path={APP_ROUTES.SHOP_REGISTER} element={<RegisterShopPage />} />
               <Route path={APP_ROUTES.MYSHOP.BASE} element={<MyshopPage />} />
-              <Route path={APP_ROUTES.ADMIN.BASE} element={<AdminPage />} />
               <Route path="/*" element={<UserRoute />} />
             </Routes>
             {/* </Suspense> */}
