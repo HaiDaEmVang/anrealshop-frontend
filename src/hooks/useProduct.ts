@@ -336,30 +336,3 @@ export const useGetProduct = () => {
         getListRecommended
     };
 }
-
-
-
-export const useProductOperations = () => {
-    const [isLoading, setIsLoading] = useState(false);
-
-
-    const updateProduct = useCallback(async (id: string, data: ProductCreateRequest) => {
-        setIsLoading(true);
-        try {
-            const result = await ProductsService.update(id, data);
-            showSuccessNotification('Thành công', 'Sản phẩm đã được cập nhật thành công.');
-            return result;
-        } catch (err: any) {
-            const errorMessage = getErrorMessage(err);
-            showErrorNotification('Lỗi cập nhật sản phẩm', errorMessage);
-            throw err;
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    return {
-        isLoading,
-        updateProduct
-    };
-};
