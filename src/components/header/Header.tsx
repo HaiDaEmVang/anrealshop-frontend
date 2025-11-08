@@ -18,10 +18,9 @@ import { FaSearch, FaShoppingBag, FaStore } from 'react-icons/fa';
 import { FiHome, FiLogIn, FiLogOut, FiMapPin, FiPackage, FiUser } from 'react-icons/fi';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '../../constant';
-import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
-import { fetchCurrentUser, logoutUser } from '../../store/authSlice';
+import { useAppSelector } from '../../hooks/useAppRedux';
+import { useAuth } from '../../hooks/useAuth';
 import SuggestSearch from '../header/SuggestSearch';
-import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 
 // Dữ liệu danh mục
@@ -39,7 +38,7 @@ const POPULAR_CATEGORIES = [
 
 const Header: React.FC = () => {
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-    const useDispatch = useAppDispatch();
+    const { handleLogout } = useAuth();
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -51,13 +50,6 @@ const Header: React.FC = () => {
     // const [currentAddress, setCurrentAddress] = useState(SAVED_ADDRESSES[0]);
 
     const searchContainerRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        // console.log(isAuthenticated)
-        if (!isAuthenticated && !user) {
-            useDispatch(fetchCurrentUser());
-        }
-    }, [useDispatch, isAuthenticated]);
 
 
     // Xử lý click outside để ẩn gợi ý tìm kiếm
@@ -111,16 +103,6 @@ const Header: React.FC = () => {
     //     }
     //     setAddressModalOpened(false);
     // };
-
-    const handleLogout = async () => {
-        await useDispatch(logoutUser()).unwrap()
-            .then(() => {
-                showSuccessNotification('Đăng xuất thành công!', 'Bạn đã đăng xuất khỏi tài khoản.');
-            })
-            .catch((error) => {
-                showErrorNotification('Đăng xuất thất bại!', error.message);
-            });
-    };
 
     const handleOpenCart = () => {
         if (!isAuthenticated)
@@ -391,9 +373,9 @@ const Header: React.FC = () => {
                                                 <FiMapPin size={14} />
                                                 {user?.address ? (
                                                     <Text size="sm">Giao đến: <Text component="span" size="sm" fw={600}
-                                                    // onClick={() => setAddressModalOpened(true)} 
-                                                    className="hover:text-primary cursor-pointer">{user?.address?.districtName + ", " + user?.address?.provinceName || "Nho cap nhat dia chi nhe"}</Text></Text>
-                                                ): (
+                                                        // onClick={() => setAddressModalOpened(true)} 
+                                                        className="hover:text-primary cursor-pointer">{user?.address?.districtName + ", " + user?.address?.provinceName || "Nho cap nhat dia chi nhe"}</Text></Text>
+                                                ) : (
                                                     <Text size="sm" className="hover:text-primary cursor-pointer"
                                                     // onClick={() => setAddressModalOpened(true)}
                                                     >Tạo địa chỉ mới</Text>

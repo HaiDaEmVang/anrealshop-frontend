@@ -57,12 +57,17 @@ function App() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    
     if (!user && !isAuthenticated) {
       dispatch(fetchCurrentUser());
     }
     if (user) {
       connectWs();
     }
+    if (!user) {
+      disconnectWs();
+    }
+
     return () => {
       disconnectWs();
     };
@@ -74,7 +79,6 @@ function App() {
       <BrowserRouter>
         <div className="min-h-screen flex flex-col">
           <main className="flex-1">
-            {/* <Suspense fallback={<div>Loading...</div>}> */}
             <Routes>
               <Route path={APP_ROUTES.LOGIN} element={<AuthoPage />} />
               <Route path={APP_ROUTES.REGISTER} element={<AuthoPage />} />
@@ -83,7 +87,6 @@ function App() {
               <Route path={APP_ROUTES.MYSHOP.BASE} element={<MyshopPage />} />
               <Route path="/*" element={<UserRoute />} />
             </Routes>
-            {/* </Suspense> */}
           </main>
         </div>
       </BrowserRouter>

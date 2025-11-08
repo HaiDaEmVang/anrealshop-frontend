@@ -19,7 +19,7 @@ function ensureClient(): Client {
         undefined,
         { transports: ['websocket', 'xhr-streaming', 'xhr-polling'], withCredentials: true } as any
       ),
-    reconnectDelay: 5000,
+    reconnectDelay: 0,
     heartbeatIncoming: 10000,
     heartbeatOutgoing: 10000,
   });
