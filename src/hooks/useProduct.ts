@@ -1,19 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
 import showErrorNotification from '../components/Toast/NotificationError';
 import showSuccessNotification from '../components/Toast/NotificationSuccess';
+import type { TypeMode } from '../constant';
 import { productStatusDefaultData, productStatusDefaultDataAdmin } from '../data/ProductData';
 import ProductsService from '../service/ProductsService';
 import type {
     MyShopProductDto,
     MyShopProductListResponse,
-    ProductCreateRequest,
     ProductStatus,
     ProductStatusDto,
     UserProductDto
 } from '../types/ProductType';
 import { getErrorMessage } from '../untils/ErrorUntils';
 import { formatDateForBe, getDefaultDateRange_Now_Yesterday } from '../untils/Untils';
-import type { TypeMode } from '../constant';
 
 
 export interface UseProductParams {
@@ -299,12 +298,12 @@ export const useProductApproval = () => {
 }
 
 export const useGetProduct = () => {
-    const [isLoading, setIsLoading] = useState(false); 
+    const [isLoading, setIsLoading] = useState(false);
 
     const getProductById = useCallback(async (id: string) => {
         setIsLoading(true);
         try {
-            const result = await ProductsService.getProductById(id);  
+            const result = await ProductsService.getProductById(id);
             return result;
         } catch (err: any) {
             const errorMessage = getErrorMessage(err);
@@ -316,7 +315,7 @@ export const useGetProduct = () => {
     }, []);
 
     const getListRecommended = useCallback(async (params?: UseProductParams) => {
-        setIsLoading(true); 
+        setIsLoading(true);
         try {
             const result: UserProductDto[] = await ProductsService.getListRecommended(params);
             console.log('getListRecommended result:', result);
@@ -331,7 +330,7 @@ export const useGetProduct = () => {
     }, []);
 
     return {
-        isLoading, 
+        isLoading,
         getProductById,
         getListRecommended
     };
