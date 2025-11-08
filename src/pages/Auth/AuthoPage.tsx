@@ -14,7 +14,6 @@ export function AuthoPage() {
   const { isAuthenticated } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    console.log(isAuthenticated);
     if (isAuthenticated) {
       navigate(APP_ROUTES.HOME);
     }

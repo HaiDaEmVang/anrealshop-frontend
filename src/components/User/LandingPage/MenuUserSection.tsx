@@ -3,9 +3,7 @@ import { useState } from 'react';
 import { FaClipboardList, FaHeart, FaRegUser, FaSignInAlt, FaSignOutAlt, FaStore, FaUser } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { APP_ROUTES } from '../../../constant';
-import { useAppDispatch } from '../../../hooks/useAppRedux';
-import { logoutUser } from '../../../store/authSlice';
-import showSuccessNotification from '../../Toast/NotificationSuccess';
+import { useAuth } from '../../../hooks/useAuth';
 
 interface MenuUserSectionProps {
     user: any;
@@ -15,7 +13,7 @@ interface MenuUserSectionProps {
 
 const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionProps) => {
     const [userMenuOpened, setUserMenuOpened] = useState(false);
-    const dispatch = useAppDispatch();
+    const { handleLogout } = useAuth();
 
 
     return (
@@ -104,10 +102,7 @@ const MenuUserSection = ({ user, isAuthenticated, scrolled }: MenuUserSectionPro
 
                         <Menu.Divider />
                         <Menu.Item
-                            onClick={() => {
-                                dispatch(logoutUser());
-                                showSuccessNotification('Thông báo', 'Đăng xuất thành công');
-                            }}
+                            onClick={handleLogout}
                             color="red"
                             leftSection={<FaSignOutAlt size={14} />}
                         >

@@ -3,12 +3,12 @@ import { useDisclosure } from '@mantine/hooks';
 import React, { Suspense, lazy } from 'react';
 import { FiChevronRight, FiHome } from 'react-icons/fi';
 import { Link, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { CategoryDisplayPage } from '../../components/Admin/CategoryDisplay/CategoryDisplayPage.tsx';
+import User from '../../components/Admin/User/UserPage.tsx';
 import OverlayLoading from '../../components/common/OverlayLoading';
 import showErrorNotification from '../../components/Toast/NotificationError';
 import { APP_ROUTES } from '../../constant';
 import { useAppSelector } from '../../hooks/useAppRedux';
-import User from '../../components/Admin/User/UserPage.tsx';
-import { CategoryDisplayPage } from '../../components/Admin/CategoryDisplay/CategoryDisplayPage.tsx';
 
 const CategoryManagement = lazy(() => import('../../components/Admin/Category/CategoryPage'));
 const AdminHeader = lazy(() => import('../../components/Admin/Header/AdminHeader'));
@@ -82,7 +82,6 @@ const AdminPage: React.FC = () => {
 
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
-
 
   if (!isAuthenticated || !user) {
     return <OverlayLoading visible={true} />

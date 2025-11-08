@@ -23,10 +23,12 @@ import {
 } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../../../hooks/useAppRedux';
+import { useAuth } from '../../../hooks/useAuth';
 
 const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean }> = ({ toggleSidebar, sidebarOpened }) => {
   const [hasUnread] = useState(true);
   const { user } = useAppSelector((state) => state.auth);
+  const { handleLogout } = useAuth();
 
   const userMenuItems = [
     { label: 'Hồ sơ của tôi', icon: <FiUser size={14} />, path: '/admin/profile' },
@@ -200,6 +202,7 @@ const AdminHeader: React.FC<{ toggleSidebar: () => void, sidebarOpened: boolean 
                 <Menu.Item
                   leftSection={<FiLogOut size={14} />}
                   color="red"
+                  onClick={handleLogout}
                 >
                   Đăng xuất
                 </Menu.Item>
