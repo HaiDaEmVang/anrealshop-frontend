@@ -157,19 +157,14 @@ export const useProductForm = (isEditMode = false) => {
         setIsLoading(true);
 
         try {
-            let data;
-            console.log('Submitting product data:', form.values);
             if (isEditMode && id) {
-                data = await ProductsService.update(id, form.values);
+                await ProductsService.update(id, form.values);
                 showSuccessNotification('Thành công', 'Sản phẩm đã được cập nhật thành công.');
             } else {
-                form.values.categoryId = '87ef8ac9-8064-4123-ba22-7e50f5930e3a';
-                data = await ProductsService.create(form.values);
+                await ProductsService.create(form.values);
                 showSuccessNotification('Thành công', 'Sản phẩm đã được tạo thành công.');
                 // clearForm();
             }
-
-            console.log('Product operation successful:', data);
         } catch (err: any) {
             let notificationMessage = err.message || 'Có trường chưa được nhập.';
 
