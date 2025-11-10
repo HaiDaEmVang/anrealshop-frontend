@@ -7,6 +7,7 @@ import { updateVerifiedStatus } from '../../store/authSlice';
 import { getErrorMessage } from '../../untils/ErrorUntils';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
+import { useURLParams } from '../../hooks/useURLParams';
 
 interface ModalVerifyCodeProps {
     opened: boolean;
@@ -19,6 +20,8 @@ const ModalVerifyCode: React.FC<ModalVerifyCodeProps> = ({ opened, onClose, emai
     const [otpValue, setOtpValue] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
     const [isSendingOtp, setIsSendingOtp] = useState(false);
+
+    const { redirectTo } = useURLParams();
 
     const handleSendOtp = async () => {
         if (!email) return;
@@ -46,6 +49,7 @@ const ModalVerifyCode: React.FC<ModalVerifyCodeProps> = ({ opened, onClose, emai
             dispatch(updateVerifiedStatus(true));
             showSuccessNotification('Xác thực thành công', 'Email của bạn đã được xác thực thành công.');
             handleClose();
+            redirectTo();
         } catch (error: any) {
             showErrorNotification('Xác thực thất bại', error.message || 'Mã xác thực không đúng');
         } finally {

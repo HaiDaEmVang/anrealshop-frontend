@@ -1,7 +1,6 @@
 import {
   Anchor,
   Button,
-  Checkbox,
   Divider,
   Group,
   PasswordInput,
@@ -24,11 +23,11 @@ import { validateEmail, validatePassword } from '../../untils/ValidateInput';
 import showErrorNotification from '../Toast/NotificationError';
 import showSuccessNotification from '../Toast/NotificationSuccess';
 import ResetPassword from './ResetPasswrod';
+import { motion } from 'framer-motion';
 
-interface SignInFormValues {
+interface SignInFormValues { 
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 export function SignIn() {
@@ -48,7 +47,6 @@ export function SignIn() {
     initialValues: {
       email: 'botgiatv2@gmail.com',
       password: 'Abc123456@',
-      rememberMe: false,
     },
     validate: {
       email: (value) => { return validateEmail(value); },
@@ -124,8 +122,18 @@ export function SignIn() {
   }, []);
 
   return (
-    <div className="w-1/2 bg-white flex items-center justify-center p-8">
-      <div className="w-full max-w-md">
+    <motion.div
+      className="w-1/2 bg-white flex items-center justify-center p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <Title order={1} className="text-3xl font-bold mb-6 text-center text-slate-800">
           Đăng nhập
         </Title>
@@ -149,10 +157,6 @@ export function SignIn() {
             />
 
             <Group justify="apart">
-              <Checkbox
-                label="Ghi nhớ đăng nhập"
-                {...form.getInputProps('rememberMe', { type: 'checkbox' })}
-              />
               <Anchor size="sm" component="button" type="button" className="text-primary" onClick={open}>
                 Quên mật khẩu?
               </Anchor>
@@ -186,6 +190,7 @@ export function SignIn() {
             leftSection={<FaFacebook size={16} />}
             variant="outline"
             className="border-gray-300"
+            onClick={() => showSuccessNotification('Chức năng đang phát triển', 'Đăng ký bằng Facebook sẽ sớm được ra mắt!')}
           >
             Facebook
           </Button>
@@ -198,7 +203,7 @@ export function SignIn() {
           </Link>
         </Text>
         {opened && <ResetPassword opened={opened} close={close} />}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

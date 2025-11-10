@@ -9,23 +9,24 @@ import {
 } from '@mantine/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiTruck } from 'react-icons/fi';
-import { removeFromCart, updateCartCount } from '../../../store/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { APP_ROUTES } from '../../../constant';
 import { useAppDispatch, useAppSelector } from '../../../hooks/useAppRedux';
 import { CartService } from '../../../service/CartService';
 import { ShipmentService } from '../../../service/ShipmentService';
+import { removeFromCart, updateCartCount } from '../../../store/authSlice';
 import type { CartDto } from '../../../types/CartType';
 import type { CartShippingFee } from '../../../types/ShipmentType';
 import { getErrorMessage } from '../../../untils/ErrorUntils';
 import { ContentEmpty } from '../../common/ContentEmpty';
+import { NotificationModal } from '../../common/NotificationModal';
 import showErrorNotification from '../../Toast/NotificationError';
 import showSuccessNotification from '../../Toast/NotificationSuccess';
 import CartBreadcrumbs from './Breadcrumbs';
 import ListProduct from './ListProduct';
 import ListProductSkeleton, { SummerSkeleton } from './Skeleton';
 import Summer from './Summer';
-import { NotificationModal } from '../../common/NotificationModal';
+import { useURLParams } from '../../../hooks/useURLParams';
 
 const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartDto[]>([]);
@@ -34,7 +35,9 @@ const CartPage: React.FC = () => {
   const [shippingFees, setShippingFees] = useState<CartShippingFee[]>([]);
   const [loadingShopIds, setLoadingShopIds] = useState<string[]>([]);
   const [showAddressModal, setShowAddressModal] = useState(false);
+  const [addressSupported, setAddressSupported] = useState(true);
   const { user } = useAppSelector(state => state.auth);
+  const { getRedirectUrl } = useURLParams();
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -81,7 +84,6 @@ const CartPage: React.FC = () => {
     if (ids.length === 0) {
       return;
     }
-    // Chặn fetch nếu user chưa có address
     if (user?.address === null || user?.address === undefined) {
       return;
     }
@@ -96,6 +98,7 @@ const CartPage: React.FC = () => {
       })
       .catch(error => {
         setLoadingShopIds([]);
+        setAddressSupported(false);
         showErrorNotification('Lấy phí vận chuyển thất bại', getErrorMessage(error));
       });
   }, [user?.address])
@@ -235,13 +238,14 @@ const CartPage: React.FC = () => {
 
   const handleNavigateToAddress = () => {
     setShowAddressModal(false);
-    navigate(APP_ROUTES.USER_ADDRESSES);
+    navigate(getRedirectUrl(APP_ROUTES.USER_ADDRESSES));
   };
 
   const handleCancelAddress = () => {
     setShowAddressModal(false);
     navigate(-1);
   };
+
 
   return (
     <Container size="xl" className="py-6">
@@ -272,6 +276,21 @@ const CartPage: React.FC = () => {
         <Grid gutter="xl">
           <Grid.Col span={{ base: 12, md: 8 }}>
             <Paper radius="md" shadow="sm" p="md" className="bg-white">
+              {!addressSupported && (
+                <Box className="mb-4 p-3 bg-yellow-50 border border-yellow-100 rounded-md flex justify-between items-center">
+                  <Text size="sm">
+                    Địa chỉ của bạn không được hỗ trợ giao hàng. Vui lòng cập nhật địa chỉ khác.
+                  </Text>
+                  <Text
+                    size="xs"
+                    fw={500}
+                    onClick={() => navigate(getRedirectUrl(APP_ROUTES.USER_ADDRESSES))}
+                    className="text-primary cursor-pointer hover:underline"
+                  >
+                    Thay đổi
+                  </Text>
+                </Box>
+              )}
               {loading ? (
                 <ListProductSkeleton />
               ) : (
@@ -300,6 +319,7 @@ const CartPage: React.FC = () => {
                   shippingFees={shippingFees}
                   freeShippingThreshold={500000}
                   loadingShop={loadingShopIds.length > 0}
+                  addressSupported={addressSupported}
                 />
               )}
 

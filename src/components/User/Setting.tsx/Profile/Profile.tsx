@@ -31,10 +31,12 @@ import { getErrorMessage } from '../../../../untils/ErrorUntils';
 import showErrorNotification from '../../../Toast/NotificationError';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 import ModalVerifyCode from '../../../common/ModalVerifyCode';
+import { useURLParams } from '../../../../hooks/useURLParams';
 
 const Profile: React.FC = () => {
     const dispatch = useAppDispatch();
     const { user, status } = useAppSelector((state) => state.auth);
+    const { redirectTo } = useURLParams();
 
     const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatarUrl || null);
     const [opened, { open, close }] = useDisclosure(false);
@@ -124,6 +126,7 @@ const Profile: React.FC = () => {
             await dispatch(updateUserProfile(profileData)).unwrap();
             showSuccessNotification('Cập nhật thành công', 'Thông tin cá nhân đã được cập nhật');
             setUploadedAvatarUrl(null);
+            redirectTo();
         } catch (error: any) {
             showErrorNotification('Cập nhật thất bại', getErrorMessage(error) || 'Không thể cập nhật thông tin. Vui lòng thử lại.');
         }
@@ -135,7 +138,7 @@ const Profile: React.FC = () => {
                 Thông tin cá nhân
             </Title>
 
-            {!user?.isVerified && (
+            {!user?.verified && (
                 <Alert
                     icon={<FiAlertCircle size={16} />}
                     color="orange"
@@ -227,7 +230,7 @@ const Profile: React.FC = () => {
                             label="Email"
                             value={user?.email || ''}
                             rightSection={
-                                user?.isVerified ? (
+                                user?.verified ? (
                                     <FiCheck size={16} className="text-green-500" />
                                 ) : (
                                     <FiAlertCircle size={16} className="text-red-500" />

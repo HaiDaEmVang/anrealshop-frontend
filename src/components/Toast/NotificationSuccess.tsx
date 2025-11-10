@@ -1,5 +1,5 @@
 import { notifications } from '@mantine/notifications';
-import { FaCheckCircle, FaMousePointer } from 'react-icons/fa';
+import { FaFaceLaughWink } from "react-icons/fa6";
 
 interface NotificationOptions {
   title?: string;
@@ -12,14 +12,13 @@ export const showSuccessNotification = (
   titleOrOptions: string | NotificationOptions,
   message?: string
 ) => {
-  // Support both old and new API
   const options: NotificationOptions = typeof titleOrOptions === 'string'
     ? { title: titleOrOptions, message: message || '' }
     : titleOrOptions;
 
   const { title = 'Thành công', message: msg, onClick, autoClose } = options;
 
-  const finalAutoClose = autoClose !== undefined ? autoClose : (onClick ? 7000 : 4000);
+  const finalAutoClose = autoClose !== undefined ? autoClose : (onClick ? 4000 : 3000);
 
   return notifications.show({
     title,
@@ -27,15 +26,14 @@ export const showSuccessNotification = (
       <div>
         <div>{msg}</div>
         {onClick && (
-          <div className="mt-2 flex items-center gap-1 text-blue-600 text-sm font-medium">
-            <FaMousePointer size={12} />
-            <span>Nhấn để xem chi tiết</span>
+          <div className="mt-2 flex items-center gap-1 text-primary text-sm font-medium">
+            <span className='underline'>Nhấn để xem chi tiết</span>
           </div>
         )}
       </div>
     ),
     color: 'primary',
-    icon: <FaCheckCircle size={20} className='text-primary' />,
+    icon: <FaFaceLaughWink size={22} className='text-primary' />,
     withBorder: true,
     autoClose: finalAutoClose,
     onClick,
