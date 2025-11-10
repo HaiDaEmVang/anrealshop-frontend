@@ -1,5 +1,5 @@
 import { notifications } from '@mantine/notifications';
-import { FaMousePointer, FaTimesCircle } from 'react-icons/fa';
+import { FaFaceSadTear } from "react-icons/fa6";
 
 interface NotificationOptions {
   title?: string;
@@ -18,7 +18,7 @@ export const showErrorNotification = (
 
   const { title = 'Lỗi', message: msg, onClick, autoClose } = options;
 
-  const finalAutoClose = autoClose !== undefined ? autoClose : (onClick ? 7000 : 4000);
+  const finalAutoClose = autoClose !== undefined ? autoClose : (onClick ? 4000 : 3000);
 
   return notifications.show({
     title,
@@ -26,15 +26,14 @@ export const showErrorNotification = (
       <div>
         <div>{msg}</div>
         {onClick && (
-          <div className="mt-2 flex items-center gap-1 text-red-600 text-sm font-medium">
-            <FaMousePointer size={12} />
-            <span>Nhấn để xem chi tiết</span>
+          <div className="mt-2 flex items-center gap-1 text-sm font-medium">
+            <span className='underline'>Nhấn để xem chi tiết</span>
           </div>
         )}
       </div>
     ),
     color: 'red',
-    icon: <FaTimesCircle size={20} className='text-red-500' />,
+    icon: <FaFaceSadTear size={22} />,
     withBorder: true,
     autoClose: finalAutoClose,
     onClick,
@@ -44,7 +43,7 @@ export const showErrorNotification = (
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         borderColor: theme.colors.red[4],
-        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.02)',
         '&::before': { backgroundColor: theme.colors.red[5] },
         cursor: onClick ? 'pointer' : 'default',
         transition: 'transform 0.2s ease',

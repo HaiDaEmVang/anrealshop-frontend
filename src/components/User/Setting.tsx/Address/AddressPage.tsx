@@ -23,6 +23,7 @@ import { ContentEmpty } from '../../../common/ContentEmpty';
 import showErrorNotification from '../../../Toast/NotificationError';
 import showSuccessNotification from '../../../Toast/NotificationSuccess';
 import { AddressModal } from './AddressModal';
+import { useURLParams } from '../../../../hooks/useURLParams';
 
 export const AddressPage = () => {
     const [addresses, setAddresses] = useState<AddressDto[]>([]);
@@ -33,6 +34,7 @@ export const AddressPage = () => {
     const [openedModal, { open: openModal, close: closeModal }] = useDisclosure(false);
     const [openedDeleteModal, { open: openDeleteModal, close: closeDeleteModal }] = useDisclosure(false);
 
+    const { redirectTo } = useURLParams();
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -106,11 +108,11 @@ export const AddressPage = () => {
             } else {
                 await AddressService.createUserAddress(addressData);
                 await fetchAddresses();
-                // Nếu tạo địa chỉ mới là primary hoặc là địa chỉ đầu tiên, fetch user
                 if (addressData.isPrimary || addresses.length === 0) {
                     dispatch(fetchCurrentUser());
                 }
                 showSuccessNotification('Thành công', 'Thêm địa chỉ mới thành công');
+                redirectTo();
             }
             closeModal();
         } catch (error) {

@@ -32,8 +32,8 @@ const UserDetailModal: React.FC<UserDetailModalProps> = ({ opened, onClose, user
                             <Badge color={getRoleBadgeColor(user.role)}>
                                 {getRoleLabel(user.role)}
                             </Badge>
-                            <Badge color={user.isVerified ? 'green' : 'gray'}>
-                                {user.isVerified ? 'Đã xác minh' : 'Chưa xác minh'}
+                            <Badge color={user.verified ? 'green' : 'gray'}>
+                                {user.verified ? 'Đã xác minh' : 'Chưa xác minh'}
                             </Badge>
                         </Group>
                     </Stack>

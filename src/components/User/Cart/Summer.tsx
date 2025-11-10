@@ -23,13 +23,15 @@ interface SummerProps {
   shippingFees: CartShippingFee[];
   freeShippingThreshold?: number;
   loadingShop: boolean;
+  addressSupported?: boolean;
 }
 
 const Summer: React.FC<SummerProps> = ({
   cartItems,
   shippingFees,
   freeShippingThreshold = 500000,
-  loadingShop = false
+  loadingShop = false,
+  addressSupported = true
 }) => {
   const { selectedItemsCount, subtotal, discount, shippingCost, total, hasSelectedItems, freeShippingAmount } = useMemo(() => {
     const selectedItems = cartItems.flatMap(shop => shop.items.filter(i => i.isSelected));
@@ -140,9 +142,9 @@ const Summer: React.FC<SummerProps> = ({
         color="blue"
         radius="md"
         fullWidth
-        className={`${hasSelectedItems ? "bg-primary hover:bg-picton-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
+        // className={`${hasSelectedItems ? "bg-primary hover:bg-picton-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
         rightSection={<FiArrowRight size={16} />}
-        disabled={!hasSelectedItems}
+        disabled={!hasSelectedItems || !addressSupported}
         onClick={handlePayment}
       >
         Tiến hành thanh toán

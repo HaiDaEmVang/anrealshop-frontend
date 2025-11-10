@@ -13,7 +13,7 @@ export interface UserDto {
   gender: GenderType;
   dob: string; 
   role: string;
-  isVerified: boolean;
+  verified: boolean;
   createdAt: string; 
   updatedAt: string;
 
@@ -62,7 +62,7 @@ export interface UserManagerDto {
     phoneNumber: string;
     avatarUrl: string;
     role: string;
-    isVerified: boolean;
+    verified: boolean;
     createdAt: string; 
 }
 

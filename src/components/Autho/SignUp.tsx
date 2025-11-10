@@ -1,24 +1,26 @@
 // import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import {
-  TextInput,
-  PasswordInput,
   Button,
-  Group,
   Checkbox,
-  Stack,
   Divider,
+  Group,
+  PasswordInput,
+  Stack,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../hooks/useAppRedux';
-import type { RegisterRequest } from '../../types/UserType';
-import showSuccessNotification from '../Toast/NotificationSuccess';
 import { registerUser } from '../../store/authSlice';
-import showErrorNotification from '../Toast/NotificationError';
+import type { RegisterRequest } from '../../types/UserType';
 import { validateAgreeTerms, validateConfirmPassword, validateEmail, validatePassword } from '../../untils/ValidateInput';
+import showErrorNotification from '../Toast/NotificationError';
+import showSuccessNotification from '../Toast/NotificationSuccess';
+import { GOOGLE_LOGIN_URL } from '../../constant';
+import { motion } from 'framer-motion';
 
 interface SignUpFormValues {
   fullName: string;
@@ -87,9 +89,24 @@ export function SignUp() {
     }
   };
 
+
+
+  const handleGoogleLogin = () => {
+    window.location.href = GOOGLE_LOGIN_URL;
+  }
   return (
-    <div className="w-1/2 bg-white flex items-center justify-center p-8">
-      <div className="w-full max-w-md">
+    <motion.div
+      className="w-1/2 bg-white flex items-center justify-center p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <Title order={1} className="text-3xl font-bold mb-6 text-center text-slate-800">
           Đăng ký
         </Title>
@@ -147,8 +164,9 @@ export function SignUp() {
               fullWidth
               type="submit"
               loading={isLoading}
-              className="bg-primary hover:bg-primary/90 mt-4"
+              // className="bg-primary hover:bg-primary/90 mt-4"
               size="md"
+              disabled={isLoading || form.values.agreeTerms === false}
             >
               Đăng ký
             </Button>
@@ -162,6 +180,7 @@ export function SignUp() {
             leftSection={<FaGoogle size={16} />}
             variant="outline"
             className="border-gray-300"
+            onClick={() => handleGoogleLogin()}
           >
             Google
           </Button>
@@ -169,6 +188,7 @@ export function SignUp() {
             leftSection={<FaFacebook size={16} />}
             variant="outline"
             className="border-gray-300"
+            onClick={() => showSuccessNotification('Chức năng đang phát triển', 'Đăng ký bằng Facebook sẽ sớm được ra mắt!')}
           >
             Facebook
           </Button>
@@ -180,7 +200,7 @@ export function SignUp() {
             Đăng nhập
           </Link>
         </Text>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

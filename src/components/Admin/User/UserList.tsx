@@ -78,8 +78,8 @@ const UserList: React.FC<UserListProps> = ({
                                 {formatDate(user.createdAt)}
                             </Table.Td>
                             <Table.Td style={{ textAlign: 'center' }}>
-                                <Badge color={user.isVerified ? 'green' : 'gray'}>
-                                    {user.isVerified ? 'Đã xác minh' : 'Chưa xác minh'}
+                                <Badge color={user.verified ? 'green' : 'gray'}>
+                                    {user.verified ? 'Đã xác minh' : 'Chưa xác minh'}
                                 </Badge>
                             </Table.Td>
                             <Table.Td>

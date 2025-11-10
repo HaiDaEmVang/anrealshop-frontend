@@ -1,8 +1,10 @@
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import showSuccessNotification from '../components/Toast/NotificationSuccess';
 
 export const useURLParams = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+    const location = useLocation();
 
     const getParam = useCallback(
         <T extends string>(key: string, defaultValue?: T): string => {
@@ -63,11 +65,34 @@ export const useURLParams = () => {
         [updateParams]
     );
 
+    const getRedirectUrl = useCallback(
+        (destinationPath: string): string => {
+            const currentPath = location.pathname + location.search;
+            const encodedCurrentPath = encodeURIComponent(currentPath);
+            return `${destinationPath}?redirect=${encodedCurrentPath}`;
+        },
+        [location]
+    );
+
+    const redirectTo = () => {
+        const redirectUrl = getParam('redirect');
+        if (redirectUrl) {
+            setTimeout(() => {
+                showSuccessNotification('Chuyển hướng', 'Bạn sẽ được chuyển hướng đến trang trước đó sau vài giây.');
+            }, 2000);
+            setTimeout(() => {
+                window.location.href = decodeURIComponent(redirectUrl);
+            }, 4000);
+        }
+    }
+
     return {
         getParam,
         updateParams,
         clearParams,
         setPageParam,
         searchParams,
+        getRedirectUrl,
+        redirectTo,
     };
 };

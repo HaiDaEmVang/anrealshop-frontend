@@ -4,6 +4,7 @@ import {
 } from '@mantine/core';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
 import { paymentMethodsDataDefault } from '../../../data/CheckoutData';
 import { useAppSelector } from '../../../hooks/useAppRedux';
 import { CheckoutService, type ItemsCheckoutRequest } from '../../../service/CheckoutService';
@@ -21,7 +22,7 @@ import CheckoutReview from './CheckoutReview';
 import ListProduct from './ListProductForShop';
 import PaymentMethod from './PaymentMethod';
 import Address from './address/Address';
-import { APP_ROUTES, LOCAL_STORAGE_KEYS } from '../../../constant';
+import { useURLParams } from '../../../hooks/useURLParams';
 
 
 const CheckoutPage = () => {
@@ -37,6 +38,8 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const [itemLoading, setItemLoading] = useState(true);
   const [showAddressModal, setShowAddressModal] = useState(false);
+
+  const { getRedirectUrl } = useURLParams();
 
   const idItems: ItemsCheckoutRequest = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEYS.ORDER_ITEM_IDS) || '{}');
 
@@ -86,9 +89,19 @@ const CheckoutPage = () => {
     refreshFee();
   }, [selectedAddress]);
 
+
   const handlePlaceOrder = () => {
     if (!selectedAddress) {
       showErrorNotification("Lỗi đặt hàng", "Vui lòng chọn địa chỉ giao hàng");
+      return;
+    }
+
+    if (user && !user.verified) {
+      showErrorNotification({
+        title: "Xác thực trước khi đặt hàng",
+        message: "Vui lòng xác thực email trước khi đặt hàng.",
+        onClick: () => navigate(getRedirectUrl(APP_ROUTES.USER_PROFILE))
+      });
       return;
     }
 

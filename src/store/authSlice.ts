@@ -196,7 +196,7 @@ const userAuthSlice = createSlice({
 
     updateVerifiedStatus: (state, action: PayloadAction<boolean>) => {
       if (state.user) {
-        state.user.isVerified = action.payload;
+        state.user.verified = action.payload;
       }
     },
 

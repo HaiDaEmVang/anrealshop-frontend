@@ -14,7 +14,9 @@ import { FiMail } from 'react-icons/fi';
 import OtpService from '../../service/OtpService';
 import UserService from '../../service/UserService';
 import type { forgotPwRequest } from '../../types/UserType';
+import { getErrorMessage } from '../../untils/ErrorUntils';
 import { validateEmail, validatePassword } from '../../untils/ValidateInput';
+import showErrorNotification from '../Toast/NotificationError';
 
 interface ResetPasswordProps {
   opened: boolean;
@@ -62,8 +64,9 @@ export function ResetPassword(props: ResetPasswordProps) {
     try {
       await OtpService.getOtp(form.values.email, 'RESET_PASSWORD');
       setOtpSend(true);
-    } catch (error) {
-      form.validateField('otp');
+    } catch (error: any) {
+      form.setFieldError('email', 'Không thể gửi mã OTP. Vui lòng kiểm tra lại email.');
+      showErrorNotification('Gửi mã OTP thất bại', getErrorMessage(error?.response?.data));
     } finally {
       setOtpSending(false);
     }
@@ -76,8 +79,9 @@ export function ResetPassword(props: ResetPasswordProps) {
       try {
         await OtpService.verifyOtp(form.values.email, otpValue);
         setVerifyOtp(true);
-      } catch (error) {
+      } catch (error: any) {
         form.setFieldError('otp', 'Mã OTP không hợp lệ');
+        showErrorNotification('Xác thực mã OTP thất bại', getErrorMessage(error?.response?.data));
         setVerifyOtp(false);
       }
     } else {
@@ -106,8 +110,9 @@ export function ResetPassword(props: ResetPasswordProps) {
       await UserService.forgotPassword(resetData);
       props.close();
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       form.setFieldError('password', 'Không thể đặt lại mật khẩu. Vui lòng thử lại.');
+      showErrorNotification('Gửi mã OTP thất bại', getErrorMessage(error?.response?.data));
     } finally {
       setResetting(false);
     }
@@ -119,15 +124,19 @@ export function ResetPassword(props: ResetPasswordProps) {
       onClose={props.close}
       title={
         <div className="text-xl font-semibold text-slate-800">
-      Đặt lại mật khẩu
-    </div>
+          Đặt lại mật khẩu
+        </div>
       }
       centered
+      overlayProps={{
+        backgroundOpacity: 0.55,
+        blur: 3,
+      }}
     >
       <form onSubmit={form.onSubmit(() => { })}>
         <Stack gap="md">
           {!verifyOtp && (
-            <Text size="sm" className="text-gray-500 -mt-2 mb-2">
+            <Text size="sm" className="text-gray-500 mt-2 mb-2">
               Nhập email của bạn để nhận mã OTP đặt lại mật khẩu
             </Text>
           )}
